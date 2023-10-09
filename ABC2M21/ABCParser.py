@@ -12,7 +12,7 @@ from music21 import expressions, articulations, harmony, style, environment
 from music21 import key, pitch, stream, metadata, bar, tempo, layout
 from music21 import note, chord, repeat, meter
 
-from ABCToken import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
+from ABC2M21.ABCToken import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
 
 environLocal = environment.Environment('ABC2M21')
 
@@ -360,7 +360,7 @@ class FileHeader(ABCParser):
 
         Examples:
 
-        >>> from ABCToken import Field
+        >>> from ABC2M21 import Field
         >>> fh = FileHeader()
 
         Commonly used valuee for unit note length area crotchet (1/4)
@@ -409,7 +409,7 @@ class FileHeader(ABCParser):
 
         Examples:
 
-        >>> from Token import Field
+        >>> from ABC2M21 import Field
         >>> fh = FileHeader()
 
         Apart from standard meters, e.g. M:6/8 or M:4/4
@@ -475,7 +475,7 @@ class FileHeader(ABCParser):
 
         Examples:
 
-        >>> from Token import Field
+        >>> from ABC2M21 import Field
         >>> fh = FileHeader()
         >>> fh.abc_meta_data(Field('MetaData', 'B:WTC I'))
         >>> fh.abc_meta_data(Field('MetaData', 'C:J.S. Bach'))
@@ -555,7 +555,7 @@ class FileHeader(ABCParser):
         >>> processor = FileHeader()
         >>> processor.abc_user_def(Field('UserDef', 'U: T = !trill!'))
         >>> processor.user_defined['T']
-        [<Decoration: '!trill!' (pos=1)>]
+        [<decoration: '!trill!' (pos=1)>]
         """
         try:
             symbol, token_str = token.data.split('=', maxsplit=1)
@@ -586,8 +586,7 @@ class FileHeader(ABCParser):
         to the ABC voice with the id 'Tb'
 
         >>> fh = FileHeader()
-        >>> token = Field('Instruction',
-        ...                        'I: MIDI voice Tb instrument=59')
+        >>> token = Field('Instruction', 'I: MIDI voice Tb instrument=59')
         >>> fh.abc_midi_instruction(token)
         >>> fh.midi
         {'Tb': 59}
@@ -1118,7 +1117,7 @@ class TuneHeader(FileHeader):
         >>> th.tempo
         <music21.tempo.MetronomeMark slow Quarter=26>
         >>> th.voice_info['Violine']
-        VoiceInfo(voice_id='Violine', name='First Violine', sub_name=None, stem=None,\
+        VoiceInfo(voice_id='Violine', name='First Violine', sub_name=None, stem=None, \
 m21_clef=<music21.clef.TrebleClef>, octave=None)
         """
 
@@ -1140,7 +1139,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         The clef definition in abc is part of the voice (V:) or key (K:) field.
 
-        >>> from ABCToken import Field
+        >>> from ABC2M21 import Field
         >>> th = TuneHeader()
         >>> m21_clef, octave = th.abc_clef(
         ...         Field("Voice", "V:1 clef=treble octave=-2"))
@@ -1148,7 +1147,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
         <music21.clef.TrebleClef>
         >>> octave
         -2
-        >>> th.abc_clef(Field(Field('key', "K:C clef=bass"))
+        >>> th.abc_clef(Field('key', "K:C clef=bass"))
         (<music21.clef.BassClef>, None)
         >>> th.abc_clef(Field("Voice","V:1 octave=2"))
         (None, 2)
@@ -1225,7 +1224,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         Q:1/2=120 means 120 half-note beats per minute.
 
-        >>> from ABCToken import Field
+        >>> from ABC2M21 import Field
         >>> th = TuneHeader()
         >>> th.abc_tempo(Field('tempo', 'Q:1/2=120'))
         <music21.tempo.MetronomeMark Half=120>
@@ -1332,7 +1331,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         Examples:
 
-        >>> from ABCToken import Field
+        >>> from ABC2M21 import Field
         >>> th = TuneHeader()
 
         The processing of the 'key' token will consistently return a tuple
@@ -1510,7 +1509,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         Examples:
 
-        >>> from ABCToken import Field
+        >>> from ABC2M21 import Field
         >>> processor = TuneHeader()
         >>> processor.abc_part(Field('Section', 'P: A2BC'))
         >>> processor.section_sequence
@@ -3352,7 +3351,7 @@ def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
     >>> tune_path = Path('abc/avemaria.abc')
     >>> score = ABCTranslator(tune_path)
     >>> score
-    <music21.stream.Score X:1 (file='tests/avemaria.abc')>
+    <music21.stream.Score X:1 (file='abc/avemaria.abc')>
     >>> score.metadata.title
     "Ave Maria (Ellen's Gesang III) - Page 1"
 

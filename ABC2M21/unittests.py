@@ -1,17 +1,14 @@
 import unittest
 from unittest.mock import patch
 from io import StringIO
-from music21 import environment
 from testtunes import *
 from typing import NamedTuple
 from music21 import duration, spanner, dynamics, common, tie, instrument, clef
 from music21 import expressions, articulations, harmony, style, environment
 from music21 import meter, key, pitch, stream, metadata, bar, tempo, layout
 from music21 import note, chord, repeat, base
-from pprint import pprint
 from itertools import chain
-from ABCParser import ABCTranslator
-from ABCToken import tokenize
+from ABC2M21 import ABCTranslator, tokenize
 
 a = environment.Environment()
 a['debug'] = True
