@@ -1,5 +1,20 @@
 # ABC2M21
-Converter for abc music notation to music21 streams and objects
+ABC2M21 implements an alternative translator/converter for tunes in 
+[abc notation](https://abcnotation.com/wiki/abc:standard:v2.1) to 
+[music21](https://github.com/cuthbertLab/music21) streams and objects.
+
+## Setup
+ABC2M21 only requires the [music21](https://github.com/cuthbertLab/music21) Python library and python version >= 3.10
+
+*install music21:*
+
+    pip3 install music21
+
+or
+
+    pip3 install requirements.txt
+
+## Usage
 
     def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
 
@@ -81,9 +96,11 @@ Converter for abc music notation to music21 streams and objects
       >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
       True
 
+## License
 
-ABC Elements
-============
+@TODO
+
+## ABC Elements
 
 The following section demonstrates, using images, how the translator creates music21 objects 
 from abc elements. The abc fragments were converted into music21 streams and then used to generate images with Lilypond.
