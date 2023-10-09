@@ -488,6 +488,16 @@ class TestFiles(unittest.TestCase):
             self.assertEqual(_key,
                 score.recurse().getElementsByClass(key.KeySignature)[0].name)
 
+    def test_key_signature(self):
+        score = ABCTranslator(abc_key_signature)
+        self.assertIsInstance(score, stream.Score)
+
+        for measure in score.recurse().getElementsByClass(stream.Measure):
+            ks = measure.keySignature
+            self.assertIsNotNone(ks)
+            ano = measure.recurse().getElementsByClass(expressions.TextExpression).first()
+            self.assertIsNotNone(ano)
+            self.assertEqual(ks.name, ano.content)
 
     def test_chords(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:

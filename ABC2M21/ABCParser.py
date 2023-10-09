@@ -832,8 +832,7 @@ class FileHeader(ABCParser):
         Set the accidental mode to 'not', 'octave', or 'pitch'
 
         >>> fh = FileHeader()
-        >>> token = Field('Instruction',
-        ...                        'I:propagate-accidentals octave')
+        >>> token = Field('Instruction', 'I:propagate-accidentals octave')
         >>> fh.abc_propagate_accidentals_instruction(token)
         >>> fh.accidental_mode
         'octave'
@@ -2503,6 +2502,17 @@ class TuneBody(TuneHeader, NoteMixin):
         # remember the grace notes to slur to a main note
         self.voice.overlay.grace_notes = GraceNoteParser(self).process(tokens)
 
+    def abc_key(self, token: Field):
+        ks, _, _ = super().abc_key(token)
+
+        if ks:
+            if self.voice.stream is None:
+                self.voice.open_measure(time_signature=self.time_signature,
+                                        key_signature=self.key_signature)
+
+            self.voice.overlay.append(self.key_signature)
+
+
 
     def abc_bidirectonal_barline(self, token: Token):
         """
@@ -3097,7 +3107,7 @@ class TuneBody(TuneHeader, NoteMixin):
             if self.voice.stream:
                 self.voice.stream.append(linebreak)
             else:
-                self.voice.part.append(linebreak)
+                self.voice.overlay.decorations.append(linebreak)
         else:
             self.abc_error(f"Symbol '{token.src}' is not a supported score linebreak")
 
