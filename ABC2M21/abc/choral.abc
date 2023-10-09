@@ -1,0 +1,36 @@
+% choral.abc
+% Basic layout settings for choral scores
+% Guido Gonzato, October 2017
+
+
+% PAGE FORMAT
+%
+%%pagewidth      21cm
+%%pageheight     29.7cm
+%%topmargin      1.5cm
+%%botmargin      1.5cm
+%%leftmargin     1.5cm
+%%rightmargin    1.5cm
+%%topspace       0cm
+%%footer "	$T, p. $P	"
+%
+% FONTS
+%
+%%titlefont      Times-Bold 28
+%%subtitlefont   Times-Bold 22
+%%composerfont   Times-Roman 16
+%%vocalfont      Times-Roman 15
+%%annotationfont Times-BoldItalic 14
+%%footerfont     Times-Roman 12
+%
+% MISC
+%
+%%measurebox     1
+%%measurenb      0
+%%pagescale      0.8
+%%maxshrink      1
+%%linebreak      <none>
+%%squarebreve    true
+%%printparts     false
+
+% --- End of file choral.abc

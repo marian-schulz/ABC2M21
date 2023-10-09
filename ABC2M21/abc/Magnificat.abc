@@ -1,0 +1,137 @@
+%abc-2.1
+%
+% Magnificat.abc       -*- abc -*-
+%
+% Written for abcm2ps and abc2midi:
+% http://abcplus.sourceforge.net
+% Tested with abcm2ps-8.13.17 and abcMIDI-2017.11.27
+%
+% Edited by Guido Gonzato <guido dot gonzato at gmail dot com>
+% Latest update: November 30, 2017
+%
+% To typeset this file:
+%       abcm2ps -O= -c Magnificat.abc
+% To make a MIDI file:
+%       abc2midi Magnificat.abc
+
+% load settings for choral scores
+%%abc-include choral.abc
+% customisation
+%%pagescale 1.1
+
+X: 1
+T: Magnificat
+T: RV. 610 in Re minore
+C: Antonio Vivaldi (1678-1741)
+M: 4/4
+L: 1/4
+Q: "Adagio" 1/4 = 66
+%%%score [S|A|T|B] [V1 V2 VL BC] {(RH1 RH2)|(LH1 LH2)}
+%%MIDI program 1  54 % voice ooh
+%%MIDI program 2  54
+%%MIDI program 3  54
+%%MIDI program 4  54
+%%MIDI program 5  40 % violin
+%%MIDI program 6  40
+%%MIDI program 7  41 % viola
+%%MIDI program 8  43 % cello
+%%MIDI program 9  19 % church organ
+%%MIDI program 10 19
+%%MIDI program 11 27
+%%MIDI program 12 19
+V: S clef=treble   name="Soprano"   sname="S"
+V: A clef=treble   name="Alto"      sname="A"
+V: T clef=treble-8 name="Tenor"     sname="T"
+V: B clef=bass     name="Bass"      sname="B"
+V: V1 clef=treble  name="Violino 1" sname="V1"
+V: V2 clef=treble  name="Violino 2" sname="V2"
+V: VL clef=alto    name="Viola"     sname="Vl"
+V: BC clef=bass    name="B.C."      sname="B.C."
+V: RH1 clef=treble name="Organ"     sname="O"
+V: RH2 clef=treble
+V: LH1 clef=bass
+V: LH2 clef=bass
+Z: Guido Gonzato, November 2017
+K: Dm
+%
+% All: 1 - 4
+%
+%%text 1. Magnificat
+[V: S] B2 B>B    |HB2=B B/ B/    |=BBA2-  |AAHA2|
+w: Ma-gni-fi-cat a-ni-ma me-a Do - mi-num,
+[V: A] G2 G>G    |HG2^G G/ G/    |^GG=G2- |GFHF2|
+w: Ma-gni-fi-cat a-ni-ma me-a Do - mi-num,
+[V: T] d2 d>d    |Hd2d d/ d/     |dde2    |AdHd2|
+w: Ma-gni-fi-cat a-ni-ma me-a Do - mi-num,
+[V: B] G,2 G,>G, |HG,2 E, E,/ E,/|E,E,^C,2|D,2HD,2|
+w: Ma-gni-fi-cat a-ni-ma me-a Do-mi-num,
+[V: V1] g2 g>g   |HG2^g G/G/     |^gg=g2- |gfHf2|
+[V: V2] B2 B>B   |HB2=B B/B/     |=BBA2-  |AAHA2|
+[V: VL] D2 D>D   |HD2 D D/D/     |DDE2    |A,DHD2|
+[V: BC] G,2 G,>G,|HG,2 E, F,/F,/ |F,F,^C,2|D,2HD,2|
+%
+[V: RH1] [DGB]2 [DGB]>[DGB]|H[DGB]2 [E^G=B] [EGB]/[EGB]/|\
+         [E^G=B] [EGB] [E=GA]2|[DA]2 H[DFA]2|
+[V: RH2] x4                |x4            |\
+         x4                |GF x2         |
+[V: LH1] G,2 G,>G,         |HG,2 E, E,/E,/|\
+         E, E, ^C,2        |D,2 HD,2      |
+[V: LH2] x4                |x4            |\
+         x4                |x4            |
+% % Organ: 3 - 4
+% [V: RH1] [E^G=B] [EGB] [E=GA]2|[DA]2 [DFA]2|
+% [V: RH2] x4                   |GF x2       |
+% [V: LH1] E, E, ^C,2           |D,2 HD,2    |
+% [V: LH2] x4                   |x4          |
+%
+% All: 5 - 9
+%
+[V: S] =B2 c>c   |AB2 _A/A/|G2F2     |_E2c2   |B3A      |
+w: ma-gni-fi-cat a-ni-ma me-a Do -__
+[V: A] F2 _E>E   |_EDF2-   |F_E2D-   |DCCA-   |AG2 F/=E/|
+w: ma-gni-fi-cat a-ni - ma me - a Do -____
+[V: T] d2 G>G    |cfB2-    |B2 =B2   |GG_ed-  |d>e^c2   |
+w: ma-gni-fi-cat a-ni - ma me-a Do -___
+[V: B] G,2 G,>G, |F,2 D,2  |_E,2=B,,2|C,3^F,  |G,2A,2   |
+w: ma-gni-fi-cat a-ni-ma me-a Do -
+[V: V1] f2 _e>e  |_edf2-   |f _e2d-  |dcca-   |ag2 f/e/ |
+[V: V2] =B2 c>c  |AB2_A    |G2 F2    |_E2c2   |B3A      |
+[V: VL] D2 G,>G, |CFB,2-   |B,2 =B,2 |G,G,_ED-|D>E ^C2  |
+[V: BC] G,2 G,>G,|F,2D,2   |_E,2=B,,2|C,3^F,  |G,2A,2   |
+% Organ: 5 - 6
+[V: RH1] [DF=B]2 [_EGc]>[EGc]|[_EAc][DFB]B_A|
+[V: RH2] x4                  |x2 [B,F]2     |
+[V: LH1] G,2 G,>G,           |F,2 D,2       |
+[V: LH2] x4                  |x4            |
+% Organ: 7 - 9
+[V: RH1] [B,G]2 F2 |[G,_E]2 c2 |B3     A      |
+[V: RH2] F _E2 D   |DC[_EG][DA]|D2 ^C2 & A B3 |
+[V: LH1] _E,2 =B,,2|C,3  ^F,   |G,2A,2        |
+[V: LH2] x4        |x4         |x4            |
+%
+% All: 10 - 14
+%
+[V: S] =B>d^cd-   |d^c=c2 |B4  |A2A2 |HB4  |]
+w: _________mi-num.
+[V: A] F2GA       |G2A^F  |G4- |G2^F2|HG4  |]
+w: ________mi-num.
+[V: T] d2ef       |=Be^fd |e3A |d2d2 |Hd4  |]
+w: __________mi-num.
+[V: B] ^G,2=G,F,  |E,2D,2 |^C,4|D,4  |HG,,4|]
+w: ______mi-num.
+[V: V1] f2ga      |g2a^f  |g4- |g2^f2|Hg4  |]
+[V: V2] =B>d^cd-  |d^c=c2 |B4  |A2A2 |HB4  |]
+[V: VL] D2 EF     |=B,E^FD|E3A |D2D2 |HD4  |]
+[V: BC] ^G,2 =G,F,|E,2D,2 |^C,4|D,4  |HG,,4|]
+% Organ: 10 - 11
+[V: RH1] [F=Bd]2 [EA^c][DAd]|d ^c [^FA=c]2|
+[V: RH2] x4                 |G2 x2        |
+[V: LH1] ^G,2 =G,F,         |E,2 D,2      |
+[V: LH2] x4                 |x4           |
+% Organ: 12 - 14
+[V: RH1] [GB]2 [EGA]2|[DA]4  |H[B,DG]4||
+[V: RH2] x4          |G2 ^F2 |x4      ||
+[V: LH1] ^C,4        |D,2 D,2|HG,,4   ||
+[V: LH2] x4          |x4     |x4      ||
+%
+% End of file Magnificat_Vivaldi.abc

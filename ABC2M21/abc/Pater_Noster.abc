@@ -1,0 +1,152 @@
+%abc-2.1
+%
+% Pater_Noster.abc    -*- abc -*-
+%
+% Written for abcm2ps and abc2midi:
+% http://abcplus.sourceforge.net
+% Tested with abcm2ps-8.13.17 and abcMIDI-2017.11.27
+%
+% Edited by Guido Gonzato <guido dot gonzato at gmail dot com>
+% Latest update: November 30, 2017
+%
+% To typeset this file:
+%       abcm2ps -O= -c Pater_Noster.abc
+% To make a MIDI file:
+%       abc2midi Pater_Noster.abc
+
+%%abc-include choral.abc
+% customisation
+%%pagescale 0.85
+
+X: 1
+T: Pater Noster
+C: I. F. Stravinskij (1882 - 1971)
+M: 2/4
+L: 1/8
+Q: 1/4 = 72
+%
+%%score [S|A|T|B]
+%%MIDI program 1 53 % voice ooh
+%%MIDI program 2 53
+%%MIDI program 3 53
+%%MIDI program 4 53
+V: S clef=treble   name="Soprano" sname="S"
+V: A clef=treble   name="Alto"    sname="A"
+V: T clef=treble-8 name="Tenor"   sname="T"
+V: B clef=bass     name="Bass"    sname="B"
+Z: Guido Gonzato, November 2017
+K: Eb
+%
+%
+% Measures 1 - 6
+%
+[V: S] !p!c c c c-|c2 c2|c2 c2|c c3 |c2 d2|e e2 e |
+w: Pa- ter nos- ter_ qui es in coe- lis, san- cti- fi- ce- tur
+[V: A] E E E E-|E2 E2|F2 G2|A A3 |G2 F2|G G2 G |
+w: Pa- ter nos- ter_ qui es in coe- lis, san- cti- fi- ce- tur
+[V: T] c c c c-|c2 c2|c2 c2|d d3 |e2 B2|=A A2 A|
+w: Pa- ter nos- ter_ qui es in coe- lis, san- cti- fi- ce- tur
+[V: B] C, C, C, C,-|C,2 C,2|D,2 E,2|F, F,3 |E,2 D,2|C, C,2 C, |
+w: Pa- ter nos- ter_ qui es in coe- lis, san- cti- fi- ce- tur
+%
+% 7 - 12
+%
+[V: S] d2 d2  |d !breath!d3 |(c2 d2)|e e2 e |d d d2  |d4 |
+w: no- men tu- um: ad - ve- ni- at re- gnum tu- um:
+[V: A] F2 GF  |G !breath!G3 |(G2 F2)|G G2 G |F F GF  |G4 |
+w: no- men_ tu- um: ad - ve- ni- at re- gnum tu - um:
+[V: T] =A2 =B2|=B !breath!B3|(e2 B2)|=A A2 A|=A A =BA|=B4|
+w: no- men tu- um: ad - ve- ni- at re- gnum tu - um:
+[V: B] D,2 G,D, |G, !breath!G,3 |(E,2 D,2)|C, C,2 C, |D, D, G,D, |G,4 |
+w: no- men_ tu- um: ad - ve- ni- at re- gnum tu - um:
+%
+% 13 - 16
+%
+[V: S] [M:3/4] (c2 d2) e2 |[M:2/4] d d2 d  |d d3 |[M:3/8] c c c|
+w: fi - at vo- lun- tas tu- a, si- cut in
+[V: A] [M:3/4] (G2 F2) G2 |[M:2/4] F G2 F  |G G3 |[M:3/8] E E E|
+w: fi - at vo- lun- tas tu- a, si- cut in
+[V: T] [M:3/4] (e2 B2) =A2|[M:2/4] =A =B2 A|=B B3|[M:3/8] c c c|
+w: fi - at vo- lun- tas tu- a, si- cut in
+[V: B] [M:3/4] (E,2 D,2) C,2 |[M:2/4] D, G,2 D, |G, G,3 |[M:3/8] C, C, C,|
+w: fi - at vo- lun- tas tu- a, si- cut in
+%
+% 17 - 19
+%
+[V: S] [M:2/4] c2 c2|[M:3/4] c2 B2 B2|[M:2/4] !breath!c4|
+w: coe- lo et in ter- ra:
+[V: A] [M:2/4] FG A2|[M:3/4] G2 G2 GF|[M:2/4] !breath!E4|
+w: coe - lo et in ter - ra:
+[V: T] [M:2/4] c2 d2|[M:3/4] d2 d2 d2|[M:2/4] !breath!E4|
+w: coe- lo et in ter- ra:
+[V: B] [M:2/4] D,E, F,2|[M:3/4] E,2 B,,2 G,,2|[M:2/4] !breath!C,4|
+w: coe - lo et in ter- ra:
+%
+% 20 - 24
+%
+[V: S] c c c c|(3 c c c c c|[M:3/4] B2 B2 B2|c c !breath!c4|
+w: pa- nem no- strum quo- ti- di- a- num da no- bis ho- di- e:
+[V: A] E E E E|(3 E E E E F|[M:3/4] G2 G2 GF|E E !breath!E4|
+w: pa- nem no- strum quo- ti- di- a- num da no- bis* ho- di- e:
+[V: T] c c c c|(3 c c c c c|[M:3/4] d2 d2 d2|e e !breath!e4|
+w: pa- nem no- strum quo- ti- di- a- num da no- bis ho- di- e:
+[V: B] C, C, C, C,| (3 C, C, C,C, D,|[M:3/4] E,2 B,,2 G,,2|C, C, !breath!C,4|
+w: pa- nem no- strum quo- ti- di- a- num da no- bis ho- di- e:
+%
+% 25 - 29
+%
+[V: S] c c c c c c|[M:3/8] c c c|[M:2/4] B4     |c4|[M:3/8] c c c|
+w: et di- mit- te no- bis de- bi- ta no- stra, si- cut et
+[V: A] E E E E E E|[M:3/8] E E F|[M:2/4] (G2 F2)|E4|[M:3/8] E E E|
+w: et di- mit- te no- bis de- bi- ta no - stra, si- cut et
+[V: T] c c c c c c|[M:3/8] c c c|[M:2/4] d4     |e4|[M:3/8] c c c|
+w: et di- mit- te no- bis de- bi- ta no- stra, si- cut et
+[V: B] C, C, C, C, C, C,|[M:3/8] C, C, D,|[M:2/4] (E,2 D,2)|C,4|[M:3/8] C, C, C,|
+w: et di- mit- te no- bis de- bi- ta no - stra, si- cut et
+%
+% 30 - 33
+%
+[V: S] [M:2/4] c2 c2|[M:3/4] c2 c2 c2|[M:2/4] B2 B2|[M:3/4] c2 d2 e2 |
+w: nos di- mit- ti- mus de- bi- to- ri- bus
+[V: A] [M:2/4] E2 E2|[M:3/4] E2 E2 F2|[M:2/4] G2 F2|[M:3/4] E2 F2 G2 |
+w: nos di- mit- ti- mus de- bi- to- ri- bus
+[V: T] [M:2/4] c2 c2|[M:3/4] c2 c2 c2|[M:2/4] d2 d2|[M:3/4] c2 B2 =A2|
+w: nos di- mit- ti- mus de- bi- to- ri- bus
+[V: B] [M:2/4] C,2 C,2|[M:3/4] C,2 C,2 D,2|[M:2/4] E,2 D,2|[M:3/4] E,2 D,2 C,2 |
+w: nos di- mit- ti- mus de- bi- to- ri- bus
+%
+% 34 - 37
+%
+[V: S] [M:2/4] !f!d !breath!d3|c c c c|[M:3/8] c c2|[M:2/4] c2 c2|
+w: nos- tris: et ne nos in- du- cas in ten-
+[V: A] [M:2/4] F !breath!G3|E E E E|[M:3/8] F EF|[M:2/4] G2 A2|
+w: nos- tris: et ne nos in- du- cas * in ten-
+[V: T] [M:2/4] =B!breath!B3|c c c c|[M:3/8] c c2|[M:2/4] c2 d2|
+w: nos- tris: et ne nos in- du- cas in ten-
+[V: B] [M:2/4] D, !breath!G,3|C, C, C, C,|[M:3/8] C, C,D,|[M:2/4] E,2 F,2|
+w: nos- tris: et ne nos in- du- cas * in ten-
+%
+% 38 - 41
+%
+[V: S] c2 B2|[M:3/4] B2 !breath!c3 c|[M:3/8] c c c|[M:2/4] c2 c2|
+w: ta- ti- o- nem: sed li- be- ra nos a
+[V: A] G2 G2|[M:3/4] GF !breath!E3 E|[M:3/8] E F G|[M:2/4] A2 G2|
+w: ta- ti- o - nem: sed li- be- ra nos a
+[V: T] d2 d2|[M:3/4] d2 !breath!e3 c|[M:3/8] c c c|[M:2/4] d2 d2|
+w: ta- ti- o- nem: sed li- be- ra nos a
+[V: B] E,2 B,,2|[M:3/4] G,,2 !breath!C,3 C,|[M:3/8] C, D, E,|[M:2/4] F,2 E,2|
+w: ta- ti- o- nem: sed li- be- ra nos a
+%
+% 42 - 45
+%
+[V: S] B4     |c4|[M:3/4] z2 c2 c2-|c6|]
+w: ma- lo. A- men._
+[V: A] (G2 F2)|E4|[M:3/4] z2 C2 C2-|C6|]
+w: ma - lo. A- men._
+[V: T] d4     |e4|[M:3/4] z2 c2 c2-|c6|]
+w: ma- lo. A- men._
+[V: B] (B,,2 G,,2)|C,4|[M:3/4] z2 C,2 C,2-|C,6|]
+w: ma - lo. A- men._
+%
+%
+% End of file Pater_Noster.abc
