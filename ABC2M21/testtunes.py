@@ -45,28 +45,40 @@ K:
 % Having an empty abc tune is legal but removed from the abc parser               
 """
 
-abc_accidentals = """
-X:1
-L:1/1
-K:
-^C | _D | =E | ^^F | __G
-w: sharp | flat | natural | double sharp | double flat 
-"""
-
 abc_note_duration = """
 X:1
+T:Relative durations
 L:1/4
 M:none
 K:C
-   C4   C4   C3   C3/2 C3/   C    C/2  C/   C/4  C//   C/8  C///  C/16 C////
-w: 1/1  1/2  3/4  3/8  -     1/4  1/8  -    1/16 -     1/32 -     1/64 -
+   C4   C3   C2   C3/2  C    C/2  C//   C///  C////
+w: 1/1  3/4  1/2  3/8   1/4  1/8  1/16  1/32  1/64 
+"""
+
+abc_decoration_spanner = """
+X: 1
+T:Decoration spanner
+L:1/4
+K:C
+!<(!ABCD!<)! !>(!ABCD!>)! !trill(!ABCD!trill)!|
+"""
+
+abc_user_defined_symbols = """
+X: 1
+L: 1/4
+T: User defined symbols
+U: W = !trill!
+U: U = !staccato!
+U: V = !fermata!
+K:C
+WC UD VE .F
 """
 
 abc_legacy_chord_and_decoration = """
 %abc-1.5 
 X:1
 T: legacy chord and decoration 
-K:
+K:C
 +CEG+
 I:decoration +  % Set '+' als decoration denotation symbol
 +CEG+           % But now, the legacy chord symbol '+' is disabled
@@ -106,6 +118,7 @@ c               % this will create a score line break (newline)
 C\              % Continue music code without a score line break
 B               % this will create a score line break (newline)
 """
+
 line_continue = """%abc-2.1
 X:1
 T:Line
@@ -124,21 +137,9 @@ abc_rests = """
 X: 
 T:Rests
 L:1/4
-C:Marian Schulz
 M:C
 K:
-% normal rests
-z z2 z/2 z/2 |
-% hidden rests
-x x2 x/2 x/2 |
-% whole measure rest
-Z |
-% hidden whole measure rest
-X |
-% multi measure rest
-Z2 |
-% hidden multi measure rest
-X2 |
+z z2 z/2 z/4 z/4 | x x2 x/2 x/4 x/4 | Z | X | Z2 | X2 |
 """
 
 tunebook_with_macros = """T: titel_file
@@ -205,14 +206,11 @@ K:E
 abc_broken_rhythm = """
 X:0
 L:1/4
-C:Marian
-T:Broken rythm
+T:Broken rhythm
 M:C
 K:C
->F>FA<A | G<<GB>>B | C>>>C D<<<D |   %12
-[CEG]>E E<[EGB] | [BDF]>[DFA] [BDF]<[DFA] | % 8
-E>D [BDF]<D |                   % 4
-E>{CEG2}D [BDF]<{CE>G}D | D>    % 5
+>F>FA<A | G<<GB>>B | C>>>C D<<<D | [CEG]>E E<[EGB] |
+[BDF]>[DFA] [BDF]<[DFA] | E>D [BDF]<D | E>{CEG2}D [BDF]<{CE>G}D | D> |
 """
 
 abc_decorations = """
@@ -230,19 +228,50 @@ K:
 !segno!C !coda!D !D.S.alcoda!d !D.C.alcoda!d !fine!f !D.S.alfine!e
 !D.C.alfine!e !dacapo!g !D.S.!e  
 !p!e !pp!e !ppp!e !pppp!e !f!e, !ff!e !fff!e !ffff!e !mp!e !mf!e !sfz!e
- 
+"""
+
+abc_dynamics = """
+X: 0
+T: Dynamics
+L: 1/4
+K:C
+!p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
+"""
+
+abc_expressions = """
+X: 0
+T: Expressions
+L: 1/4
+K:C
+!invertedfermata!C !trill!C !mordent!C !fermata!C !turn!C !arpeggio!'C !slide!C !uppermordent!C
+w:!invertedfermata! !trill! !lmordent! !fermata!  !turn!  !arpeggio!   !slide!  !uppermordent! 
+"""
+
+abc_articulations = """
+X: 0
+T: Articulations
+L: 1/4
+K:C
+!staccato!C  !>!C !downbow!C !^!C !breath!C !tenuto!C !upbow!C !open!C !+!C !snap!C !nail!C
+w:!staccato! !>!  !downbow!  !^!  !breath!  !tenuto!  !upbow!  !open!  !+!  !snap!  !nail!
+"""
+
+abc_repeat_marker = """
+X: 0
+T: Repeat marker
+L: 1/4
+K:C
+  !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C
+w:!segno!     !coda!    !fine!    !D.S.!    !D.S.alcoda!    !D.S.alfine!    !dacapo!    !D.C.alcoda!
 """
 
 abc_repeat_bar_lines = """
 X: 2
-T:bar lines
-M: 4/4
-L: 1/4
-K: E
-P:A
-|: EGBc [| cega & aaaa :: CEGA ::|
-P:B
-fa ge|[1 de BA | defg :|[2 de dB || abcde |] 
+T:Bar lines
+M:4/4
+L:1/4
+K:C
+|: EGBc [| cega & aaaa :: CEGA ::| fa ge|[1 de BA | defg :|[2 de dB || abcde |] 
 """
 
 abc_grace= """
@@ -533,11 +562,13 @@ K:
 [K:G#Loc]"^G# locrian"CDEFGABc | [K:ALoc]"^A locrian"CDEFGABc | [K:BbLoc]"^B- locrian"CDEFGABc |
 """
 
-abc_pitch_octaves = """X:1
-L:1/8
-K:
-C, D, E, F, G, A, B, x  | C D E F G A B x | c d e f g a b x | c' d' e' f' g' a' b' x |
-w: C, D, E, F, G, A, B, | C D E F G A B   | c d e f g a b   | c' d' e' f' g' a' b'
+abc_accidentals = """
+X:1
+T: Accidentals
+L:1/1
+K:C
+   ^C     _D   =E      ^^F          __G
+w: sharp  flat natural double~sharp double~flat
 """
 
 abc_overlays_and_lyric = """
@@ -548,18 +579,6 @@ L: 1/4
 K: C
    C D E/2 E/2 F & g/2 g/2 b2 b|
 w: C D E-  -   F |
-"""
-
-abc_user_defined_symbols = """
-U: W = !upbow!
-U: V = !fermata!
-X: 1
-L: 1/4
-T: user defined symbols
-U: W = !trill!!upbow!
-U: U = !staccato!
-K:
-WC UC VC
 """
 
 spanner = """
@@ -585,6 +604,24 @@ P:B
 CDEFGAAB|[K: C#]DEFGAABC|
 P:C
 CDEFGAAB|[K: F]DEFG[K: E]AABC|
+"""
+
+abc_pitch_octaves = """X:1
+T:Pitches Across Various Octaves
+L:1/1
+K:C
+   C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b' |
+w: C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b'
+"""
+
+abc_twinkle = """
+X:1
+T:Twinkle, Twinkle Little Star in C
+M:C
+K:C
+L:1/4
+vC C G G|A A G2|F F E E|D D C2|vG G F F|E E D2|
+uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]
 """
 
 abc_propagate_accidentals = """

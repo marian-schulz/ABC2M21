@@ -63,6 +63,7 @@ M21_ARTICULATIONS = {
     '^': articulations.StrongAccent,
     '+': articulations.Pizzicato,
     'staccato': articulations.Staccato,
+    'marcato': articulations.StrongAccent,
     'accent': articulations.Accent,
     'emphasis': articulations.Accent,
     'strongaccent': articulations.StrongAccent,
@@ -104,7 +105,6 @@ def upright_fermata() -> expressions.Fermata:
 M21_EXPRESSIONS = {
     'invertedfermata': expressions.Fermata,
     'trill': expressions.Trill,
-    'marcato': articulations.StrongAccent,
     'invertedmordent': expressions.InvertedMordent,
     'lowermordent': expressions.Mordent,
     'uppermordent': expressions.InvertedMordent,

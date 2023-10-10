@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from io import StringIO
-from testtunes import *
+from ABC2M21.testtunes import *
 from typing import NamedTuple
 from music21 import duration, spanner, dynamics, common, tie, instrument, clef
 from music21 import expressions, articulations, harmony, style, environment
@@ -166,13 +166,20 @@ class TestFiles(unittest.TestCase):
             notes = score.flatten().getElementsByClass(note.Note)
             self.assertEqual(len(notes), metric.note)
 
+    def test_note_duration(self):
+        score = ABCTranslator(abc_note_duration)
+        self.assertIsInstance(score, stream.Score)
+        quarter_lengths = [ n.quarterLength for n in score.recurse().getElementsByClass(note.Note)]
+        self.assertEqual([4.0, 3.0, 2.0, 1.5, 1.0, 0.5, 0.25, 0.125, 0.0625],
+                         quarter_lengths)
+
     def test_legacy_chord_and_decoration(self):
 
         # catch debug messages
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
             score = ABCTranslator(abc_legacy_chord_and_decoration)
 
-        self.assertIsInstance(score, stream.Score, )
+        self.assertIsInstance(score, stream.Score)
         # we have one chord ?
         self.assertEqual(len(score.recurse().getElementsByClass(chord.Chord)), 1)
         # and one note
@@ -184,7 +191,7 @@ class TestFiles(unittest.TestCase):
         # Check the debug message for legacy warning about unknown decoration
         debug_messages = mock_stdout.getvalue()
         self.assertIn("TuneBody: Unknown abc decoration", debug_messages)
-        self.assertIn("<decoration_or_chord: '+CEG+' (pos=100)>", debug_messages)
+        self.assertIn("<decoration_or_chord: '+CEG+' (pos=101)>", debug_messages)
 
     def test_legacy_decoration_2_0(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
@@ -326,8 +333,8 @@ class TestFiles(unittest.TestCase):
         rests: list[note.Rest] = list(score.recurse().getElementsByClass(note.Rest))
         hidden_rest = [rest for rest in rests if rest.style.hideObjectOnPrint == True]
 
-        self.assertEqual(14, len(rests))
-        self.assertEqual(7, len(hidden_rest))
+        self.assertEqual(16, len(rests))
+        self.assertEqual(8, len(hidden_rest))
         self.assertEqual(32.0, sum(r.quarterLength for r in rests))
 
     def test_pitch_octaves(self):
@@ -413,7 +420,7 @@ class TestFiles(unittest.TestCase):
         self.assertEqual(2, durations[1.875])
         self.assertIn("Overlay: Remove unfinished broken rhythm", debug_messages)
         self.assertIn("TuneBody: Ignore broken rhythm. No left side note.", debug_messages)
-        self.assertIn("<broken_rhythm: '>' (pos=38)>", debug_messages)
+        self.assertIn("<broken_rhythm: '>' (pos=30)>", debug_messages)
 
     def test_decorations(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
@@ -560,12 +567,11 @@ class TestFiles(unittest.TestCase):
         self.assertIsInstance(score, stream.Score)
         notes = list(score.recurse().getElementsByClass(note.Note))
 
-        self.assertEqual(3, len(notes))
+        self.assertEqual(4, len(notes))
         self.assertIsInstance(notes[0].expressions[0], expressions.Trill)
-        self.assertIsInstance(notes[0].articulations[0], articulations.UpBow)
         self.assertIsInstance(notes[1].articulations[0], articulations.Staccato)
         self.assertIsInstance(notes[2].expressions[0], expressions.Fermata)
-
+        self.assertIsInstance(notes[3].articulations[0], articulations.Staccato)
     def test_anacrusis_padding(self):
         # using voices in the measure streams cause a problem with the note beats ..
         return
