@@ -10,7 +10,7 @@ abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
              'abc_accidentals', 'abc_decoration_spanner', 'abc_note_duration',
              'abc_user_defined_symbols', 'abc_broken_rhythm', 'abc_dynamics',
              'abc_expressions', 'abc_articulations', 'abc_repeat_marker', 'abc_rests',
-             'abc_legacy_chord_and_decoration']
+             'abc_legacy_chord_and_decoration', 'abc_ave_maria']
 
 musecores = ['/home/mschulz/Anwendungen/MuseScore-3.6.0.451381076-x86_64.AppImage',
              '/home/mschulz/Anwendungen/MuseScore-4.1.1.232071203-x86_64.AppImage',

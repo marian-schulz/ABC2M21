@@ -712,19 +712,50 @@ K:
 !editorial! ^F^EGA
 """
 
-ave_maria = """%abc-2.1
+abc_ave_maria = """%abc-2.1
 X:1
-T:Ave Maria (Ellen's Gesang III) - Page 1     
+T:Ave Maria (Ellen's Gesang III) - Page 1
 C:Franz Schubert
-+:Marian Schulz
+C:Marian Schulz
+%%score 1 (2 | 3)
 L:1/8
 Q:1/4=26
 M:4/4
+I:linebreak $
+%%MIDI program 1  54
 K:Bb
-V:1
- z8 | z8 [|: B3 A/B/ (d7/2 c/) | B2 z2 (c2 B/A/)(G/A/) | B2 z d d3/2(c/4B/4) A/G/ d/=e/ |
-z8 | z8 [|: B3 A/B/ (d7/2 c/) | B2 z2 (c2 B/A/)(G/A/) | B2 z d d3/2(c/4B/4) A/G/ d/=e/ |
+V:1 treble nm="Voice" clef= treble
+ z8 | z8 [|: B3 A/B/ (d7/2 c/) | B2 z2 (c2 {dc} B/A/)(G/A/) | B2 z d d3/2(c/4B/4) A/G/ d/=e/ | %5
+w: ||A- ve Ma- ri- -|a! Jung- - - frau *|mild! Er- hö- re * ei- ner Jung- frau|
+w: ||A- ve Ma- ri- -|a! Un- - - be- -|fleckt! Wenn wir auf * die- sen Fels hin-|
+w: ||A- ve Ma- ri- -|a! Rei- - - ne *|Magd! Der Er- de * und der Luft Dä-|
+d2 ^c3/2A/ =c3/2B/(3:2:3 (A/c/)d/(3:2:3(e/c/)A/ |$ %6
+w: Fle- hen! Aus die- sem Fel- - sen, starr * und|
+w: sin- ken zum Schlaf, und uns * dein Schutz * be-|
+w: mo- nen, von dei- nes Au- - ges Huld * ver-|
+ B3 (d/c/) c3/2A/(3:2:3 (G/=B/)d/(3:2:3 (f/d/)B/ | (c2-(6:4:6 c/G/A/_B/ {cB}A/G/) F2 z F ::| %8
+w: wild, soll * mein Ge- bet * zu dir * hin|we- - - - - - - hen. Wir|
+w: deckt, wird * weich der har- - te Fels * uns|dün- - - - - - - ken. Du|
+w: jagt, sie * kön- nen hier * nicht bei * uns|woh- - - - - - - nen! Wir|
+V:2 treble nm="RH"
+"^Sehr langsam"!pp!(6:4:6 z/ (.[D/F/].[F/B/]!>!.[B/d/].[F/B/].[D/F/])(6:4:6 z/ (.[D/F/].[F/B/]!>!.[B/d/].[F/B/].[D/F/])!<(!(6:4:6 z/ (.[F/B/].[B/d/]!>!.[d/f/].[B/d/].[F/B/])(6:4:6 z/ (.[_A/d/].[d/f/]!>!.[f/_a/].[d/f/]!<)!.[A/d/]) | %1
+!>(!(6:4:6 z/ (.[G/B/].[B/e/]!>!.[e/g/].[B/e/].[G/B/])(6:4:6 z/ (.[_G/=A/].[A/e/]!>!.[e/_g/].[A/e/]!>)!.[G/A/])(6:4:6 z/ (.[F/B/].[B/d/]!>!.[d/f/].[B/d/].[F/B/])(6:4:6 z/ (.[D/F/].[F/B/]!>!.[B/d/].[F/B/].[D/F/]) [|:$ %2
+(6:4:6 z/ [D/F/][F/B/][B/d/][F/B/][D/F/](6:4:6 z/ [D/=E/][E/B/][B/d/][E/B/][D/E/](6:4:6 z/ [D/F/][F/B/][B/d/][F/B/][D/F/](6:4:6 z/ [_E/A/][A/c/][c/e/][A/c/][E/A/] | %3
+(6:4:6 z/ [D/G/][G/B/][B/d/][G/B/][D/G/](6:4:6 z/ [D/G/][G/B/][B/d/][G/B/][D/G/](6:4:6 z/ [E/G/][G/c/][c/e/][G/c/][E/G/](6:4:6 z/ [E/F/][F/A/][A/c/][F/A/][E/F/] |$ %4
+(6:4:6 z/ [D/F/][F/B/][B/d/][F/B/][D/F/](6:4:6 z/ [D/F/][F/B/][B/d/][F/B/][D/F/]!<(!(6:4:6 z/ [D/^F/][F/B/][B/d/][F/B/][D/F/](6:4:6 z/ [D/G/][G/B/][B/d/][G/B/]!<)![D/G/] | %5
+!>(!(6:4:6 z/ [=E/G/][G/B/][B/d/][G/B/][E/G/](6:4:6 z/ [E/G/][G/A/][A/^c/][G/A/][E/G/]!>)!(6:4:6 z/ [_E/A/][A/=c/][c/e/][A/c/][E/A/](6:4:6 z/ [E/A/][A/c/][c/e/][A/c/][E/A/] |$ %6
+(6:4:6 z/ [D/G/][G/B/][B/d/][G/B/][D/G/](6:4:6 z/ [D/=E/][E/B/][B/d/][E/B/][D/E/](6:4:6 z/ [C/F/][F/A/][A/c/][F/A/][C/F/](6:4:6 z/ [F/G/][G/=B/][B/f/][G/B/][F/G/] | %7
+(6:4:6 z/ [F/A/][A/c/][c/f/][A/c/][F/A/](6:4:6 z/ [=E/B/][B/c/][c/=e/][B/c/][E/B/](6:4:6 z/ [F/A/][A/c/][c/f/][A/c/][F/A/](6:4:6 z/ [F/A/][A/c/][c/f/][A/c/][F/A/] | %8
+V:3 bass nm="LH"
+"_col Pedale" [B,,,B,,] z [B,,,B,,] z [B,,,B,,] z [B,,,B,,] z | %1
+ [B,,,B,,] z [B,,,B,,] z [B,,,B,,] z [B,,,B,,] z [|:$ %2
+ [B,,,B,,] z [G,,,G,,] z [F,,,F,,] z [F,,,F,,] z | %3
+ [G,,,G,,] z [G,,,G,,] z [E,,,E,,] z [F,,,F,,] z |$ %4
+ [B,,,B,,] z [B,,,B,,] z [B,,,B,,] z [B,,,B,,] z | %5
+ [A,,,A,,] z [A,,,A,,] z [^F,,,^F,,] z [F,,,F,,] z |$ %6
+ [G,,,G,,] z [G,,,G,,] z [A,,,A,,] z [D,,D,] z | [C,,C,] z [C,,C,] z [F,,F,] z [F,,F,] z | %8
 """
+
 
 Magnificat = """%abc-2.1
 X: 1

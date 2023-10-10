@@ -116,7 +116,7 @@ the letters H-W and h-w, as well as the symbol ~, can be designated using the U:
 Note:
 * ABC2M21 is versatile and can handle multiple symbols and various types of symbols (not just decorations, 
 but also fields in the inline form).
-* The '.' symbol is A pre defined Symbol for '!staccato!' and is treated like a user-defined symbol, 
+* The '.' symbol is a pre defined Symbol for '!staccato!' and is treated like a user-defined symbol, 
 but cannot be overridden.
 
 TODO:
@@ -279,5 +279,13 @@ I:decoration +  % Set '+' als decoration denotation symbol
 +trill+C        % this is now a legal trill decoration
 ```
 ![legacy chord and decoration](images/legacy_chord_and_decoration.png)
+
+# Show off
+
+One of my favorit tunes from Franz Schubert
+
+![Ave Marian (Schubert) (1)](images/ave_maria.png)
+![Ave Marian (Schubert) (2)](images/ave_maria-2.png)
+![Ave Marian (Schubert) (3)](images/ave_maria-3.png)
 
 
