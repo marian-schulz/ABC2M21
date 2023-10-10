@@ -7,7 +7,7 @@ a = environment.Environment()
 
 musecores = ['/home/mschulz/Anwendungen/MuseScore-3.6.0.451381076-x86_64.AppImage',
              '/home/mschulz/Anwendungen/MuseScore-4.1.1.232071203-x86_64.AppImage',
-             '/home/mschulz/local/bin/MuseScore-4.1.1','/home/mschulz/local/bin/MuseScore',
+             '/home/mschulz/local/bin/MuseScore', '/home/mschulz/local/bin/MuseScore-4.1.1',
              '/usr/bin/musescore']
 
 for musecore in musecores:
@@ -110,10 +110,11 @@ for name, abc_tune in dict(locals()).items():
     if not name.startswith('abc_'):
         continue
 
+    #@TODO: Image size
     m21_stream = ABCTranslator(abc_tune)
     #m21_stream.show()
     xmlconv = converter.subConverters.ConverterMusicXML()
-    xmlconv.write(m21_stream, fmt='musicxml', fp=f"{name[4:]}.png", subformats=['png'])
+    xmlconv.write(m21_stream, fmt='musicxml', fp=f"{name[4:]}.png", subformats=['png'], trimEdges=True)
 
 
 # delete all except png and py files

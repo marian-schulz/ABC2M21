@@ -1,5 +1,5 @@
 
-## ABC Elements
+# ABC Elements
 
 The following section shows images, how the translator creates music21 objects 
 from abc elements. 
@@ -28,7 +28,7 @@ xmlconv.write(m21_stream, fmt='musicxml', fp="myfile.png", subformats=['png'])
 ```
 ![twinkle](images/twinkle.png)
 
-### Pitches über verschiedene Oktaven
+## Pitches über verschiedene Oktaven
 ```
 X:1
 T: abc pitches over serval octaves
@@ -39,7 +39,7 @@ w: C, D, E, F, G, A, B, | C D E F G A B | c d e f g a b | c' d' e' f' g' a' b'
 ```
 ![abc pitches over serval octave](images/pitch_octaves.png)
 
-### Accidentals
+## Accidentals
 In ABC notation, accidentals are written before the note using symbols such as ^ (sharp), = (natural), and _ (flat). 
 Double sharps and flats are denoted by ^^ and __ respectively.
 ```
@@ -51,7 +51,7 @@ K:C
 ```
 ![abc pitches over serval octave](images/accidentals.png)
 
-### Note duration
+## Note duration
 ```
 X:1
 T:Relative durations
@@ -64,7 +64,7 @@ w: 1/1  3/4  1/2  3/8   1/4  1/8  1/16  1/32  1/64
 The note duration is relative to the `unit not length`.
 ![note durations](images/note_duration.png)
 
-### User defined symbols
+## User defined symbols
 ```
 X:1
 T:User defined symbols
@@ -77,7 +77,7 @@ WC UD VE .F
 ```
 ![user defined symbols](images/user_defined_symbols.png)
 
-### Decoration_spanner
+## Decoration_spanner
 ```
 X: 1
 T:Decoration spanner
@@ -87,7 +87,7 @@ K:C
 ```
 ![Decoration spanner](images/decoration_spanner.png)
 
-### Propagate accidentals directive
+## Propagate accidentals directive
 `I:propagate-accidentals not | octave | pitch`
 
 * When set to 'not,' accidentals are exclusive to the individual notes they are attached to.
