@@ -107,6 +107,15 @@ rests."
 TODO:
 * Remove the additional clef and meter symbols for multi measure rests
 
+```
+X: 
+T:Rests
+L:1/4
+M:C
+K:
+z z2 z/2 z/4 z/4 | x x2 x/2 x/4 x/4 | Z | X | Z2 | X2 |
+```
+
 ![rests](images/rests.png)
 
 ## User defined symbols
