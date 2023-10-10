@@ -493,10 +493,10 @@ class TestFiles(unittest.TestCase):
         self.assertIsInstance(score, stream.Score)
 
         for measure in score.recurse().getElementsByClass(stream.Measure):
-            ks = measure.keySignature
-            self.assertIsNotNone(ks)
+            ks = measure.recurse().getElementsByClass(key.KeySignature).first()
             ano = measure.recurse().getElementsByClass(expressions.TextExpression).first()
-            self.assertIsNotNone(ano)
+            self.assertIsNotNone(ks, ano)
+            self.assertIsNotNone(ano, ks)
             self.assertEqual(ks.name, ano.content)
 
     def test_chords(self):

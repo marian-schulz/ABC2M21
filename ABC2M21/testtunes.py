@@ -492,51 +492,51 @@ T: Key signatures
 M: 4/4
 L: 1/8
 K:
-[K:C#]"^C# major"CDEFGABc | [K:D]"^D major"CDEFGABc | [K:Eb]"^Eb major"CDEFGABc | 
-[K:F#]"^F# major"CDEFGABc | [K:G]"^G major"CDEFGABc | [K:Ab]"^Ab major"CDEFGABc |
-[K:B]"^B major"CDEFGABc | [K:C]"^C major"CDEFGABc | [K:Db]"^Db major"CDEFGABc |
-[K:E]"^E major"CDEFGABc | [K:F]"^F major"CDEFGABc | [K:Gb]"^Gb major"CDEFGABc | 
-[K:A]"^A major"CDEFGABc | [K:Bb]"^Bb major"CDEFGABc | [K:Cb]"^Cb major"CDEFGABc |
-[K:C#Ion]"^C#Ion"CDEFGABc | [K:DIon]"^DIon"CDEFGABc | [K:EbIon]"^EbIon"CDEFGABc | 
-[K:F#Ion]"^F#Ion"CDEFGABc | [K:GIon]"^GIon"CDEFGABc | [K:AbIon]"^AbIon"CDEFGABc |
-[K:BIon]"^BIon"CDEFGABc | [K:CIon]"^CIon"CDEFGABc | [K:DbIon]"^DbIon"CDEFGABc |
-[K:EIon]"^EIon"CDEFGABc | [K:FIon]"^FIon"CDEFGABc | [K:GbIon]"^GbIon"CDEFGABc | 
-[K:AIon]"^AIon"CDEFGABc | [K:BbIon]"^BbIon"CDEFGABc | [K:CbIon]"^CbIon"CDEFGABc |
-[K:A#mAeo]"^A#mAeo"CDEFGABc | [K:C#mAeo]"^C#mAeo"CDEFGABc | [K:EmAeo]"^EmAeo"CDEFGABc | 
-[K:GmAeo]"^GmAeo"CDEFGABc | [K:BbmAeo]"^BbmAeo"CDEFGABc | [K:D#mAeo]"^D#mAeo"CDEFGABc | 
-[K:F#mAeo]"^F#mAeo"CDEFGABc | [K:AmAeo]"^AmAeo"CDEFGABc | [K:CmAeo]"^CmAeo"CDEFGABc | 
-[K:EbmAeo]"^EbmAeo"CDEFGABc | [K:G#mAeo]"^G#mAeo"CDEFGABc | [K:BmAeo]"^BmAeo"CDEFGABc | 
-[K:DmAeo]"^DAeom"CDEFGABc | [K:FmAeo]"^FmAeo"CDEFGABc | [K:AbmAeo]"^AbmAeo"CDEFGABc |
-[K:A#m]"^A#m"CDEFGABc | [K:C#m]"^C#m"CDEFGABc | [K:Em]"^Em"CDEFGABc | 
-[K:Gm]"^Gm"CDEFGABc | [K:Bbm]"^Bbm"CDEFGABc | [K:D#m]"^D#m"CDEFGABc | 
-[K:F#m]"^F#m"CDEFGABc | [K:Am]"^Am"CDEFGABc | [K:Cm]"^Cm"CDEFGABc | 
-[K:Ebm]"^Ebm"CDEFGABc | [K:G#m]"^G#m"CDEFGABc | [K:Bm]"^Bm"CDEFGABc | 
-[K:Dm]"^Dm"CDEFGABc | [K:Fm]"^Fm"CDEFGABc | [K:Abm]"^Abm"CDEFGABc |
-[K:G#Mix]"^G#Mix"CDEFGABc | [K:BMix]"^BMix"CDEFGABc | [K:DMix]"^DMix"CDEFGABc  |
-[K:FMix]"^FMix"CDEFGABc | [K:AbMix]"^AbMix"CDEFGABc | [K:C#Mix]"^C#Mix"CDEFGABc |
-[K:EMix]"^EMix"CDEFGABc | [K:GMix]"^EbMix"CDEFGABc | [K:BbMix]"^BbMix"CDEFGABc |
-[K:DbMix]"^DbMix"CDEFGABc | [K:F#Mix]"^F#Mix"CDEFGABc | [K:AMix]"^AMix"CDEFGABc | 
-[K:CMix]"^CMix"CDEFGABc | [K:EbMix]"^EbMix"CDEFGABc | [K:GbMix]"^GbMix"CDEFGABc |
-[K:D#Dor]"^D#Dor"CDEFGABc | [K:F#Dor]"^F#Dor"CDEFGABc | [K:ADor]"^ADor"CDEFGABc |
-[K:CDor]"^CDor"CDEFGABc | [K:EbDor]"^EbDor"CDEFGABc | [K:G#Dor]"^G#Dor"CDEFGABc | 
-[K:BDor]"^BDor"CDEFGABc | [K:DDor]"^DDor"CDEFGABc | [K:FDor]"^FDor"CDEFGABc | 
-[K:AbDor]"^AbDor"CDEFGABc | [K:C#Dor]"^C#Dor"CDEFGABc | [K:EDor]"^EDor"CDEFGABc | 
-[K:GDor]"^GDor"CDEFGABc | [K:BbDor]"^BbDor"CDEFGABc | [K:DbDor]"^BbDor"CDEFGABc |
-[K:E#Phr]"^E#Phr"CDEFGABc | [K:G#Phr]"^G#Phr"CDEFGABc | [K:BPhr]"^BPhr"CDEFGABc |
-[K:DPhr]"^DPhr"CDEFGABc | [K:FPhr]"^FPhr"CDEFGABc |  [K:A#Phr]"^A#Phr"CDEFGABc |
-[K:C#Phr]"^C#Phr"CDEFGABc | [K:EPhr]"^EPhr"CDEFGABc | [K:GPhr]"^GPhr"CDEFGABc |
-[K:BbPhr]"^BbPhr"CDEFGABc | [K:D#Phr]"^D#Phr"CDEFGABc | [K:F#Phr]"^F#Phr"CDEFGABc |
-[K:APhr]"^APhr"CDEFGABc | [K:CPhr]"^CPhr"CDEFGABc | [K:EbPhr]"^EbPhr"CDEFGABc |
-[K:F#Lyd]"^F#Lyd"CDEFGABc | [K:GLyd]"^GLyd"CDEFGABc | [K:AbLyd]"^AbLyd"CDEFGABc |
-[K:BLyd]"^BLyd"CDEFGABc | [K:CLyd]"^CLyd"CDEFGABc | [K:DbLyd]"^DbLyd"CDEFGABc |
-[K:ELyd]"^ELyd"CDEFGABc | [K:FLyd]"^FLyd"CDEFGABc | [K:GbLyd]"^GbLyd"CDEFGABc |
-[K:ALyd]"^ALyd"CDEFGABc | [K:BbLyd]"^BbLyd"CDEFGABc | [K:CbLyd]"^CbLyd"CDEFGABc |
-[K:DLyd]"^DLyd"CDEFGABc | [K:EbLyd]"^EbLyd"CDEFGABc | [K:FbLyd]"^FbLyd"CDEFGABc |
-[K:B#Loc]"^B#Loc"CDEFGABc | [K:C#Loc]"^C#Loc"CDEFGABc | [K:DLoc]"^DLoc"CDEFGABc |
-[K:E#Loc]"^E#Loc"CDEFGABc | [K:F#Loc]"^F#Loc"CDEFGABc | [K:GLoc]"^GLoc"CDEFGABc |
-[K:A#Loc]"^A#Loc"CDEFGABc | [K:BLoc]"^BLoc"CDEFGABc | [K:CLoc]"^CLoc"CDEFGABc |
-[K:D#Loc]"^D#Loc"CDEFGABc | [K:ELoc]"^ELoc"CDEFGABc | [K:FLoc]"^FLoc"CDEFGABc |
-[K:G#Loc]"^G#Loc"CDEFGABc | [K:ALoc]"^ALoc"CDEFGABc | [K:BbLoc]"^BbLoc"CDEFGABc |
+[K:C#]"^C# major"CDEFGABc | [K:D]"^D major"CDEFGABc | [K:Eb]"^E- major"CDEFGABc | 
+[K:F#]"^F# major"CDEFGABc | [K:G]"^G major"CDEFGABc | [K:Ab]"^A- major"CDEFGABc |
+[K:B]"^B major"CDEFGABc | [K:C]"^C major"CDEFGABc | [K:Db]"^D- major"CDEFGABc |
+[K:E]"^E major"CDEFGABc | [K:F]"^F major"CDEFGABc | [K:Gb]"^G- major"CDEFGABc | 
+[K:A]"^A major"CDEFGABc | [K:Bb]"^B- major"CDEFGABc | [K:Cb]"^C- major"CDEFGABc |
+[K:C#Ion]"^C# ionian"CDEFGABc | [K:DIon]"^D ionian"CDEFGABc | [K:EbIon]"^E- ionian"CDEFGABc | 
+[K:F#Ion]"^F# ionian"CDEFGABc | [K:GIon]"^G ionian"CDEFGABc | [K:AbIon]"^A- ionian"CDEFGABc |
+[K:BIon]"^B ionian"CDEFGABc | [K:CIon]"^C ionian"CDEFGABc | [K:DbIon]"^D- ionian"CDEFGABc |
+[K:EIon]"^E ionian"CDEFGABc | [K:FIon]"^F ionian"CDEFGABc | [K:GbIon]"^G- ionian"CDEFGABc | 
+[K:AIon]"^A ionian"CDEFGABc | [K:BbIon]"^B- ionian"CDEFGABc | [K:CbIon]"^C- ionian"CDEFGABc |
+[K:A#Aeo]"^A# aeolian"CDEFGABc | [K:C#Aeo]"^C# aeolian"CDEFGABc | [K:EAeo]"^E aeolian"CDEFGABc | 
+[K:GAeo]"^G aeolian"CDEFGABc | [K:BbAeo]"^B- aeolian"CDEFGABc | [K:D#Aeo]"^D# aeolian"CDEFGABc | 
+[K:F#Aeo]"^F# aeolian"CDEFGABc | [K:AAeo]"^A aeolian"CDEFGABc | [K:CAeo]"^C aeolian"CDEFGABc | 
+[K:EbAeo]"^E- aeolian"CDEFGABc | [K:G#Aeo]"^G# aeolian"CDEFGABc | [K:BAeo]"^B aeolian"CDEFGABc | 
+[K:DAeo]"^D aeolian"CDEFGABc | [K:FAeo]"^F aeolian"CDEFGABc | [K:AbAeo]"^A- aeolian"CDEFGABc |
+[K:A#m]"^A# minor"CDEFGABc | [K:C#m]"^C# minor"CDEFGABc | [K:Em]"^E minor"CDEFGABc | 
+[K:Gm]"^G minor"CDEFGABc | [K:Bbm]"^B- minor"CDEFGABc | [K:D#m]"^D# minor"CDEFGABc | 
+[K:F#m]"^F# minor"CDEFGABc | [K:Am]"^A minor"CDEFGABc | [K:Cm]"^C minor"CDEFGABc | 
+[K:Ebm]"^E- minor"CDEFGABc | [K:G#m]"^G# minor"CDEFGABc | [K:Bm]"^B minor"CDEFGABc | 
+[K:Dm]"^D minor"CDEFGABc | [K:Fm]"^F minor"CDEFGABc | [K:Abm]"^A- minor"CDEFGABc |
+[K:G#Mix]"^G# mixolydian"CDEFGABc | [K:BMix]"^B mixolydian"CDEFGABc | [K:DMix]"^D mixolydian"CDEFGABc  |
+[K:FMix]"^F mixolydian"CDEFGABc | [K:AbMix]"^A- mixolydian"CDEFGABc | [K:C#Mix]"^C# mixolydian"CDEFGABc |
+[K:EMix]"^E mixolydian"CDEFGABc | [K:GMix]"^G mixolydian"CDEFGABc | [K:BbMix]"^B- mixolydian"CDEFGABc |
+[K:DbMix]"^D- mixolydian"CDEFGABc | [K:F#Mix]"^F# mixolydian"CDEFGABc | [K:AMix]"^A mixolydian"CDEFGABc | 
+[K:CMix]"^C mixolydian"CDEFGABc | [K:EbMix]"^E- mixolydian"CDEFGABc | [K:GbMix]"^G- mixolydian"CDEFGABc |
+[K:D#Dor]"^D# dorian"CDEFGABc | [K:F#Dor]"^F# dorian"CDEFGABc | [K:ADor]"^A dorian"CDEFGABc |
+[K:CDor]"^C dorian"CDEFGABc | [K:EbDor]"^E- dorian"CDEFGABc | [K:G#Dor]"^G# dorian"CDEFGABc | 
+[K:BDor]"^B dorian"CDEFGABc | [K:DDor]"^D dorian"CDEFGABc | [K:FDor]"^F dorian"CDEFGABc | 
+[K:AbDor]"^A- dorian"CDEFGABc | [K:C#Dor]"^C# dorian"CDEFGABc | [K:EDor]"^E dorian"CDEFGABc | 
+[K:GDor]"^G dorian"CDEFGABc | [K:BbDor]"^B- dorian"CDEFGABc | [K:DbDor]"^D- dorian"CDEFGABc |
+[K:E#Phr]"^E# phrygian"CDEFGABc | [K:G#Phr]"^G# phrygian"CDEFGABc | [K:BPhr]"^B phrygian"CDEFGABc |
+[K:DPhr]"^D phrygian"CDEFGABc | [K:FPhr]"^F phrygian"CDEFGABc |  [K:A#Phr]"^A# phrygian"CDEFGABc |
+[K:C#Phr]"^C# phrygian"CDEFGABc | [K:EPhr]"^E phrygian"CDEFGABc | [K:GPhr]"^G phrygian"CDEFGABc |
+[K:BbPhr]"^B- phrygian"CDEFGABc | [K:D#Phr]"^D# phrygian"CDEFGABc | [K:F#Phr]"^F# phrygian"CDEFGABc |
+[K:APhr]"^A phrygian"CDEFGABc | [K:CPhr]"^C phrygian"CDEFGABc | [K:EbPhr]"^E- phrygian"CDEFGABc |
+[K:F#Lyd]"^F# lydian"CDEFGABc | [K:GLyd]"^G lydian"CDEFGABc | [K:AbLyd]"^A- lydian"CDEFGABc |
+[K:BLyd]"^B lydian"CDEFGABc | [K:CLyd]"^C lydian"CDEFGABc | [K:DbLyd]"^D- lydian"CDEFGABc |
+[K:ELyd]"^E lydian"CDEFGABc | [K:FLyd]"^F lydian"CDEFGABc | [K:GbLyd]"^G- lydian"CDEFGABc |
+[K:ALyd]"^A lydian"CDEFGABc | [K:BbLyd]"^B- lydian"CDEFGABc | [K:CbLyd]"^C- lydian"CDEFGABc |
+[K:DLyd]"^D lydian"CDEFGABc | [K:EbLyd]"^E- lydian"CDEFGABc | [K:FbLyd]"^F- lydian"CDEFGABc |
+[K:B#Loc]"^B# locrian"CDEFGABc | [K:C#Loc]"^C# locrian"CDEFGABc | [K:DLoc]"^D locrian"CDEFGABc |
+[K:E#Loc]"^E# locrian"CDEFGABc | [K:F#Loc]"^F# locrian"CDEFGABc | [K:GLoc]"^G locrian"CDEFGABc |
+[K:A#Loc]"^A# locrian"CDEFGABc | [K:BLoc]"^B locrian"CDEFGABc | [K:CLoc]"^C locrian"CDEFGABc |
+[K:D#Loc]"^D# locrian"CDEFGABc | [K:ELoc]"^E locrian"CDEFGABc | [K:FLoc]"^F locrian"CDEFGABc |
+[K:G#Loc]"^G# locrian"CDEFGABc | [K:ALoc]"^A locrian"CDEFGABc | [K:BbLoc]"^B- locrian"CDEFGABc |
 """
 
 abc_overlays_and_lyric = """

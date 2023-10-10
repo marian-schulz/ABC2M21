@@ -1465,7 +1465,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                     # Set alteredPitches of the KeySignature
                     ks.alteredPitches = [f"{p}{a}" for p, a in altered_pitches.items()]
             else:
-                self.abc_error(f"Unknown mode '{mode}' in ABC Key field.")
+                self.abc_error(f"Unknown mode '{mode}' in ABC Key field.", token)
                 ks = None
 
         elif key_field_str == "HP":
