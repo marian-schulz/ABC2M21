@@ -340,6 +340,26 @@ class TestFiles(unittest.TestCase):
          'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5',
          'C6', 'D6', 'E6', 'F6', 'G6', 'A6', 'B6'], name_with_octave)
 
+    def test_propagate_accidentals(self):
+        score = ABCTranslator(abc_propagate_accidentals)
+        self.assertIsInstance(score, stream.Score)
+        self.assertEqual(3, len(score.parts))
+
+        pitches_octave = [n.pitch for n in score.parts[0].recurse().getElementsByClass(note.Note)]
+        pitches_pitch = [n.pitch for n in score.parts[1].recurse().getElementsByClass(note.Note)]
+        pitches_not = [n.pitch for n in score.parts[2].recurse().getElementsByClass(note.Note)]
+
+        # Test the accidentals
+        self.assertEqual(['C#', 'C#', 'D', 'C', 'C', 'C#', 'C#', 'C'], [p.name for p in pitches_octave])
+        self.assertEqual(['C#', 'C#', 'D', 'C#', 'C', 'C#', 'C#', 'C#'], [p.name for p in pitches_pitch])
+        self.assertEqual(['C#', 'C', 'D', 'C', 'C', 'C#', 'C', 'C'], [p.name for p in pitches_not])
+
+        # Test the display status of the accidentals
+        self.assertEqual([True, False, True, False], [p.accidental.displayStatus for p in pitches_octave if p.accidental])
+        self.assertEqual([True, False, False, True, False, False], [p.accidental.displayStatus for p in pitches_pitch if p.accidental])
+        self.assertEqual([True, True], [p.accidental.displayStatus for p in pitches_not if p.accidental])
+
+
     def test_trills(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
             score = ABCTranslator(abc_trills)

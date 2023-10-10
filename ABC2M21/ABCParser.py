@@ -342,7 +342,7 @@ class FileHeader(ABCParser):
         self.user_defined: dict[str, list[Token]] = dict(
             FileHeader.DEFAULT_USER_DEF_SYMBOLS)
 
-        self.accidental_mode: str = 'not' if abc_version < (2, 1, 0) \
+        self.accidental_mode: str = 'not' if abc_version < (2, 0, 0) \
             else 'pitch'
 
         self.is_legacy_abc_decoration: bool = abc_version == (2, 0, 0)
@@ -832,10 +832,16 @@ class FileHeader(ABCParser):
         Set the accidental mode to 'not', 'octave', or 'pitch'
 
         >>> fh = FileHeader()
-        >>> token = Field('Instruction', 'I:propagate-accidentals octave')
+        >>> fh.accidental_mode
+        'not'
+        >>> token = Field('instruction', 'I:propagate-accidentals octave')
         >>> fh.abc_propagate_accidentals_instruction(token)
         >>> fh.accidental_mode
         'octave'
+        >>> token = Field('instruction', 'I:propagate-accidentals pitch')
+        >>> fh.abc_propagate_accidentals_instruction(token)
+        >>> fh.accidental_mode
+        'pitch'
         """
         try:
             instruction_str = token.data.split(maxsplit=1)[1].lower()
@@ -1902,6 +1908,8 @@ class ABCVoice(ABCObject):
         # set the closing barline i the measure
         self.stream.rightBarline = bar_line if bar_line else bar.Barline()
 
+        self.carried_accidentals = {}
+
         # Remove the measure reference from the context
         self.stream = None
         self.overlay.stream = None
@@ -1945,8 +1953,6 @@ class ABCVoice(ABCObject):
         # add the measure to an open repeat bracket spanner
         if self.repeat_bracket:
             self.repeat_bracket.addSpannedElements(measure)
-
-        self.carried_accidentals = {}
 
         # set active measure in the context
         self.stream = measure
@@ -2065,10 +2071,10 @@ class NoteMixin:
         if (carried_accidentals := self.voice.carried_accidentals) is not None:
             if accidental:
                 # Remember the active accidentals in the measure
-                if self.accidental_mode == 'octave':
-                    self.voice.carried_accidentals[(pitch_name, octave)] = accidental
-                elif self.accidental_mode == 'pitch':
-                    self.voice.carried_accidentals[pitch_name] = accidental
+                if self.accidental_mode == 'pitch':
+                    carried_accidentals[pitch_name] = accidental
+                elif self.accidental_mode == 'octave':
+                    carried_accidentals[(pitch_name, octave)] = accidental
             else:
                 if self.accidental_mode == 'pitch' and pitch_name in carried_accidentals:
                     implicit_accidental = carried_accidentals[pitch_name]

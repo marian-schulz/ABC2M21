@@ -587,22 +587,25 @@ P:C
 CDEFGAAB|[K: F]DEFG[K: E]AABC|
 """
 
-
-propagate_accidentals= """X:1
+abc_propagate_accidentals = """
+X:1
+T:Propagate-accidentals directive
 M:4/4
 L:1/4
 K:C
-[V:1 treble]
+[V:1 name="octave"]
 [I:propagate-accidentals octave]
-^C C D c | C ^C D c |
-[V:2 treble]
+   ^C C  D c | C ^C C  c |
+w: C# C# D C | C C# C# C |
+[V:2 name="pitch"]
 [I:propagate-accidentals pitch]
-^C C D c | C ^C D c |
-[V:3 treble]
+   ^C C  D c   | C ^C C  c  |
+w: C# C# D C#  | C C# C# C# |
+[V:3 name="not"]
 [I:propagate-accidentals not]
-^C C D c | C ^C D c |
+   ^C C  D c | C ^C C c |
+w: C# C  D C | C C# C C |
 """
-
 
 abc_ties = """
 X: 1
