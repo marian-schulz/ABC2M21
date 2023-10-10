@@ -44,12 +44,6 @@ T:Example 2
 K:
 % Having an empty abc tune is legal but removed from the abc parser               
 """
-abc_pitch_octaves = """X:1
-L:1/8
-K:
-C, D, E, F, G, A, B, x | C D E F G A B x | c d e f g a b x | c' d' e' f' g' a' b' x
-w: C, D, E, F, G, A, B, | C D E F G A B | c d e f g a b | c' d' e' f' g' a' b' 
-"""
 
 abc_accidentals = """
 X:1
@@ -537,6 +531,13 @@ K:
 [K:A#Loc]"^A# locrian"CDEFGABc | [K:BLoc]"^B locrian"CDEFGABc | [K:CLoc]"^C locrian"CDEFGABc |
 [K:D#Loc]"^D# locrian"CDEFGABc | [K:ELoc]"^E locrian"CDEFGABc | [K:FLoc]"^F locrian"CDEFGABc |
 [K:G#Loc]"^G# locrian"CDEFGABc | [K:ALoc]"^A locrian"CDEFGABc | [K:BbLoc]"^B- locrian"CDEFGABc |
+"""
+
+abc_pitch_octaves = """X:1
+L:1/8
+K:
+C, D, E, F, G, A, B, x  | C D E F G A B x | c d e f g a b x | c' d' e' f' g' a' b' x |
+w: C, D, E, F, G, A, B, | C D E F G A B   | c d e f g a b   | c' d' e' f' g' a' b'
 """
 
 abc_overlays_and_lyric = """

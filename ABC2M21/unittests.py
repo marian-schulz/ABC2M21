@@ -54,7 +54,7 @@ class TestMetric(NamedTuple):
 
 
 def create_metric(src: str):
-    score: stream.Score = next(ABCtranslator(src))
+    score: stream.Score = next(ABCTranslator(src))
     _objects = score.flatten().getElementsByClass(base.Music21Object)
     _note = score.flatten().getElementsByClass(note.Note)
     _chord = score.flatten().getElementsByClass(chord.Chord)
@@ -329,6 +329,16 @@ class TestFiles(unittest.TestCase):
         self.assertEqual(14, len(rests))
         self.assertEqual(7, len(hidden_rest))
         self.assertEqual(32.0, sum(r.quarterLength for r in rests))
+
+    def test_pitch_octaves(self):
+        score = ABCTranslator(abc_pitch_octaves)
+        self.assertIsInstance(score, stream.Score)
+        name_with_octave: list[str] = [ n.nameWithOctave for n in score.recurse().getElementsByClass(note.Note)]
+
+        self.assertEqual(['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3',
+         'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4',
+         'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5',
+         'C6', 'D6', 'E6', 'F6', 'G6', 'A6', 'B6'], name_with_octave)
 
     def test_trills(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:

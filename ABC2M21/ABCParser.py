@@ -2055,7 +2055,7 @@ class NoteMixin:
         pitch_name: common.types.StepName = pitch_name.upper()
 
         if m := match.group(3):
-            octave -= (m.count(',') + m.count("'"))
+            octave = octave - m.count(',') + m.count("'")
 
         # the abc accidental of the note
         accidental = self.abc_accidental(match.group(1))
@@ -2098,7 +2098,17 @@ class NoteMixin:
                 accidental, display = '', None
 
         m21_note = note.Note(f"{pitch_name}{accidental}{octave}")
-        m21_note.quarterLength = self.abc_length(m) if (m := match.group(4)) else 1.0
+
+        if m := match.group(4):
+            try:
+                length_modifier = self.abc_length(m)
+            except ABCException as e:
+                self.abc_error("Fallback to note length modifier '1.0'.", token, e)
+                length_modifier = 1.0
+        else:
+            length_modifier = 1.0
+
+        m21_note.quarterLength = length_modifier
 
         if accidental:
             m21_note.pitch.accidental.displayStatus = display
@@ -2148,33 +2158,33 @@ class NoteMixin:
         Returns:
             float: The length modifier as a float.
         """
+
+
+        denominator: int = 1
+        while src.endswith('/'):
+            denominator *= 2
+            src = src[:-1]
+
         if not src:
-            return 1.0
-        if src == '/':
-            return 0.5
-        if src == '//':
-            return 0.25
-        if src == '///':
-            return 0.125
+            return 1.0 / denominator
 
         try:
+            numerator = 1.0
             if src.startswith('/'):
                 # common usage: /4 short for 1/4
-                n, d = 1, int(src.lstrip('/'))
-            elif src.endswith('/'):
-                # uncommon usage: 3/ short for 3/2
-                n, d = int(src.strip().rstrip('/')), 2
+                denominator = int(src.lstrip('/'))
             elif '/' in src:
                 # common usage: 3/4
                 n, d = src.split('/')
-                n, d = int(n.strip()), int(d.strip())
-            else:
-                n, d = int(src), 1
-            return n / d
-        except ValueError:
-            self.abc_error(f'Incorrectly encoded or unparsable duration.')
+                numerator, denominator = int(n), int(d)
+            elif src.isdigit():
+                numerator = int(src)
 
-        return 1.0
+            return numerator / denominator
+
+        except ValueError:
+            raise ABCException(f'Incorrectly encoded or unparsable duration.')
+
 
     @staticmethod
     def abc_accidental(src: str) -> str:
@@ -3063,7 +3073,12 @@ class TuneBody(TuneHeader, NoteMixin):
         """
 
         rest_symbol = token.src[0]
-        length_modifier = self.abc_length(token.src[1:])
+        try:
+            length_modifier = self.abc_length(token.src[1:])
+        except ABCException as e:
+            length_modifier = 1.0
+            self.abc_error("Fallback to rest length modifier '1.0'.", token, e)
+
         rest: note.Rest = note.Rest()
 
         if rest_symbol in 'ZX':
@@ -3110,6 +3125,7 @@ class TuneBody(TuneHeader, NoteMixin):
                 self.voice.overlay.decorations.append(linebreak)
         else:
             self.abc_error(f"Symbol '{token.src}' is not a supported score linebreak")
+
 
     def fix_part_lengths(self):
         """
@@ -3249,8 +3265,14 @@ class ChordParser(ABCParser, NoteMixin):
             t.quarterLength = m21_notes[0].quarterLength
 
         m21_chord = chord.Chord(m21_notes)
-        m21_chord.quarterLength = m21_notes[0].quarterLength * \
-                                  self.abc_length(length_str)
+        try:
+            chord_length_modifier = self.abc_length(length_str)
+        except ABCException as e:
+            chord_length_modifier= 1.0
+            self.abc_error("Fallback to chord length modifier '1.0'.", token, e)
+
+        m21_chord.quarterLength = m21_notes[0].quarterLength * chord_length_modifier
+
 
         return m21_chord
 
