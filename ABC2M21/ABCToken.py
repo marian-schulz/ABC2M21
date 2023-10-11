@@ -107,8 +107,7 @@ TOKEN_SPEC: list[tuple[str, str]] = [
     ('end_repeat_barline', r"|".join([r':+[\|]', '[\|\]][1-9]'])),
     ('start_repeat_barline', r'[\|]:+|\[[1-9]'),
     ('barline', r"|".join([r'\|\]', r'\[\|', r'\|\|(?![:])', r'\|'])),
-    ('fingering', r'![0-5]!'),
-    ('decoration', r'![^!\n]*!'),
+    ('decoration', r'![^!%\[\]\|:\s]+!'),     # Note that decorations may not contain any spaces, [, ], | or : signs.
     ('chord', r'[\[][^\]:]*[\]][0-9]*[/]*[0-9]*(\s*[-])?'),
     ('decoration_or_chord', r'[+][^+:\n]*[+][0-9]*[/]*[0-9]*(\s*[-])?'),  # for legacy support
     ('unknown_decoration', rf"![^!\n]!"),

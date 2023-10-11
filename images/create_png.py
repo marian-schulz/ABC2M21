@@ -10,7 +10,12 @@ abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
              'abc_accidentals', 'abc_decoration_spanner', 'abc_note_duration',
              'abc_user_defined_symbols', 'abc_broken_rhythm', 'abc_dynamics',
              'abc_expressions', 'abc_articulations', 'abc_repeat_marker', 'abc_rests',
-             'abc_legacy_chord_and_decoration', 'abc_ave_maria']
+             'abc_legacy_chord_and_decoration', 'abc_ave_maria', 'abc_fingerings',
+             'abc_repeat_bar_lines', 'abc_slur', 'abc_simple_ties', 'abc_simple_grace',
+             'abc_atholl_brose', 'abc_auto_trill_spanner', 'abc_tuplets', 'abc_extended_tuplet',
+             'abc_shorthand_decorations', 'abc_chord_example', 'abc_unison', 'abc_chord_symbols',
+             'abc_chord_dialect'
+             ]
 
 musecores = ['/home/mschulz/Anwendungen/MuseScore-3.6.0.451381076-x86_64.AppImage',
              '/home/mschulz/Anwendungen/MuseScore-4.1.1.232071203-x86_64.AppImage',
@@ -26,7 +31,7 @@ for musecore in musecores:
 # Getting the current working directory
 cwd = os.getcwd()
 
-#s = ABCTranslator(abc_propagate_accidentals)
+#s = ABCTranslator(testtunes.abc_chord_dialect)
 #s.show()
 #exit()
 

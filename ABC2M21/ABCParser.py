@@ -346,7 +346,7 @@ class FileHeader(ABCParser):
             else 'pitch'
 
         self.is_legacy_abc_decoration: bool = abc_version == (2, 0, 0)
-        self.is_legacy_abc_chord: bool = (abc_version < (1, 6, 0)
+        self.is_legacy_abc_chord: bool = (abc_version != (2, 0, 0)
                                           and not self.is_legacy_abc_decoration)
         self.linebreak = ['<EOL>', '$', '!']
 
@@ -2509,14 +2509,14 @@ class TuneBody(TuneHeader, NoteMixin):
                                     key_signature=self.key_signature)
 
         intern = token.src[1:-1]
-
-        if intern.startswith('/'):
+        slash = intern.startswith('/')
+        if slash:
             intern = intern[1:]
 
         tokens = list(tokenize(intern, abc_version=self.abc_version))
 
         # remember the grace notes to slur to a main note
-        self.voice.overlay.grace_notes = GraceNoteParser(self).process(tokens)
+        self.voice.overlay.grace_notes = GraceNoteParser(self).process(tokens, slash)
 
     def abc_key(self, token: Field):
         ks, _, _ = super().abc_key(token)
@@ -2908,7 +2908,11 @@ class TuneBody(TuneHeader, NoteMixin):
             token (Token): The token to process.
         """
         if self.is_legacy_abc_chord:
-            self.abc_chord(token)
+            try:
+                self.abc_chord(token)
+            except ABCException as e:
+                self.abc_error("Cannot parse this chord ( + dialect). Maybe it is a abc 2.0 decoration?", token)
+
         elif self.is_legacy_abc_decoration:
             self.abc_decoration(token)
         else:
@@ -2952,9 +2956,9 @@ class TuneBody(TuneHeader, NoteMixin):
         elif decoration in M21_OPEN_SPANNER:
             self.voice.add_spanner(M21_OPEN_SPANNER[decoration]())
         elif decoration in ('1', '2', '3', '4', '5'):
-            self.voice.overlay.decorations.append(
-                articulations.Fingering(fingerNumber=int(decoration))
-            )
+            finger = articulations.Fingering(fingerNumber=int(decoration))
+            finger.placement = 'below'
+            self.voice.overlay.articulations.append(finger)
         else:
             self.abc_error('Unknown abc decoration', token)
 
@@ -3234,7 +3238,7 @@ class ChordParser(ABCParser, NoteMixin):
 
     def process(self, token: Token):
 
-        if self.is_legacy_abc_chord:
+        if token.src.startswith('+'):
             # legacy chord style: +CEG+/2
             intern_str, length_str = token.src[1:].split('+', 1)
         else:
@@ -3294,10 +3298,11 @@ class GraceNoteParser(ABCParser, NoteMixin):
         self.time_signature = body_processor.time_signature
         self.quarterLength = 0.25
 
-    def process(self, intern: list[Token]) -> list[music21.Music21Object]:
-        grace_notes: list[music21.Music21Object] = []
+    def process(self, intern: list[Token], slash:bool = False) -> list[music21.Music21Object]:
+        grace_notes: list[note.Note] = []
         for token in intern:
             if grace_note := self.abc_token(token):
+                grace_note.duration.slash = slash
                 grace_notes.append(grace_note)
         return grace_notes
 
@@ -3306,20 +3311,19 @@ class GraceNoteParser(ABCParser, NoteMixin):
         Während grace notes broken rhythm enthalten können, dürfen sie nicht mir
         einen broken rhythm ausserhalb ihres kontext kommunizieren.
         """
-        self.abc_error('Broken rhythm for grace notes not supported.', token)
+        self.abc_error('Broken rhythm for grace notes not supported. (yet)', token)
 
     def abc_tuplet(self, token: Token):
         """
         Während grace notes broken rhythm enthalten können, dürfen sie nicht mir
         einen broken rhythm ausserhalb ihres kontext kommunizieren.
         """
-        self.abc_error('Tuplets for grace notes not supported.', token)
+        self.abc_error('Tuplets for grace notes not supported. (yet)', token)
 
     def abc_note(self, token: Token):
         m21_note= super().abc_note(token)
         m21_note.quarterLength *= self.quarterLength
-        m21_note = m21_note.getGrace()
-        return m21_note
+        return m21_note.getGrace()
 
 
 def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:

@@ -74,6 +74,10 @@ K:C
 WC UD VE .F
 """
 
+abc_chord_symbols = """
+"A"A2 "Am"A2 "A7"A2 "Amaj7"A2 "A+"A2
+"""
+
 abc_legacy_chord_and_decoration = """
 %abc-1.5 
 X:1
@@ -83,6 +87,10 @@ K:C
 I:decoration +  % Set '+' als decoration denotation symbol
 +CEG+           % But now, the legacy chord symbol '+' is disabled
 +trill+C        % this is now a legal trill decoration
+"""
+
+abc_chord_dialect = """
++CEG+           
 """
 
 abc_legacy_decoration_2_0 = """
@@ -102,7 +110,7 @@ abc_decoration_instruction = """
 X:1
 K:
 +trill+C        % This is not 2.1 syntax
-I:decoration +  % After setting the decoraition symbol +
+I:decoration +  % After setting the decoration symbol +
 +plus+E         % This will work now
 !trill!G        % And using ! for decorations will still work too
 """
@@ -161,6 +169,15 @@ K:
 WC~C
 """
 
+abc_auto_trill_spanner = """
+X: 
+T: Tune with trills
+L: 1/4
+M:C
+K:C
+C TE T[CEG] TF | TE CEG |
+"""
+
 abc_trills = """%abc-1.9
 X: 
 T: Tune with trills
@@ -200,7 +217,6 @@ L:1/4
 M:4/4
 K:E
 !<(!ABCD!<)! | !>(!ABCD!>)! | !trill(! ABCD | A!trill)!BCAB |
-
 """
 
 abc_broken_rhythm = """
@@ -212,6 +228,15 @@ K:C
 >F>FA<A | G<<GB>>B | C>>>C D<<<D | [CEG]>E E<[EGB] |
 [BDF]>[DFA] [BDF]<[DFA] | E>D [BDF]<D | E>{CEG2}D [BDF]<{CE>G}D | D> |
 """
+
+abc_fingerings = """
+X:0
+L:1/4
+T:Fingerings
+K:C
+!1!E !2!G !3!E !4!F !5!G 
+"""
+
 
 abc_decorations = """
 X: 0
@@ -267,11 +292,11 @@ w:!segno!     !coda!    !fine!    !D.S.!    !D.S.alcoda!    !D.S.alfine!    !dac
 
 abc_repeat_bar_lines = """
 X: 2
-T:Bar lines
+T:Barlines
 M:4/4
 L:1/4
 K:C
-|: EGBc [| cega & aaaa :: CEGA ::| fa ge|[1 de BA | defg :|[2 de dB || abcde |] 
+|: EGBc [| cega :: CEGA ::|[1 de BA | defg :|[2 de dB || abcd |]
 """
 
 abc_grace= """
@@ -289,14 +314,33 @@ K:D
 [C/2EG]8 | [CEG]4 | [C/4EG]4 [C/2EG]2 [CEG]2
 """
 
+abc_unison = """
+[DD]
+"""
+abc_extended_tuplet = """
+X:0
+T:shorthand decoration
+K:C
+(3:2:4 G2A2Bc
+"""
+
+abc_chord_example = """
+( "^I" !f! [CEG]- > [CEG] "^IV" [F=AC]3/2"^V"[GBD]/  H[CEG]2 )
+"""
+
 abc_tuplets = """
 X:2
-T:Test Tuplet Primitive
+T:Simple Tuplets
 M:4/4
 K:E
 (3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f
 (3.c2=c2^c2 (3.c2=c2^c2
 (6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
+"""
+
+abc_shorthand_decorations = """
+(3.a.b.c
+vAuBvA
 """
 
 abc_primitive_polyphonic = '''M:6/8
@@ -309,6 +353,7 @@ BdB AcA | GAG D3 | BdB AcA | D6 ||
 V:3 name="Bass" snm="b" clef=bass
 D3 D3 | D6 | D3 D3 | D6 ||
 '''
+
 the_begger_boy = '''
 X:5
 T:The Begger Boy
@@ -587,6 +632,7 @@ T:Test spanner
 U:t = !trill!
 L:1/4
 M:4/4
+M:4/4
 K:E
 !<(!ABCD!<)! | !>(!ABCD!>)! | !trill(! ABCD | A!trill)!tBCtAtB |
 """
@@ -644,6 +690,14 @@ w: C# C# D C#  | C C# C# C# |
 w: C# C  D C | C C# C C |
 """
 
+abc_simple_ties = """
+X: 1
+M: 4/4
+L: 1/4
+K: C
+C-C-[CEG-]G-|[CEG]-[EGB]-B z |
+"""
+
 abc_ties = """
 X: 1
 M: 4/4
@@ -663,7 +717,7 @@ X: 1
 M: 4/4
 L: 1/4
 K: C
-C(DE)F|ABC(D|AB)([CEG]C)
+C(DE)F|ABC(D|AB)([CEG]C)|
 """
 
 abc_carry_accidentals = """
@@ -856,7 +910,15 @@ clef = """
 
 """
 
-atholl_brose ="""X:2
+abc_simple_grace = """
+X: 1
+T: Grace notes
+L: 1/2
+K: C
+"^Appoggiatura"{g}E {GdGe}F | "^Acciaccatura"{/g}E {/GdGe}F |
+"""
+
+abc_atholl_brose ="""X:2
 T:Atholl Brose
 %%MIDI program 1  110
 Q:1/4=80
