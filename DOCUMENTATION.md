@@ -1,4 +1,17 @@
 
+# ABC2M21 Configuration
+Sometimes, it's necessary to disable or configure certain features of ABC2M21.
+
+For instance, the images in this document were created using Musescore3. Unfortunately, Musescore's musicxml 
+import is not flawless. In such cases, if possible, ABC2M21 provides a workaround.
+
+```
+from ABC2M21 import ABC2M21_CONFIG
+
+# Convert complex meters into an equivalent of a simple meter
+ABC2M21_CONFIG['simplifiedComplexMeter'] = True
+```
+
 # ABC Elements
 
 The following section shows images, how the translator creates music21 objects 
@@ -29,51 +42,105 @@ xmlconv.write(m21_stream, fmt='musicxml', fp="myfile.png", subformats=['png'])
 ```
 ![twinkle](images/twinkle.png)
 
-## Pitches Across Various Octaves
+## ABC fields
+
+### Unit note length
+The **Unit Note Length** sets the fundamental duration of an ABC note. 
+
+If no `L:` field is provided, the default unit note length is determined based on the length of the 
+meter's bar duration:
+
+* If the length is less than 0.75, the default unit note length is a sixteenth note.
+* If the length is 0.75 or greater, it defaults to an eighth note.
+* If no meter is defined, it also defaults to an eighth note
+
+Example:
+```
+[L:1/1] C [L:1/2] C [L:1/4] C [L:1/8] C [L:1/16] C [L:1/32] C
+```
+![unit note length](images/unit_note_length.png)
+
+### Meter
+The `M:` field in ABC notation indicates the **meter** of the music. Common meters like 6/8 or 4/4 are 
+represented as `M:6/8` or `M:4/4`. Additionally, `M:C` represents common time (4/4), and `M:C|` represents 
+cut time (2/2). Using `M:none` omits specifying the meter, indicating free meter.
+
+Complex meters can be defined, such as `M:(2+3+2)/8`. However, certain applications like Musescore may 
+struggle to handle complex meters. To address this, you can ask **ABC2M21** to simplify complex meter by 
+setting the `simplifiedComplexMeter` property in the **ABC2M21 Configuration**. 
+```
+ABC2M21_CONFIG['simplifiedComplexMeter'] = True
+```
+
+Example:
+```
+X:0
+L:1/8
+M:6/8
+K:C
+CDEFGA|[M:4/4]CDEFGABc|[M:C]CDEFGABc|[M:C|]CDEFGABc|[M:(2+3+2)/8]CDEFGAB
+```
+![Meter](images/meter.png)
+
+### Tempo
+The `Q:` field in ABC notation sets the tempo as beats per minute, for instance, `Q:1/2=120` 
+means 120 half-note beats per minute. The tempo definition can include an optional text string 
+in quotes before or after it. 
+Additionally, there are deprecated older syntax variants specifying how many unit note lengths 
+to play per minute, for instance `Q:120` or `Q:C=120` means play 120 unit note-lengths per minute.
+
+Example:
+```
+L:1/1
+[Q:1/2=120]E | [Q:"Allegro" 1/4=120]F | [Q: 3/8=50 "Slowly"]G | [Q:"Andante"]A | [Q:120]B | 
+```
+![Tempo](images/tempo.png)
+
+## ABC music code
+
+### Pitches Across Various Octaves
 
 Example:
 ```
 X:1
+L:1/1
 K:C
    C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b' |
 w: C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b' 
 ```
 ![abc pitches over serval octave](images/pitch_octaves.png)
 
-## Accidentals
-In ABC notation, accidentals are written before the note using symbols such as ^ (sharp), = (natural), and _ (flat). 
-Double sharps and flats are denoted by ^^ and __ respectively.
+### Accidentals
+In ABC notation, accidentals are written before the note using symbols such as `^` (sharp), `=` (natural), and `_` (flat). 
+Double sharps and flats are denoted by `^^` and `__` respectively.
+
+Note:
+* The decoration !courtesy! is a feature defined in the ABC 2.2 draft.
+
 ```
-X:1
 L:1/1
-K:C
-   ^C     _D   =E      ^^F          __G
-w: sharp  flat natural double~sharp double~flat
+"_sharp"^C "_flat"_D  "_natural"=E  "_double sharp"^^F  "_double flat"__G "_!courtesy!"!courtesy!^C
 ```
 ![abc pitches over serval octave](images/accidentals.png)
 
-## Note duration
+### Note duration
 The note duration is relative to the `unit not length`.
 
 ```
-X:1
 L:1/4
-M:none
-K:C
-   C4   C3   C2   C3/2  C    C/2  C//   C///  C////
-w: 1/1  3/4  1/2  3/8   1/4  1/8  1/16  1/32  1/64 
+C4   C3   C2   C3/2  C    C/2  C//   C///  C////
 ```
 
 ![note durations](images/note_duration.png)
 
-## Broken rhythm
-In ABC notation, the symbols '>' and '<' represent specific rhythmic patterns. 
-'>' signifies 'the previous note is dotted, the next note is halved,' while '<' 
-indicates 'the previous note is halved, the next note is dotted.
+### Broken rhythm
+In ABC notation, the symbols `>` and `<` represent specific rhythmic patterns. 
+`>` signifies 'the previous note is dotted, the next note is halved, while `<` 
+indicates the previous note is halved, the next note is dotted.
 
-Extending this logic, '>>' implies the first note is double dotted and the second 
-is quartered, while '>>>' means the first note is triple dotted and the second note's 
-length is divided by eight. The same pattern applies for '<<' and '<<<'. 
+Extending this logic, `>>` implies the first note is double dotted and the second 
+is quartered, while `>>>` means the first note is triple dotted and the second note's 
+length is divided by eight. The same pattern applies for `<<` and `<<<`. 
 
 Note:
 * It's important to note that using broken rhythm markers between notes of unequal lengths 
@@ -84,36 +151,31 @@ may yield undefined results and should be avoided.
 
 Example:
 ```
-X:0
 L:1/4
-M:C
-K:C
 >F>F A<A | G<<G B>>B | C>>>C D<<<D | [CEG]>E E<[EGB] |
 [BDF]>[DFA] [BDF]<[DFA] | E>D [BDF]<D | E>{CEG2}D [BDF]<{CE>G}D | D> |
 ```
 ![broken rhythm](images/broken_rhythm.png)
 
-## Rests
-Rests in ABC notation can be represented using 'z' or 'x', and their length can be modified just like regular notes. 
-'z' rests are visible in the sheet music, while 'x' rests are invisible and won't be shown when printed. 
-For multi-measure rests, 'Z' (uppercase) is used followed by the number of measures, or 'X' for invisible multi-measure 
+### Rests
+Rests in ABC notation can be represented using `z` or `x`, and their length can be modified just like regular notes. 
+`z` rests are visible in the sheet music, while `x` rests are invisible and won't be shown when printed. 
+For multi-measure rests, `Z` (uppercase) is used followed by the number of measures, or `X` for invisible multi-measure 
 rests."
 
 TODO:
 * Remove the additional clef and meter symbols for multi measure rests
 
 ```
-X: 
 L:1/4
 M:C
-K:
 z z2 z/2 z/4 z/4 | x x2 x/2 x/4 x/4 | Z | X | Z2 | X2 |
 ```
 
 ![rests](images/rests.png)
 
 
-## Barlines
+### Bar lines
 
 |       Symbol       | Meaning                              |
 |:------------------:|--------------------------------------|
@@ -132,11 +194,11 @@ Note:
 
 Todo:
   * Variant endings
-  * Dotted Barline '.|'
+  * Dotted bar line '.|'
   * An invisible bar line may be notated by putting the bar line in brackets: [|]
 
 ```
-X: 2
+X:1
 M:4/4
 L:1/4
 K:C
@@ -144,9 +206,12 @@ K:C
 ```
 ![barlines](images/repeat_bar_lines.png)
 
-## Ties
+### Ties
 Ties in music notation are used to link the duration of two or more notes of the same pitch, 
 creating a seamless, extended sound.
+
+Todo:
+* Dotted ties `.-`
 
 ```
 X: 1
@@ -157,12 +222,14 @@ C-C-[CEG-]G-|[CEG]-[EGB]-B z |
 ```
 ![ties](images/simple_ties.png)
 
-## Slurs
+### Slurs
 Slurs in music notation are used to indicate the grouping or legato playing of notes, typically denoting a 
 smooth transition between them.
 
-TODO:
-* Dotted slur `.(` & `.)`
+Note:
+* MuseScore didn't recognize the dotted slur attribute.
+
+Todo:
 * Slurs starting/ending on chord notes
 
 ```
@@ -174,7 +241,7 @@ C(DE)F|ABC(D|AB)([CEG]C)
 ```
 ![slur](images/slur.png)
 
-## Grace notes
+### Grace notes
 Grace notes in abc are represented within curly braces: `{ ... }`. Acciaccaturas are indicated by adding a forward slash 
 after the opening brace `{/ ... }` to differentiate them from appoggiaturas.  Acciaccatura and appoggiatura, differ in 
 their visual representation on the score too. Acciaccatura is typically notated  with a slash through the stem, 
@@ -183,7 +250,6 @@ distinguishing it from appoggiatura.
 Notes:
 * Musescore3 ignores the 'slash' attribut in xml imports.
 * The parser requires a main note for grace notes
-* The tune 'Athol Brose' demonstrates gracing on the Highland pipes. (tunes section)
 
 Todo:
 * Chords for grace notes
@@ -198,7 +264,7 @@ K: C
 ```
 ![Grace notes](images/simple_grace.png)
 
-## Tuplets (Duplets, triplets, quadruplets...)
+### Tuplets (Duplets, triplets, quadruplets...)
 Tuplets are rhythmic groupings where a specific number of notes are played in the time typically occupied by a 
 different number of notes, adding rhythmic variety and complexity to the music. 
 
@@ -233,7 +299,7 @@ K:E
 ```
 ![simple tuplets](images/tuplets.png)
 
-## Decorations
+### Decorations
 In ABC notation, decorations refer to symbols or annotations that modify the way a note is played or interpreted. 
 These include dynamic markings, articulations, expressions, and more. Decorations enhance the musical expression and 
 provide additional information to the performer, guiding them on how to play the piece with specific nuances and 
@@ -255,7 +321,7 @@ A number of shorthand decoration symbols are available:
 |    u    | up-bow                           |
 |    v    | down-bow                         |
 
-Most of the characters above `~HLMOPSTuv`  are just short-cuts for commonly used decorations and can even be redefined.
+Most of the characters above `~HLMOPSTuv` are just short-cuts for commonly used decorations and can even be redefined.
 
 Example:
 ```
@@ -273,22 +339,19 @@ Note:
 Todo:
 * The shorthand symbol `~` is not implemented. I don't know the 'irish roll'.
 
-### Dynamics decoration
+#### Dynamics decoration
 Dynamics in music refer to variations in loudness or intensity. 
 They convey the volume or force with which a particular section of music is to be played. 
 In ABC notation, dynamics are part of decorations, allowing notations like 'mf' for mezzo-forte (moderately loud) 
 or 'p' for piano (soft).
 
 ```
-X: 0
-L: 1/4
-K:C
 !p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
 ```
 ![dynamics](images/dynamics.png)
 
 
-### Decoration spanner
+#### Decoration spanner
 Crescendo, diminuendo, and trill decorations can be spanned across multiple notes using a spanner.
 
 ```
@@ -299,8 +362,18 @@ K:C
 ```
 ![Decoration spanner](images/decoration_spanner.png)
 
+The trill spanner is a recent addition, but ABC2M21 is capable of grouping adjacent notes with trill decorations 
+into a music21 trill extension spanner.
+```
+X: 
+L:1/4
+M:C
+K:C
+C TE T[CEG] TF | TE CEG |
+```
+![auto trill spanner](images/auto_trill_spanner.png)
 
-### Expression decorations
+#### Expression decorations
 ABC decorations encompass a variety of music21 concepts, including expressions.
 
 Note:
@@ -308,25 +381,12 @@ Note:
 * !lowermordent! is the same as !mordent!
 
 ```
-X: 0
-L: 1/4
+L:1/4
 K:C
   !invertedfermata!C !trill!C !mordent!C !fermata!C !turn!C !arpeggio!'C !slide!C !uppermordent!C
 w:!invertedfermata!  !trill!  !mordent!  !fermata!  !turn!  !arpeggio!   !slide!  !uppermordent! 
 ```
 ![Expressions](images/expressions.png)
-
-#### Trills
-The trill spanner is a recent addition, but ABC2M21 is capable of grouping adjacent notes with trill decorations 
-into a music21 trill extension spanner.
-```
-X: 
-L: 1/4
-M:C
-K:C
-C TE T[CEG] TF | TE CEG |
-```
-![auto trill spanner](images/auto_trill_spanner.png)
 
 
 ### Articulation decorations
@@ -343,13 +403,10 @@ Note:
   * !+!, !snap!, !nail! are all Pizzicato variants but are ignored by musescore
 
 ```
-X: 0
-L: 1/4
+L:1/4
 K:C
   !staccato!C  | !>!C     | !downbow!C | !^!C | !breath!C |
-w:!staccato!     !>!        !downbow!    !^!    !breath!
   !tenuto!C    | !upbow!C | !open!C    | !+!C | !snap!C   | !nail!C
-w:!tenuto!       !upbow!    !open!       !+!    !snap!      !nail!
 ```
 ![Articulations](images/articulations.png)
 
@@ -357,10 +414,9 @@ w:!tenuto!       !upbow!    !open!       !+!    !snap!      !nail!
 ABC decorations encompass a variety of music21 concepts, including repeat marker
 
 ```
-X: 0
-L: 1/4
+L:1/4
 K:C
-  !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C
+  !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C |
 w:!segno!     !coda!    !fine!    !D.S.!    !D.S.alcoda!    !D.S.alfine!    !dacapo!    !D.C.alcoda!
 ```
 ![Repeat marker](images/repeat_marker.png)
@@ -538,20 +594,3 @@ I:decoration +  % Set '+' als decoration denotation symbol
 +trill+C        % this is now a legal trill decoration
 ```
 ![legacy chord and decoration](images/legacy_chord_and_decoration.png)
-
-## Tunes
-Here are some example of imported abc tunes.
-
-### Atholl Brose
-The tune 'Atholl Brose' demonstrates complex gracing on the Highland pipes.
-
-![Atholl Brose](images/atholl_brose.png)
-
-### Ave Maria (Franz Schubert)
-One of my favorit tunes from Franz Schubert
-
-![Ave Marian (Schubert) (1)](images/ave_maria.png)
-![Ave Marian (Schubert) (2)](images/ave_maria-2.png)
-![Ave Marian (Schubert) (3)](images/ave_maria-3.png)
-
-

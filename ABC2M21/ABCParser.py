@@ -14,7 +14,8 @@ from music21 import note, chord, repeat, meter
 
 from ABC2M21.ABCToken import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
 
-environLocal = environment.Environment('ABC2M21')
+ABC2M21_ENVIRONMENT = environment.Environment('ABC2M21')
+ABC2M21_CONFIG = {'simplifiedComplexMeter': False }
 
 
 Syllables: TypeAlias = list[str]
@@ -76,6 +77,9 @@ M21_ARTICULATIONS = {
     'plus': articulations.Pizzicato,
     'snap': articulations.SnapPizzicato,
     'nail': articulations.NailPizzicato,
+    'doit': articulations.Doit,
+    'thumb': articulations.StringThumbPosition,
+    'cesura': articulations.Caesura
 }
 
 # Mapping from abc decorations to music21 RepeatMark
@@ -112,8 +116,10 @@ M21_EXPRESSIONS = {
     'mordent': expressions.Mordent,
     'fermata': upright_fermata,
     'turn': expressions.Turn,
+    'invertedturn': expressions.InvertedTurn,
     'slide': expressions.Schleifer,
     'arpeggio': expressions.ArpeggioMark,
+    'tremolo': expressions.Tremolo
 }
 
 # Mapping from abc spanner (decorations) to music21 Spanner
@@ -154,7 +160,7 @@ class ABCObject:
         if exception:
             messages.append(f'\n{exception}')
 
-        environLocal.printDebug(messages)
+        ABC2M21_ENVIRONMENT.printDebug(messages)
 
 
 class ScoreInstruction(NamedTuple):
@@ -455,7 +461,11 @@ class FileHeader(ABCParser):
                 self.abc_error('Failed to calculate denominator of the meter token', token, e)
 
             if len(numerators) > 1:
-                meter_str = "+".join([f"{n}/{denominator}" for n in numerators])
+                if ABC2M21_CONFIG.get('simplifiedComplexMeter', False):
+                    meter_str = "+".join([f"{sum(numerators)}/{denominator}"])
+                else:
+                    meter_str = "+".join([f"{n}/{denominator}" for n in numerators])
+
                 self.time_signature = meter.TimeSignature(meter_str)
             else:
                 self.time_signature = meter.TimeSignature(f"{sum(numerators)}/{denominator}")
@@ -1622,6 +1632,8 @@ class ABCOverlay(ABCObject):
 
         self.stream: None = None
 
+        self.courtesy: bool = False
+
         # We remember the grace note until we find a target note.
         # We want to slur the first grace note to the target note,
         # and we need the target note to calculate the grace duration.
@@ -1830,8 +1842,6 @@ class ABCVoice(ABCObject):
         self.lyrics: list = []
         self.lyric_bar_count: int = 0
 
-        self.time_signature: meter.TimeSignature | None = None
-
         # last measure of the part in this context
         self.stream: stream.Measure | None = None
         self.repeat_bracket: spanner.RepeatBracket | None = None
@@ -1894,14 +1904,18 @@ class ABCVoice(ABCObject):
         self.repeat_bracket.completeStatus = True
         self.repeat_bracket = None
 
-    def close_measure(self, bar_line: bar.Barline | None = None):
+    def close_measure(self, time_signature: meter.TimeSignature, bar_line: bar.Barline | None = None):
 
         assert self.stream is not None, "No open measure in the active context to close found"
         assert self.stream.quarterLength > 0, 'Closing an empty measure!'
         # Split a measure if the measure length is greater than the measure
         # length of the given time signature
-        if self.time_signature is not None:
-            time_sig_length = self.time_signature.barDuration.quarterLength
+        if time_signature is not None:
+            measures = self.part.getElementsByClass(stream.Measure)
+            if len(measures) == 1:
+                measures[0].timeSignature = time_signature
+
+            time_sig_length = time_signature.barDuration.quarterLength
             if self.stream.quarterLength > time_sig_length:
                 self.split_measure(time_sig_length)
 
@@ -1919,7 +1933,6 @@ class ABCVoice(ABCObject):
 
     def open_measure(self,
                      bar_line: bar.Barline | None = None,
-                     time_signature: meter.TimeSignature | None = None,
                      key_signature: key.KeySignature | None = None
                      ):
 
@@ -1938,9 +1951,6 @@ class ABCVoice(ABCObject):
         if not self.part.getElementsByClass(stream.Measure):
             if self.clef:
                 measure.clef = self.clef
-            if time_signature:
-                measure.timeSignature = time_signature
-                self.time_signature = time_signature
             if key_signature:
                 measure.keySignature = key_signature
 
@@ -2118,6 +2128,8 @@ class NoteMixin:
 
         if accidental:
             m21_note.pitch.accidental.displayStatus = display
+            if self.voice.overlay.courtesy:
+                m21_note.pitch.accidental.displayStyle = 'parentheses'
 
         if match.group(5):
             m21_note.tie = tie.Tie('start')
@@ -2505,8 +2517,7 @@ class TuneBody(TuneHeader, NoteMixin):
             token: The token representing ABC GraceNotes.
         """
         if self.voice.stream is None:
-            self.voice.open_measure(time_signature=self.time_signature,
-                                    key_signature=self.key_signature)
+            self.voice.open_measure(key_signature=self.key_signature)
 
         intern = token.src[1:-1]
         slash = intern.startswith('/')
@@ -2523,8 +2534,7 @@ class TuneBody(TuneHeader, NoteMixin):
 
         if ks:
             if self.voice.stream is None:
-                self.voice.open_measure(time_signature=self.time_signature,
-                                        key_signature=self.key_signature)
+                self.voice.open_measure(key_signature=self.key_signature)
 
             self.voice.overlay.append(self.key_signature)
 
@@ -2601,7 +2611,7 @@ class TuneBody(TuneHeader, NoteMixin):
 
         if self.voice.stream:
             # If the last measure is still open, close it
-            self.voice.close_measure()
+            self.voice.close_measure(self.time_signature)
 
         # When starting a new repeat section, we will close all open repeat
         # Brackets.
@@ -2610,14 +2620,12 @@ class TuneBody(TuneHeader, NoteMixin):
 
         if token.src[-1].isdigit():  # [n, |n
             # Open a new measure without a bar line
-            self.voice.open_measure(time_signature=self.time_signature,
-                                    key_signature=self.key_signature)
+            self.voice.open_measure(key_signature=self.key_signature)
             # And open a repeat bracket
             self.voice.open_repeat_bracket(int(token.src[-1]))
         else:  # |:
             # Create a new measure with this bar line token
             self.voice.open_measure(
-                time_signature=self.time_signature,
                 key_signature=self.key_signature,
                 bar_line=bar.Repeat(direction='start')
             )
@@ -2639,7 +2647,8 @@ class TuneBody(TuneHeader, NoteMixin):
         if self.voice.stream:
             #  Close the current measure with this EndRepeatBarline Token
             self.voice.close_measure(
-                bar.Repeat(direction='end', times=token.src.count(':') + 1)
+                time_signature=self.time_signature,
+                bar_line=bar.Repeat(direction='end', times=token.src.count(':') + 1)
             )
         else:
             # There is no open measure in the context that can be closed
@@ -2677,11 +2686,10 @@ class TuneBody(TuneHeader, NoteMixin):
 
         if self.voice.stream:
             # Close the current measure with this bar line
-            self.voice.close_measure(bar_line)
+            self.voice.close_measure(self.time_signature, bar_line)
         else:
             # Create a new measure with this bar line
             self.voice.open_measure(bar_line,
-                                    time_signature=self.time_signature,
                                     key_signature=self.key_signature
                                     )
 
@@ -2826,7 +2834,10 @@ class TuneBody(TuneHeader, NoteMixin):
         to the active context and part.
 
         """
-        self.voice.add_spanner(spanner.Slur())
+        slur = spanner.Slur()
+        if token.src.startswith('.'):
+            slur.lineType = 'dashed'
+        self.voice.add_spanner(slur)
 
     def abc_close_slur(self, token: Token):
         """
@@ -2875,6 +2886,9 @@ class TuneBody(TuneHeader, NoteMixin):
         Insert a music21 tempoMark Object into the recent measure
         """
         if tempoMark := super().abc_tempo(token):
+            if self.voice.stream is None:
+                self.voice.open_measure(key_signature=self.key_signature)
+
             self.voice.overlay.append(tempoMark)
 
     def abc_tuplet(self, token: Token):
@@ -2934,6 +2948,8 @@ class TuneBody(TuneHeader, NoteMixin):
         # remove the decoration symbol '!' or '+'
         decoration = token.src[1:-1]
 
+        if decoration == 'courtesy':
+            self.voice.overlay.courtesy = True
         if decoration == 'trill':
             # Trill is a special case for detecting
             self.voice.overlay.is_trill = True
@@ -2997,8 +3013,7 @@ class TuneBody(TuneHeader, NoteMixin):
             ncr (note.GeneralNote): The GeneralNote object to be processed.
         """
         if self.voice.stream is None:
-            self.voice.open_measure(time_signature=self.time_signature,
-                                    key_signature=self.key_signature)
+            self.voice.open_measure(key_signature=self.key_signature)
 
         self.voice.overlay.apply_broken_rhythm(ncr)
         self.voice.overlay.apply_tuplet(ncr)
@@ -3044,6 +3059,16 @@ class TuneBody(TuneHeader, NoteMixin):
         self.voice.overlay.cleanup_ties([m21_note])
 
         self.abc_GeneralNote(m21_note)
+
+    def abc_meter(self, token: Field):
+        _meter = super().abc_meter(token)
+        if _meter:
+            if self.voice.stream is None:
+                self.voice.open_measure(
+                    key_signature=self.key_signature
+                )
+            self.voice.time_signature = _meter
+            self.voice.stream.timeSignature = _meter
 
     def abc_chord(self, token: Token):
         """
@@ -3488,5 +3513,5 @@ def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
 if __name__ == '__main__':
     import doctest
 
-    environLocal['debug'] = False
+    ABC2M21_ENVIRONMENT['debug'] = False
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

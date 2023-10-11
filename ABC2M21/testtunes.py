@@ -46,23 +46,17 @@ K:
 """
 
 abc_note_duration = """
-X:1
 L:1/4
-M:none
-K:C
-   C4   C3   C2   C3/2  C    C/2  C//   C///  C////
-w: 1/1  3/4  1/2  3/8   1/4  1/8  1/16  1/32  1/64 
+C4   C3   C2   C3/2  C    C/2  C//   C///  C////
 """
 
 abc_decoration_spanner = """
-X: 1
 L:1/4
 K:C
 !<(!ABCD!<)! !>(!ABCD!>)! !trill(!ABCD!trill)!|
 """
 
 abc_user_defined_symbols = """
-X: 1
 L: 1/4
 T: User defined symbols
 U: W = !trill!
@@ -140,10 +134,8 @@ AG$F!D
 """
 
 abc_rests = """
-X: 
 L:1/4
 M:C
-K:
 z z2 z/2 z/4 z/4 | x x2 x/2 x/4 x/4 | Z | X | Z2 | X2 |
 """
 
@@ -206,8 +198,7 @@ DDDD | AAAA & CC'CC'
 """
 
 abc_spanner = """
-X: 1
-T:Spanner
+X:1
 U:t = !trill!
 L:1/4
 M:4/4
@@ -215,23 +206,24 @@ K:E
 !<(!ABCD!<)! | !>(!ABCD!>)! | !trill(! ABCD | A!trill)!BCAB |
 """
 
+abc_tempo = """
+L:1/1
+[Q:1/2=120]E | [Q:"Allegro" 1/4=120]F | [Q: 3/8=50 "Slowly"]G | [Q:"Andante"]A | [Q:120]B | 
+"""
+
+abc_unit_note_length = """
+[L:1/1] C [L:1/2] C [L:1/4] C [L:1/8] C [L:1/16] C [L:1/32] C 
+"""
+
 abc_broken_rhythm = """
-X:0
 L:1/4
-M:C
-K:C
 >F>FA<A | G<<GB>>B | C>>>C D<<<D | [CEG]>E E<[EGB] |
 [BDF]>[DFA] [BDF]<[DFA] | E>D [BDF]<D | E>{CEG2}D [BDF]<{CE>G}D | D> |
 """
 
 abc_fingerings = """
-X:0
-L:1/4
-T:Fingerings
-K:C
 !1!E !2!G !3!E !4!F !5!G 
 """
-
 
 abc_decorations = """
 X: 0
@@ -251,38 +243,32 @@ K:
 """
 
 abc_dynamics = """
-X: 0
-L: 1/4
-K:C
 !p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
 """
 
 abc_expressions = """
-X: 0
-L: 1/4
+L:1/4
 K:C
-!invertedfermata!C !trill!C !mordent!C !fermata!C !turn!C !arpeggio!'C !slide!C !uppermordent!C
-w:!invertedfermata! !trill! !lmordent! !fermata!  !turn!  !arpeggio!   !slide!  !uppermordent! 
+  !invertedfermata!C !trill!C !mordent!C !fermata!C !turn!C !invertedturn!C !arpeggio!'[CEG] !slide!C !uppermordent!C | !tremolo!C
+w:!invertedfermata!  !trill!  !mordent!  !fermata!  !turn!  !invertedturn!  !arpeggio!       !slide!  !uppermordent!  | !tremolo!  
 """
 
 abc_articulations = """
-X: 0
-L: 1/4
+L:1/4
 K:C
-!staccato!C  !>!C !downbow!C !^!C !breath!C !tenuto!C !upbow!C !open!C !+!C !snap!C !nail!C
-w:!staccato! !>!  !downbow!  !^!  !breath!  !tenuto!  !upbow!  !open!  !+!  !snap!  !nail!
+!staccato!C  !>!C !downbow!C !^!C !breath!C !tenuto!C !upbow!C !open!C !+!C !snap!C !nail!C !doit! C !thumb!C| !cesura!C| 
+w:!staccato! !>!  !downbow!  !^!  !breath!  !tenuto!  !upbow!  !open!  !+!  !snap!  !nail!  !doit!   !thumb!   !cesura!
 """
 
 abc_repeat_marker = """
-X: 0
-L: 1/4
+L:1/4
 K:C
-  !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C
+  !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C |
 w:!segno!     !coda!    !fine!    !D.S.!    !D.S.alcoda!    !D.S.alfine!    !dacapo!    !D.C.alcoda!
 """
 
-abc_repeat_bar_lines = """
-X: 2
+abc_bar_lines = """
+X:1
 M:4/4
 L:1/4
 K:C
@@ -317,17 +303,13 @@ abc_chord_example = """
 """
 
 abc_tuplets = """
-X:2
-M:4/4
-K:E
 (3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f
 (3.c2=c2^c2 (3.c2=c2^c2
 (6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
 """
 
 abc_shorthand_decorations = """
-(3.a.b.c
-vAuBvA
+(3.a.b.c vAuBvA
 """
 
 abc_primitive_polyphonic = '''M:6/8
@@ -341,7 +323,7 @@ V:3 name="Bass" snm="b" clef=bass
 D3 D3 | D6 | D3 D3 | D6 ||
 '''
 
-the_begger_boy = '''
+abc_the_begger_boy = '''
 X:5
 T:The Begger Boy
 R:Jig
@@ -366,7 +348,7 @@ W:And cry, Good your worship, bestow one token!
 W:--Roxburghe Ballads
 '''
 
-ale_is_dear = '''%  <A name="D1X180"></A>
+abc_ale_is_dear = '''%  <A name="D1X180"></A>
 X: 180
 T:Ale is Dear, The
 M: 4/4
@@ -413,7 +395,7 @@ B,,z [FDB,]z A,,z [ECA,]z| \
 B,,z [ECA,]z B,,z [FDB,]
 '''
 
-fyrareprisarn = '''
+abc_fyrareprisarn = '''
 %%abc-charset utf-8
 X: 1
 T: Fyrareprisarn
@@ -435,7 +417,7 @@ f>f f4|e>e e3A|A>B AG FE|D>E FD E2|
 f>f f4|e>e e3A|A>B AG FE|D2 d4:|
 '''
 
-kitchen_girl = '''X: 57
+abc_kitchen_girl = '''X: 57
 T:Kitchen Girl
 % Nottingham Music Database
 S:via PR
@@ -455,7 +437,7 @@ K:D
 
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/morris.txt/0030
 # noinspection SpellCheckingInspection
-william_and_nancy = '''X: 31
+abc_william_and_nancy = '''X: 31
 T:William and Nancy
 % Nottingham Music Database
 P:A(AABBB)2(AACCC)2
@@ -475,7 +457,7 @@ P:C
 
 # http://abcnotation.com/tunePage?a=www.fiddletech.com/music/abcproj/0253
 # noinspection SpellCheckingInspection
-mystery_reel = '''
+abc_mystery_reel = '''
 X:254
 T:Mystery Reel
 R:reel
@@ -489,7 +471,7 @@ K:G
 gede g2ag | egde ge (3eee | ~g3e a2ba | ge (3eee b2ag |
 '''
 
-hector_the_hero = '''X: 48
+abc_hector_the_hero = '''X: 48
 T:Hector the Hero
 M:3/4
 L:1/8
@@ -506,7 +488,7 @@ A2B2|:"A"c3 BA2|"D"f4ec|"A"e4-ef|e4AB|\
 '''
 
 
-full_rigged_ship = '''X: 1
+abc_full_rigged_ship = '''X: 1
 T:Full Rigged Ship
 M:6/8
 L:1/8
@@ -526,7 +508,7 @@ efe edB|A2Bc2d|efe dBG|A3A3:|!
 EFE EFE|EFE c2d|efe dBG|A3A3:|
 '''
 
-the_ale_wifes_daughter = '''X:1
+abc_the_ale_wifes_daughter = '''X:1
 T:The Ale Wife's Daughter
 Z:Jack Campin: "Embro, Embro", transcription (c) 2001
 F:17riot/abc/AleWife.abc
@@ -594,12 +576,17 @@ K:
 [K:G#Loc]"^G# locrian"CDEFGABc | [K:ALoc]"^A locrian"CDEFGABc | [K:BbLoc]"^B- locrian"CDEFGABc |
 """
 
-abc_accidentals = """
-X:1
-L:1/1
+abc_meter = """
+X:0
+L:1/8
+M:6/8
 K:C
-   ^C     _D   =E      ^^F          __G
-w: sharp  flat natural double~sharp double~flat
+CDEFGA|[M:4/4]CDEFGABc|[M:C]CDEFGABc|[M:C|]CDEFGABc|[M:(2+3+2)/8]CDEFGAB
+"""
+
+abc_accidentals = """
+L:1/1
+   "_sharp"^C "_flat"_D  "_natural"=E  "_double sharp"^^F  "_double flat"__G "_!courtesy!"!courtesy!^C
 """
 
 abc_overlays_and_lyric = """
@@ -702,7 +689,7 @@ X: 1
 M: 4/4
 L: 1/4
 K: C
-C(DE)F|ABC(D|AB)([CEG]C)|
+C(DE)F|ABC(D|AB).([CEG]C.)|
 """
 
 abc_carry_accidentals = """

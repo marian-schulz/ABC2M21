@@ -82,7 +82,7 @@ def abc_field_regex(tags: str) -> str:
     an additional expression for inline field tags.
     """
     inline_tags = [t for t in tags if t in "IKLMPQRNUV"]
-    regex = rf'^[{tags}]:.*\n'
+    regex = rf'^[{tags}]:.*(\n|$)'
     if inline_tags:
         regex += rf'|([\[]{"".join(inline_tags)}:[^\]\n%]*[\]])'
     return regex
@@ -111,8 +111,8 @@ TOKEN_SPEC: list[tuple[str, str]] = [
     ('chord', r'[\[][^\]:]*[\]][0-9]*[/]*[0-9]*(\s*[-])?'),
     ('decoration_or_chord', r'[+][^+:\n]*[+][0-9]*[/]*[0-9]*(\s*[-])?'),  # for legacy support
     ('unknown_decoration', rf"![^!\n]!"),
-    ('open_slur', r'\('),
-    ('close_slur', r'\)'),
+    ('open_slur', r'[\.]?\('),
+    ('close_slur', r'[\.]?\)'),
     ('broken_rhythm', r'[>]{1,3}|[<]{1,3}'),
     ('annotation', r'"[\^_<>@][^"]*"'),
     ('chord_symbol', r'"[^\^<>_@"][^"]*"'),
