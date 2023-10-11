@@ -2911,7 +2911,7 @@ class TuneBody(TuneHeader, NoteMixin):
             try:
                 self.abc_chord(token)
             except ABCException as e:
-                self.abc_error("Cannot parse this chord ( + dialect). Maybe it is a abc 2.0 decoration?", token)
+                self.abc_error("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token)
 
         elif self.is_legacy_abc_decoration:
             self.abc_decoration(token)

@@ -47,7 +47,6 @@ K:
 
 abc_note_duration = """
 X:1
-T:Relative durations
 L:1/4
 M:none
 K:C
@@ -57,7 +56,6 @@ w: 1/1  3/4  1/2  3/8   1/4  1/8  1/16  1/32  1/64
 
 abc_decoration_spanner = """
 X: 1
-T:Decoration spanner
 L:1/4
 K:C
 !<(!ABCD!<)! !>(!ABCD!>)! !trill(!ABCD!trill)!|
@@ -143,7 +141,6 @@ AG$F!D
 
 abc_rests = """
 X: 
-T:Rests
 L:1/4
 M:C
 K:
@@ -171,7 +168,6 @@ WC~C
 
 abc_auto_trill_spanner = """
 X: 
-T: Tune with trills
 L: 1/4
 M:C
 K:C
@@ -222,7 +218,6 @@ K:E
 abc_broken_rhythm = """
 X:0
 L:1/4
-T:Broken rhythm
 M:C
 K:C
 >F>FA<A | G<<GB>>B | C>>>C D<<<D | [CEG]>E E<[EGB] |
@@ -257,7 +252,6 @@ K:
 
 abc_dynamics = """
 X: 0
-T: Dynamics
 L: 1/4
 K:C
 !p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
@@ -265,7 +259,6 @@ K:C
 
 abc_expressions = """
 X: 0
-T: Expressions
 L: 1/4
 K:C
 !invertedfermata!C !trill!C !mordent!C !fermata!C !turn!C !arpeggio!'C !slide!C !uppermordent!C
@@ -274,7 +267,6 @@ w:!invertedfermata! !trill! !lmordent! !fermata!  !turn!  !arpeggio!   !slide!  
 
 abc_articulations = """
 X: 0
-T: Articulations
 L: 1/4
 K:C
 !staccato!C  !>!C !downbow!C !^!C !breath!C !tenuto!C !upbow!C !open!C !+!C !snap!C !nail!C
@@ -283,7 +275,6 @@ w:!staccato! !>!  !downbow!  !^!  !breath!  !tenuto!  !upbow!  !open!  !+!  !sna
 
 abc_repeat_marker = """
 X: 0
-T: Repeat marker
 L: 1/4
 K:C
   !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C
@@ -292,7 +283,6 @@ w:!segno!     !coda!    !fine!    !D.S.!    !D.S.alcoda!    !D.S.alfine!    !dac
 
 abc_repeat_bar_lines = """
 X: 2
-T:Barlines
 M:4/4
 L:1/4
 K:C
@@ -318,8 +308,6 @@ abc_unison = """
 [DD]
 """
 abc_extended_tuplet = """
-X:0
-T:shorthand decoration
 K:C
 (3:2:4 G2A2Bc
 """
@@ -330,7 +318,6 @@ abc_chord_example = """
 
 abc_tuplets = """
 X:2
-T:Simple Tuplets
 M:4/4
 K:E
 (3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f
@@ -609,7 +596,6 @@ K:
 
 abc_accidentals = """
 X:1
-T: Accidentals
 L:1/1
 K:C
    ^C     _D   =E      ^^F          __G
@@ -653,7 +639,6 @@ CDEFGAAB|[K: F]DEFG[K: E]AABC|
 """
 
 abc_pitch_octaves = """X:1
-T:Pitches Across Various Octaves
 L:1/1
 K:C
    C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b' |
@@ -672,7 +657,7 @@ uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]
 
 abc_propagate_accidentals = """
 X:1
-T:Propagate-accidentals directive
+T:Propagate-accidentals
 M:4/4
 L:1/4
 K:C
@@ -770,7 +755,6 @@ abc_ave_maria = """%abc-2.1
 X:1
 T:Ave Maria (Ellen's Gesang III) - Page 1
 C:Franz Schubert
-C:Marian Schulz
 %%score 1 (2 | 3)
 L:1/8
 Q:1/4=26
@@ -912,7 +896,6 @@ clef = """
 
 abc_simple_grace = """
 X: 1
-T: Grace notes
 L: 1/2
 K: C
 "^Appoggiatura"{g}E {GdGe}F | "^Acciaccatura"{/g}E {/GdGe}F |

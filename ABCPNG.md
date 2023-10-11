@@ -34,9 +34,6 @@ xmlconv.write(m21_stream, fmt='musicxml', fp="myfile.png", subformats=['png'])
 Example:
 ```
 X:1
-T: Pitches Across Various Octaves
-L:1/8
-K:C
 K:C
    C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b' |
 w: C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b' 
@@ -48,10 +45,10 @@ In ABC notation, accidentals are written before the note using symbols such as ^
 Double sharps and flats are denoted by ^^ and __ respectively.
 ```
 X:1
-T: accidentals
-L:1/8
+L:1/1
 K:C
-^C _D =E ^^F __G
+   ^C     _D   =E      ^^F          __G
+w: sharp  flat natural double~sharp double~flat
 ```
 ![abc pitches over serval octave](images/accidentals.png)
 
@@ -60,7 +57,6 @@ The note duration is relative to the `unit not length`.
 
 ```
 X:1
-T:Relative durations
 L:1/4
 M:none
 K:C
@@ -90,7 +86,6 @@ Example:
 ```
 X:0
 L:1/4
-T:Broken rhythm
 M:C
 K:C
 >F>F A<A | G<<G B>>B | C>>>C D<<<D | [CEG]>E E<[EGB] |
@@ -109,7 +104,6 @@ TODO:
 
 ```
 X: 
-T:Rests
 L:1/4
 M:C
 K:
@@ -143,7 +137,6 @@ Todo:
 
 ```
 X: 2
-T:Barlines
 M:4/4
 L:1/4
 K:C
@@ -199,7 +192,6 @@ Todo:
 
 ```
 X: 1
-T: Grace notes
 L: 1/2
 K: C
 "^Appoggiatura"{g}E {GdGe}F | "^Acciaccatura"{/g}E {/GdGe}F |
@@ -233,7 +225,6 @@ quadruplet, extending up to (9.
 If the time signature is compound (6/8, 9/8, 12/8) then n is three, otherwise n is two.
 ```
 X:2
-T:Simple Tuplets
 M:4/4
 K:E
 (3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f
@@ -290,7 +281,6 @@ or 'p' for piano (soft).
 
 ```
 X: 0
-T: Dynamics
 L: 1/4
 K:C
 !p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
@@ -303,7 +293,6 @@ Crescendo, diminuendo, and trill decorations can be spanned across multiple note
 
 ```
 X: 1
-T:Decoration spanner
 L:1/4
 K:C
 !<(!ABCD!<)! !>(!ABCD!>)! !trill(!ABCD!trill)!
@@ -320,7 +309,6 @@ Note:
 
 ```
 X: 0
-T: Expressions
 L: 1/4
 K:C
   !invertedfermata!C !trill!C !mordent!C !fermata!C !turn!C !arpeggio!'C !slide!C !uppermordent!C
@@ -333,7 +321,6 @@ The trill spanner is a recent addition, but ABC2M21 is capable of grouping adjac
 into a music21 trill extension spanner.
 ```
 X: 
-T: Tune with trills
 L: 1/4
 M:C
 K:C
@@ -357,7 +344,6 @@ Note:
 
 ```
 X: 0
-T: Articulations
 L: 1/4
 K:C
   !staccato!C  | !>!C     | !downbow!C | !^!C | !breath!C |
@@ -372,7 +358,6 @@ ABC decorations encompass a variety of music21 concepts, including repeat marker
 
 ```
 X: 0
-T: Repeat marker
 L: 1/4
 K:C
   !segno!C  | !coda!C | !fine!C | !D.S.!C | !D.S.alcoda!C | !D.S.alfine!C | !dacapo!C | !D.C.alcoda!C
@@ -386,7 +371,6 @@ ABC decorations encompass a variety of music21 concepts, including fingering mar
 ```
 X:0
 L:1/4
-T:Fingerings
 M:C
 K:C
 !1!E !2!G !3!E !4!F !5!G 
@@ -418,7 +402,6 @@ TODO:
 Example:
 ```
 X:1
-T:User defined symbols
 L:1/4
 U:W = !trill!
 U:U = !staccato!
@@ -514,7 +497,7 @@ Note:
 
 ```
 X:1
-T:Propagate-accidentals directive
+T:Propagate-accidentals
 M:4/4
 L:1/4
 K:C

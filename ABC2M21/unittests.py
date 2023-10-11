@@ -248,7 +248,7 @@ class TestFiles(unittest.TestCase):
         self.assertIsInstance(notes[2].expressions[0], expressions.Trill)
 
         # Check the debug message about legacy decoration and token
-        self.assertIn("Cannot parse this chord ( + dialect). Maybe it is a abc 2.0 decoration?", debug_messages)
+        self.assertIn("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", debug_messages)
         self.assertIn("<decoration_or_chord: '+trill+' (pos=3)>", debug_messages)
 
     def test_tune_header(self):
@@ -420,7 +420,7 @@ class TestFiles(unittest.TestCase):
         self.assertEqual(2, durations[1.875])
         self.assertIn("Overlay: Remove unfinished broken rhythm", debug_messages)
         self.assertIn("TuneBody: Ignore broken rhythm. No left side note.", debug_messages)
-        self.assertIn("<broken_rhythm: '>' (pos=30)>", debug_messages)
+        self.assertIn("<broken_rhythm: '>' (pos=14)>", debug_messages)
 
     def test_decorations(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
