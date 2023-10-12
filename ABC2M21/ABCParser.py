@@ -2009,11 +2009,17 @@ class ABCVoice(ABCObject):
                         continue
 
                     match syllable:
-                        case '_' | '-' | '*':
+                        case '-' | '*':
                             # previous syllable is to be held for an extra note
                             _note.lyrics.append(
                                 note.Lyric(number=len(_note.lyrics), text='')
                             )
+                        case '_':
+                            # previous syllable is to be held for an extra note
+                            _note.lyrics.append(
+                                note.Lyric(number=len(_note.lyrics), text='_')
+                            )
+
                         case '\\-':
                             # @TODO: appears as hyphen; aligns multiple syllables under one note
                             continue
@@ -2860,7 +2866,7 @@ class TuneBody(TuneHeader, NoteMixin):
 
         # Set a line break if <EOL> is a line break symbol and no backslash is
         # suppressing the newline
-        if '<EOL>' in self.linebreak and not token.src.endswith('\\'):
+        if '<EOL>' in self.linebreak and not (token.src.endswith('\\') or token.src.startswith('\\')):
             self.abc_score_linebreak(token)
 
     def abc_voice(self, token: Field):
@@ -2925,7 +2931,7 @@ class TuneBody(TuneHeader, NoteMixin):
             try:
                 self.abc_chord(token)
             except ABCException as e:
-                self.abc_error("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token)
+                self.abc_error("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token, e)
 
         elif self.is_legacy_abc_decoration:
             self.abc_decoration(token)
@@ -3155,7 +3161,7 @@ class TuneBody(TuneHeader, NoteMixin):
         if token.src.strip() in self.linebreak or token.type == "newline":
             linebreak = layout.SystemLayout(isNew=True)
             if self.voice.stream:
-                self.voice.stream.append(linebreak)
+                self.voice.overlay.stream.append(linebreak)
             else:
                 self.voice.overlay.decorations.append(linebreak)
         else:
@@ -3275,8 +3281,8 @@ class ChordParser(ABCParser, NoteMixin):
 
         m21_notes: list[note.Note] = []
 
-        for token in tokenize(intern_str):
-            m21_note: note.Note = self.abc_note(token)
+        for intern_token in tokenize(intern_str):
+            m21_note: note.Note = self.abc_note(intern_token)
             m21_notes.append(m21_note)
 
             if chord_is_tied:
@@ -3495,8 +3501,12 @@ def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
     else:
         tune_header = TuneHeader(abc_version=version)
         # no, its not a tune book just an abc fragment
-        src = abc_tune_book.strip('\n')
-        tokens = tokenize(src, abc_version=version)
+
+        src = abc_tune_book.lstrip('\n')
+        if not src.endswith('\n'):
+            src += '\n'
+
+        tokens = list(tokenize(src, abc_version=version))
         score = TuneBody(tune_header=tune_header).process(tokens)
         if len(score.parts) == 1:
             part = score.parts[0]

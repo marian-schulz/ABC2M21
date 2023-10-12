@@ -1,8 +1,160 @@
+# ABC2M21
+ABC2M21 serves as an implementation acting as an alternative translator/converter. It transforms tunes originally 
+written in abc notation into music21 streams and objects.
 
-# ABC2M21 Configuration
+At the project's inception, the aim was to enrich the ABCFormat within the music21 module, catering to the nuances of 
+the ABC music format. This included empowering it with functional lyrics and multi-voice capabilities. However, 
+the pre-existing codebase proved to be outdated and presented considerable challenges. An attempt to refactor the 
+ABCFormat resulted in a comprehensive redesign, giving rise to ABC2M21.
+
+ABC2M21 is a work in progress and is under active development. While many common ABC features have been successfully 
+implemented, some lesser-utilized ABC features are still awaiting integration, primarily due to the intricacies of 
+merging with the music21 framework. Certain features have been strategically repositioned owing to the challenges 
+encountered during implementation. Be assured, these features are slated for seamless integration in the future.
+
+* A special thank you to Michael Scott Cuthbert, the creator of music21.
+* Thanks are also due to the MuseScore teams for their valuable open-source contributions.
+* I express my gratitude to all the composers and transcribers who have enriched us with tens of thousands of ABC tunes.
+* A special note of appreciation is extended to ChatGPT for its invaluable assistance in translating and proofreading 
+the English sentences.
+
+## About this Document
+
+This document provides an overview of **ABC2M21**'s implementation, adhering to the 
+[ABC standard 2.1](https://abcnotation.com/wiki/abc:standard:v2.1) with inclusive support for older versions. Several 
+chapters are sourced directly from the [ABC standard 2.1](https://abcnotation.com/wiki/abc:standard:v2.1) description.
+
+The following chapters showcases the translation process using images, depicting how the translator transforms ABC 
+elements into music21 objects. The ABC tunes and fragments are initially converted into music21 streams and then used 
+to generate visuals with the aid of [MuseScore](https://musescore.org), an open-source music notation program. 
+MuseScore features a WYSIWYG editor, facilitating note input and providing playback functionalities.
+
+Example:
+
+    from ABC2M21 import ABCTranslator 
+    from music21 import converter, environment
+    
+    abc_tune = """
+    X:1
+    T:Twinkle, Twinkle Little Star in C
+    M:C
+    K:C
+    L:1/4
+    vC C G G|A A G2|F F E E|D D C2|vG G F F|E E D2|
+    uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]
+    """
+    
+    a = environment.Environment()
+    a['musescoreDirectPNGPath'] = '/path/to/musescore'
+    
+    m21_stream = ABCTranslator(abc_tune)
+    xmlconv = converter.subConverters.ConverterMusicXML()
+    xmlconv.write(m21_stream, fmt='musicxml', fp="myfile.png", subformats=['png'])
+
+![twinkle](images/twinkle.png)
+
+## Setup
+ABC2M21 only requires the [music21](https://github.com/cuthbertLab/music21) Python library and python version >= 3.10
+
+Note: 
+* ABC2M21 is developed and tested with music21-9.1. Older versions might work, or they might not.
+
+**install music21:**
+
+    pip3 install music21
+
+or
+
+    pip3 install requirements.txt
+
+
+## Usage
+To use ABC2M21, usually, only the following method is required.
+        
+    def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
+        
+        Translate ABC notation to a music21 stream.
+        
+        This function translates ABC notation, which can be a tune book,
+        a single tune, or an incomplete ABC fragment, into a music21 stream object.
+        The resulting object can be a stream.Opus, a single stream.Score, a stream.Part,
+        or just a stream.Measure.
+        
+        Parameters:
+        - abc: The input ABC notation as a string or a path to an ABC file.
+        
+        Returns: A music21 stream object representing the parsed ABC content.
+        
+        Examples:
+        
+        Translate a tune book from ABC notation to an opus:
+        
+        >>> from ABC2M21 import ABCTranslator
+        >>> abc_tune_book = '''
+        ... %abc-2.1
+        ... X:1
+        ... T:tune 1
+        ... K:
+        ... EGB
+        ... X: 2
+        ... T:tune 2
+        ... K:
+        ... CEG'''
+        >>> opus = ABCTranslator(abc_tune_book)
+        >>> opus
+        <music21.stream.Opus string>
+        >>> len(opus.scores)
+        2
+        
+        Translate a single tune from ABC notation to stream.Score:
+        
+        >>> abc_tune = '''
+        ... X: 1
+        ... T:single tune
+        ... K: G
+        ... CEG'''
+        >>> score = ABCTranslator(abc_tune)
+        >>> score
+        <music21.stream.Score X: 1>
+        >>> score.metadata.title
+        'single tune'
+        
+        Translate a single-voice ABC fragment to a stream.Part:
+        
+        >>> abc_fragment = '''
+        ... ABCD | EFGA'''
+        >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
+        True
+        
+        ABC Fragments with just some notes (and no bar lines) return a stream.Measure:
+        
+        >>> abc_fragment = '''
+        ... ABCD'''
+        >>> isinstance(ABCTranslator(abc_fragment), stream.Measure)
+        True
+        
+        You may load your abc source from a file:
+        
+        >>> from pathlib import Path
+        >>> tune_path = Path('tests/avemaria.abc')
+        >>> score = ABCTranslator(tune_path)
+        >>> score
+        <music21.stream.Score X:1 (file='tests/avemaria.abc')>
+        >>> score.metadata.title
+        "Ave Maria (Ellen's Gesang III) - Page 1"
+        
+        However, music21 spanners are set in the part stream, so the following
+        example, even if it consists of only a few notes, will return a part object.
+        
+        >>> abc_fragment = '''
+        ... !>(!ABCD!>)!'''
+        >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
+        True
+
+## Configuration
 Sometimes, it's necessary to disable or configure certain features of ABC2M21.
 
-For instance, the images in this document were created using Musescore3. Unfortunately, Musescore's musicxml 
+For instance, the images in this document were created using MuseScore3. Unfortunately, MuseScore's musicxml 
 import is not flawless. In such cases, if possible, ABC2M21 provides a workaround.
 
 ```
@@ -12,35 +164,7 @@ from ABC2M21 import ABC2M21_CONFIG
 ABC2M21_CONFIG['simplifiedComplexMeter'] = True
 ```
 
-# ABC Elements
-
-The following section shows images, how the translator creates music21 objects 
-from abc elements. 
-The abc fragments were converted into music21 streams and then used to generate images with musescore.
-
-Example:
-```
-from ABC2M21 import ABCTranslator 
-from music21 import converter, environment
-
-abc_tune = """
-X:1
-T:Twinkle, Twinkle Little Star in C
-M:C
-K:C
-L:1/4
-vC C G G|A A G2|F F E E|D D C2|vG G F F|E E D2|
-uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]
-"""
-
-a = environment.Environment()
-a['musescoreDirectPNGPath'] = '/path/to/musescore'
-
-m21_stream = ABCTranslator(abc_tune)
-xmlconv = converter.subConverters.ConverterMusicXML()
-xmlconv.write(m21_stream, fmt='musicxml', fp="myfile.png", subformats=['png'])
-```
-![twinkle](images/twinkle.png)
+# ABC Dokumentation
 
 ## ABC fields
 
@@ -204,7 +328,7 @@ L:1/4
 K:C
 |: EGBc [| cega :: CEGA ::|[1 de BA | defg :|[2 de dB || abcd |]
 ```
-![barlines](images/repeat_bar_lines.png)
+![barlines](images/bar_lines.png)
 
 ### Ties
 Ties in music notation are used to link the duration of two or more notes of the same pitch, 
@@ -433,10 +557,33 @@ K:C
 ```
 ![Fingering marker](images/fingerings.png)
 
+### Decoration dialect
+The ABC standard 2.0 initially introduced the `+...+` syntax to represent decorations instead 
+of using `!...!`. However, this syntax was not widely adopted, and the latter `!...!` syntax became 
+more common.
+
+The `+...+` decoration syntax is now deprecated in favor of the `!...!` syntax.
+Nevertheless, the `+...+` decoration syntax is still accessible using the `I:decoration +` 
+instruction or using the abc version 2.0.
+
+Note:
+* By activating the `+...+` decoration dialect ABC2M21 will deactivate the `+...+` chord dialect.
+* Activating the `+...+` decoration dialect for tunes using the `+...+` chord dialect may lead to undefined results
+
+```
+%abc-1.5 
+K:
++CEG+           % ABC2M21 will detect this as chord
+I:decoration +  % Set '+' als decoration denotation symbol
++trill+C        % this is now a legal trill decoration
+```
+![legacy chord and decoration](images/legacy_chord_and_decoration.png)
+
+
 ## Symbol lines
 When a piece of music has many symbols, it can become hard to read.  You can use a 'symbol line.' 
 This is a line that has only symbols, chord names, or annotations (!...!).  A symbol line starts 
-with 's:' and then has a line of symbols. The symbols line up with the notes, following the same 
+with `s:` and then has a line of symbols. The symbols line up with the notes, following the same 
 rules as lyrics. But, symbols in a symbol line can't line up with grace notes, rests, or spacers.
 
 Todo:
@@ -495,9 +642,10 @@ In early versions of the abc standard (1.2 to 1.5), chords were indicated with +
 by ABC2M21 under certain conditions.
 
 Note:
-* In abc version 2.0, this chord dialect is disabled due to its usage of + for decorations.
-* You can enable the + decoration dialect by using the directive/instruction `I:decoration +`, which will disable 
+* In abc version 2.0, this chord dialect is disabled due to its usage of `+` for decorations.
+* You can enable the `+...+` decoration dialect by using the directive/instruction `I:decoration +`, which will disable 
 this chord dialect.
+* Using the `+...+` chord dialect for tunes with `+...+` chord dialect (abc-2.0) may lead to undefined results
 * The current ABC standard, version 2.1, recommends disabling the chord dialect even in version 2.1 and opting for a 
 strict interpretation. However, ABC2M21 does not currently follow this recommendation.
 
@@ -507,9 +655,9 @@ Example:
 ![chord dialect](images/chord_dialect.png)
 
 
-## Chord symbols
-Chord symbols, like chords or bass notes, can be positioned below (or above) the melody line using double-quotation 
-marks placed to the left of the note they correspond to
+### Chord symbols
+Chord symbols can be positioned below (or above) the melody line using double-quotation marks placed to the left 
+of the note they correspond to.
 
 The chord is formatted as `<note><accidental><type><bass>`, where `<note>` can range from A-G, the optional 
 `<accidental>` can be b or #, and the optional `<type>` consists of one or more characters of:
@@ -534,7 +682,183 @@ sharp symbols (♭, ♮, ♯)
 
 ![chord symbols](images/chord_symbols.png)
 
-## Propagate accidentals
+### Annotations
+Text annotations are placed in quotation marks and provide additional textual information related to the melody.
+The first character of the annotation source string indicates the placement of the annotation relative to the next note.
+
+| Symbol | Placement Explanation              |
+|:------:|------------------------------------|
+|   `^`  | Above the note                     |
+|   `_`  | Below the note                     |
+|   `<`  | Left of the note                   |
+|   `>`  | Right of the note                  |
+|   `@`  | Indicate a free placement position |
+
+```
+"^Above"C "_Below"D "<Left"E ">Right"F "@Free placement"G 
+```
+![Annotations](images/annotations.png)
+
+## Lyrics
+The `w:` field in the tune body allows for the addition of **lyrics** that match syllable by syllable with the notes 
+in the current voice that precede them.
+
+| Symbol | Meaning                                                       |
+|:------:|---------------------------------------------------------------|
+|  `-`   | Break between syllables within a word                         |
+|  `_`   | Previous syllable is held for an extra note                   |
+|  `*`   | One note is skipped (equivalent to a blank syllable)          |
+|  `~`   | Appears as a space; aligns multiple words under one note      |
+|  `\-`  | appears as a hyphen; aligns multiple syllables under one note |
+|  `\|`  | advances to the next bar                                      |
+
+Todo:
+
+* The W: information field (uppercase W) can be used for lyrics to be printed separately below the tune.
+* add support for abc 2.0 lyric dialect.
+* Some more testing and tuning is required.
+
+Example: The following two examples are equivalent. 
+```
+I:linebreak $
+C D E F|
+w: doh re mi fa
+G A B c|
+w: sol la ti doh
+```
+![Lyrics example 1](images/lyrics_1.png)
+
+In the second example, a new feature (introduced in abc 2.1) allows **lyrics** to be placed anywhere in the tune, not 
+just immediately after the corresponding notes. This provides flexibility to position lyrics at the end of the tune if 
+needed.
+```
+I:linebreak $
+C D E F|
+G A B c|
+w: doh re mi fa sol la ti doh
+```
+![Lyrics example 2](images/lyrics_2.png)
+
+However, the extension of the alignment rules is not fully backwards compatible with abc 2.0 
+
+When there are more notes than lyrics, any extra notes have no associated **lyrics** (blank syllables). Therefore, the 
+presence of a `w:` field links all preceding notes to a syllable, whether it's a real syllable or a blank one.
+For instance, in the next example, the empty `w:` field indicates that the four G notes do not have any **lyrics** 
+associated with them.
+```
+I:linebreak $
+C D E F|
+w: doh re mi fa
+G G G G|
+w:
+F E F C|
+w: fa mi re doh
+```
+![Lyrics example 3](images/lyrics_3.png)
+
+```
+gf|e2dc B2A2|B2G2 E2D2|
+.G2.G2 GABc|d4 B2
+w: Sa-ys my au-l' wan to your aul' wan,
++: Will~ye come to the Wa-x-ies dar-gle?
+```
+![Lyrics example 4](images/lyrics_4.png)
+
+
+### Verses
+A music line can be accompanied by multiple consecutive `w:` fields, each representing different verses. The first 
+`w:` field corresponds to the initial rendition of that part, followed by the second and so forth.
+
+Examples: The subsequent examples, both equivalent, demonstrate the presence of two verses.
+```
+CDEF FEDC|
+w: these are the lyr-ics for verse one
+w: these are the lyr-ics for verse two
+```
+![Verses example 1](images/verses_1.png)
+
+```
+CDEF FEDC|
+w: these are the lyr-ics
++:  for verse one
+w: these are the lyr-ics
++:  for verse two  
+```
+![Verses example 2](images/verses_2.png)
+
+### Numbering
+VOLATILE: The following syntax may be extended to include non-numeric "numbering".
+If the first word of a w: line starts with a digit, this is interpreted as numbering of a stanza. Typesetting programs 
+should align the corresponding note with the first letter that occurs. This can be used in conjunction with the ~ symbol 
+mentioned in the table above to create a space between the digit and the first letter.
+Example: In the following, the 1.~Three is treated as a single word with a space created by the ~, but the fact that 
+the w: line starts with a number means that the first note of the corresponding music line is aligned to Three.
+
+Todo:
+ * not implemented yet
+
+```
+   w: 1.~Three blind mice
+```
+
+## Typesetting
+
+### score line-break
+The primary method for typesetting score line breaks (printed in the score) involves using code line breaks. Typically, 
+one line of music code in the tune body corresponds to one line of printed music. To prevent a score line break due to
+a end of line in the music code, a backslash `\` can be used. ABC2M21 recognizes the backslash both at the end of a line 
+and before a comment
+```
+abc cba|\ % Backslash before the comment
+abc cba| % Backslash at the end of the line \
+abc cba|
+```
+![suppress score linebreak](images/suppress_score_linebreak.png)
+
+It is possible to continue a music code line over abc fields, comments and directives.
+```
+abc cab|\
+%%setbarnb 10
+M:9/8
+%comment
+abc cba abc|
+```
+![line continue over comments](images/line_continue_over_comments.png)
+
+Todo:
+ * At moment the score line break is always at the end of a measure, not in the middle of a measure.
+
+```
+abc cba|$abc cba|!abc cba|
+```
+![score linebreak symbols](images/score_line_break_symbols.png)
+
+#### Instruction 'linebreak'
+Over time, in response to changes in ABC standards and extensions introduced by popular typesetting programs, 
+ABC standard 2.1 has evolved. One significant addition is a new line-breaking instruction `I:linebreak`, providing 
+control over score line breaks. This instruction accommodates different line-breaking preferences and offers four 
+distinct values, allowing users to tailor line breaks according to their specific needs.
+
+* `I:linebreak $`: Indicates that the $ symbol is used in the tune body to typeset a score line-break.
+* `I:linebreak !`: Indicates that the ! symbol is used in the tune body to typeset a score line-break.
+* `I:linebreak <EOL>`: indicates that the newline will typeset a score line-break.
+* `I:linebreak <none>`: indicates that all line-breaking is to be carried out automatically and any code line-breaks 
+are ignored for typesetting purposes.
+
+The values <EOL>, $ and ! may also be combined so that more than one symbol can indicate a score line-break.
+ABC2M21 starts per default with this line-break settings:
+```
+I:linebreak <EOL> $ !
+```
+Note:
+* Contrary to the recommendations of the ABC standard, `linebreak !` can be used simultaneously with `!...!` for 
+decorations. This implementation detail may change if issues arise in the interpretation or if a strict interpretation 
+is required.
+* ABC2M21 will also evaluate `I:linebreak` instructions in the tune body even it is not recommended.
+
+
+## Accidental directives
+
 `I:propagate-accidentals not | octave | pitch`
 
 or
@@ -572,25 +896,3 @@ w: C# C  D C | C C# C C |
 ```
 ![propagate-accidentals directive](images/propagate_accidentals.png)
 
-
-## Legacy chord and decoration
-The ABC standard 2.0 initially introduced the '+...+' syntax to represent decorations instead 
-of using '!...!'. However, this syntax was not widely adopted, and the latter '!' syntax became 
-more common.
-
-The '+' decoration syntax is now deprecated in favor of the '!' syntax.
-Nevertheless, the '+...+' decoration syntax is still accessible using the 'I:decoration +' 
-instruction and will detected by ABC2M21 if not disabled.
-
-TODO:
-* Show the power of legacy support
-```
-%abc-1.5 
-X:1
-T: legacy chord and decoration 
-K:
-+CEG+
-I:decoration +  % Set '+' als decoration denotation symbol
-+trill+C        % this is now a legal trill decoration
-```
-![legacy chord and decoration](images/legacy_chord_and_decoration.png)

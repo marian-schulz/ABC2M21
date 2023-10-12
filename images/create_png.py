@@ -5,7 +5,7 @@ from ABC2M21 import ABCTranslator, ABC2M21_CONFIG
 from ABC2M21 import testtunes
 from music21 import environment, converter
 a = environment.Environment()
-
+a['debug'] = True
 ABC2M21_CONFIG['simplifiedComplexMeter'] = True
 
 abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
@@ -16,10 +16,16 @@ abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
              'abc_bar_lines', 'abc_slur', 'abc_simple_ties', 'abc_simple_grace', 'abc_tempo',
              'abc_atholl_brose', 'abc_auto_trill_spanner', 'abc_tuplets', 'abc_extended_tuplet',
              'abc_shorthand_decorations', 'abc_chord_example', 'abc_unison', 'abc_chord_symbols',
-             'abc_chord_dialect', 'abc_full_rigged_ship', 'abc_hector_the_hero', 'abc_mystery_reel',
-             'abc_william_and_nancy', 'abc_kitchen_girl', 'abc_fyrareprisarn', 'abc_ale_is_dear',
-             'abc_the_begger_boy', 'abc_the_ale_wifes_daughter',
+             'abc_chord_dialect', 'abc_annotations', 'abc_lyrics_1', 'abc_lyrics_2', 'abc_lyrics_3',
+             'abc_lyrics_4', 'abc_verses_1','abc_verses_2', 'abc_suppress_score_linebreak',
+             'abc_score_line_break_symbols', 'abc_line_continue_over_comments'
              ]
+"""
+'abc_full_rigged_ship', 'abc_hector_the_hero', 'abc_mystery_reel',
+'abc_william_and_nancy', 'abc_kitchen_girl', 'abc_fyrareprisarn', 'abc_ale_is_dear',
+'abc_the_begger_boy', 'abc_the_ale_wifes_daughter'
+"""
+
 
 musecores = ['/home/mschulz/Anwendungen/MuseScore-3.6.0.451381076-x86_64.AppImage',
              '/home/mschulz/Anwendungen/MuseScore-4.1.1.232071203-x86_64.AppImage',
@@ -35,7 +41,7 @@ for musecore in musecores:
 # Getting the current working directory
 cwd = os.getcwd()
 
-#s = ABCTranslator(testtunes.abc_accidentals)
+#s = ABCTranslator(testtunes.abc_legacy_chord_and_decoration)
 #s.show()
 #exit()
 
@@ -58,9 +64,9 @@ for name in abc_tunes:
 for filename in os.listdir():
     if filename.endswith(".py"):
         continue
-    if filename.endswith(".musicxml"):
-        os.rename(filename, f'../musicxml/{filename}')
-        continue
+    #if filename.endswith(".musicxml"):
+    #    os.rename(filename, f'../musicxml/{filename}')
+    #    continue
 
     if filename.endswith(".png"):
         if filename.endswith("-1.png"):

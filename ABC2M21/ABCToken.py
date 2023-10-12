@@ -123,7 +123,7 @@ TOKEN_SPEC: list[tuple[str, str]] = [
     ('user_symbol', r'[H-Wh-w~\.](?![:])'),
     ('EmptyLine', r'^([ \t]*[\n])+'),
     ('Skip', rf'^%(?!%).*(\n|$)'),
-    ('newline', r'(%[^\n\\]*)?[\\]?[ \t]*\n'),
+    ('newline', r'[\\ ]*(%[^\n\\]*)?[\\]?[ \t]*\n'),
     ('unknown_token', r'\S')
     # ('Space', r'\s+')
 ]

@@ -179,7 +179,7 @@ class TestFiles(unittest.TestCase):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
             score = ABCTranslator(abc_legacy_chord_and_decoration)
 
-        self.assertIsInstance(score, stream.Score)
+        self.assertIsInstance(score, stream.Measure)
         # we have one chord ?
         self.assertEqual(len(score.recurse().getElementsByClass(chord.Chord)), 1)
         # and one note
@@ -191,7 +191,7 @@ class TestFiles(unittest.TestCase):
         # Check the debug message for legacy warning about unknown decoration
         debug_messages = mock_stdout.getvalue()
         self.assertIn("TuneBody: Unknown abc decoration", debug_messages)
-        self.assertIn("<decoration_or_chord: '+CEG+' (pos=101)>", debug_messages)
+        self.assertIn("<decoration_or_chord: '+CEG+' (pos=69)>", debug_messages)
 
     def test_legacy_decoration_2_0(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:

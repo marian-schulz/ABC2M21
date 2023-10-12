@@ -71,9 +71,6 @@ abc_chord_symbols = """
 """
 
 abc_legacy_chord_and_decoration = """
-%abc-1.5 
-X:1
-T: legacy chord and decoration 
 K:C
 +CEG+
 I:decoration +  % Set '+' als decoration denotation symbol
@@ -597,6 +594,74 @@ L: 1/4
 K: C
    C D E/2 E/2 F & g/2 g/2 b2 b|
 w: C D E-  -   F |
+"""
+
+abc_annotations = """
+"^Above"C "_Below"D "<Left"E ">Right"F "@Free placement"G
+"""
+
+abc_lyrics_1 = """
+I:linebreak $
+C D E F|
+w: doh re mi fa
+G A B c|
+w: sol la ti doh
+"""
+
+abc_lyrics_2 = """
+I:linebreak $
+C D E F|
+G A B c|
+w: doh re mi fa sol la ti doh
+"""
+
+abc_lyrics_3 = """
+I:linebreak $
+C D E F|
+w: doh re mi fa
+G G G G|
+w:
+F E F C|
+w: fa mi re doh
+"""
+
+abc_lyrics_4 = """
+gf|e2dc B2A2|B2G2 E2D2|
+.G2.G2 GABc|d4 B2 |
+w: Sa-ys my au-l' wan to your aul' wan,
++: Will~ye come to the Wa-x-ies dar-gle?
+"""
+
+abc_verses_1 = """
+CDEF FEDC|
+w: these are the lyr-ics for verse one
+w: these are the lyr-ics for verse two
+"""
+
+abc_verses_2 = """
+CDEF FEDC|
+w: these are the lyr-ics
++:  for verse one
+w: these are the lyr-ics
++:  for verse two 
+"""
+
+abc_suppress_score_linebreak = """
+abc cba|\ % Backslash before the comment
+abc cba| % Backslash at the end of the line \\
+abc cba| 
+"""
+
+abc_score_line_break_symbols = """
+abc cba|$abc cba|!abc cba|
+"""
+
+abc_line_continue_over_comments = """
+abc cab|\\
+%%setbarnb 10
+M:9/8
+%comment
+abc cba abc|
 """
 
 spanner = """
