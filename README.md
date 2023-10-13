@@ -3,6 +3,7 @@ ABC2M21 implements an alternative translator/converter for tunes in
 [abc notation](https://abcnotation.com/wiki/abc:standard:v2.1) to 
 [music21](https://github.com/cuthbertLab/music21) streams and objects.
 
+
 ## Setup
 ABC2M21 only requires the [music21](https://github.com/cuthbertLab/music21) Python library and python version >= 3.10
 
@@ -97,5 +98,31 @@ or
       True
 
 ## License
-@TODO
+The specific license for this project has not yet been determined, as I need to thoroughly research various open-source 
+licenses.
+
+For now, ABC2M21 is licensed under the [WTFPL](http://www.wtfpl.net/) - **Do What The Fuck You Want To Public License**, 
+the only license I comprehend without needing legal consultation.
+
+              DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                       Version 2, December 2004
+     
+    Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+    
+    Everyone is permitted to copy and distribute verbatim or modified
+    copies of this license document, and changing it is allowed as long
+    as the name is changed.
+     
+               DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+      TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+    
+     0. You just DO WHAT THE FUCK YOU WANT TO.
+
+
+## Sources
+
+* https://abcnotation.com/
+* http://web.mit.edu/music21/
+* https://abcplus.sourceforge.net
+* http://www.wtfpl.net/
 
