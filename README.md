@@ -136,7 +136,7 @@ I've written my own license that's worth reading.
     the omniscient deity embodying the SubGenius pursuit of Slackness and eternal
     mirth.
     
-    1. Disclaimer
+    1. Disclaimer:
 
     This software is provided 'as-is,' without any express or implied warranty, 
     including the warranty that it serves any particular purpose. 
@@ -154,7 +154,7 @@ I've written my own license that's worth reading.
     series, or other unforeseen events caused by the use of this software, you're
     on your own.
 
-    2. Preach and Share the Word:
+    2. Share the Word:
     
     You are allowed to replicate and distribute the "Sacred Code" in all its
     glorious manifestations, as long as you do not succumb to the Bland Normie
