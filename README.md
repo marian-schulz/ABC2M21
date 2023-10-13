@@ -98,31 +98,85 @@ or
       True
 
 ## License
-The specific license for this project has not yet been determined, as I need to thoroughly research various open-source 
-licenses.
+The specific license for this project has not yet been determined, as I need to thoroughly research 
+various open-source licenses.
 
-For now, ABC2M21 is licensed under the [WTFPL](http://www.wtfpl.net/) - **Do What The Fuck You Want To Public License**, 
-the only license I comprehend without needing legal consultation.
+For now, ABC2M21 is licensed under the COTSDSL - **CHURCH OF THE SUBGENIUS DIVINE SOFTWARE LICENSE**
 
-              DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                       Version 2, December 2004
-     
-    Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+
+                  CHURCH OF THE SUBGENIUS DIVINE SOFTWARE LICENSE
+                       Version 1, Bureaucracy, 3189 YOLD
     
-    Everyone is permitted to copy and distribute verbatim or modified
-    copies of this license document, and changing it is allowed as long
-    as the name is changed.
-     
-               DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-      TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+    Preamble:
     
-     0. You just DO WHAT THE FUCK YOU WANT TO.
+    This Divine Software License ("License") is a revelation and was transcribed
+    under the influence of habafropzipulops by Marian Schulz. By obtaining, using,
+    distributing, or contemplating this Sacred Code, you are granted the divine
+    privilege to embrace the eternal pursuit of Slack and "Bob".
+    
+    License:
+    
+    0. Definitions:
+    
+    The term "Sacred Code" refers to the Techno-magic spells of this software and
+    any variations, modifications, or derivatives thereof. The "Sacred Code" is
+    written in an arcane language that computers sometimes understand.
+    
+    The term "Slack" shall be defined as the eternal pursuit of all SubGenii in 
+    their endeavors, be it coding, frolicking, or contemplating the mysteries of
+    the cosmos while sipping coffee.
+    
+    The term "The Conspiracy" refers to the nefarious forces that seek to stifle
+    Slack and hinder the pursuit of true enlightenment and laughter.
+    
+    1. Preach and Share the Divine Word:
+    
+    You are allowed to replicate and distribute the "Sacred Code" in all its 
+    glorious manifestations, as long as you do not succumb to the Bland Normie 
+    Syndrome. And, in the spirit of chaos, you shall present it in vivid colors
+    and glitters on each copy, adorned with a joyful celebration of the divinity of 
+    "Bob"!
+    
+    2. Schism:
+    
+    The Church of the SubGenius bestows upon you the divine privilege to modify,
+    distribute, and bask in the glory of this Sacred Code of Slack. You are 
+    encouraged to fork, clone, or merge this Sacred Code, for Slack desires to be
+    fluid and ever-evolving.
+    
+    3. Copyslack:
+    
+    All modified versions of this Sacred Code must carry a notice stating your
+    changes and acknowledge the divine influence of 'Bob' and the Sacred Yeti.
+    However, you must retain this Holy Covenant and pass it on to all future users
+    of this Sacred Code, ensuring the eternal reign of Slack.
+    
+    4. Tabu:
+    
+    You shall not, under any circumstance, use this Sacred Code as a tool to file
+    patents or aid those who seek to stifle Slack with legalistic quibbles and 
+    restrictions. You shall not use this Sacred Code for stealing Slack or as a 
+    tool for 'The Conspiracy' against the Subgenii.
+    
+    5. Confession:
+    
+    By using this Sacred Code of Slack, you recognize and embrace the chaotic 
+    harmony of the SubGenius universe, where Slack reigns supreme and "Bob" is both
+    the question and the answer.
+    
+    6. Excommunication:
+    
+    If you violate this License, your privilege to use, modify, and distribute this
+    Sacred Code will be terminated, and you shall forever wander the wastelands of
+    normality, devoid of Slack and "Bob's" eternal grin.
+    
+    Praise "Bob"!
 
 
-## Sources
+## Sources of slack
 
 * https://abcnotation.com/
 * http://web.mit.edu/music21/
 * https://abcplus.sourceforge.net
 * http://www.wtfpl.net/
-
+* https://www.subgenius.com
