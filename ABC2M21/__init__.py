@@ -6,7 +6,7 @@
 # Authors:      Marian Schulz
 #
 # Copyslack:    Copyright © 2023, Marian Schulz
-# License:      COTSDSL - CHURCH OF THE SUBGENIUS DIVINE SOFTWARE LICENSE
+# License:      SSL - SUBGENIUS SOFTWARE LICENSE
 #-------------------------------------------------------------------------------
 
 from ABC2M21.ABCParser import ABCTranslator, ABC2M21_CONFIG

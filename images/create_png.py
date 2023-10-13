@@ -45,9 +45,9 @@ cwd = os.getcwd()
 #s.show()
 #exit()
 
-# delete old pngs
+# delete old pngs but bob
 for filename in os.listdir():
-    if filename.endswith(".png"):
+    if filename.endswith(".png") and not filename != "bob.png":
         os.remove(filename)
 
 for name in abc_tunes:
