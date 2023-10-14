@@ -2,11 +2,6 @@
 ABC2M21 serves as an implementation acting as an alternative translator/converter. It transforms tunes originally 
 written in abc notation into music21 streams and objects.
 
-At the project's inception, the aim was to enrich the ABCFormat within the music21 module, catering to the nuances of 
-the ABC music format. This included empowering it with functional lyrics and multi-voice capabilities. However, 
-the pre-existing codebase proved to be outdated and presented considerable challenges. An attempt to refactor the 
-ABCFormat resulted in a comprehensive redesign, giving rise to ABC2M21.
-
 ABC2M21 is a work in progress and is under active development. While many common ABC features have been successfully 
 implemented, some lesser-utilized ABC features are still awaiting integration, primarily due to the intricacies of 
 merging with the music21 framework. Certain features have been strategically repositioned owing to the challenges 
@@ -219,6 +214,31 @@ L:1/1
 [Q:1/2=120]E | [Q:"Allegro" 1/4=120]F | [Q: 3/8=50 "Slowly"]G | [Q:"Andante"]A | [Q:120]B | 
 ```
 ![Tempo](images/tempo.png)
+
+### Part
+The P: field in the tune header is used to define the sequence in which the different parts of a tune 
+are played, such as P:ABABCDCD. Inside the tune body, you can mark each part using P:A or P:B. 
+
+In the tune header, you can specify repeating a part by appending a number, like P:A3 meaning repeat 
+part A three times, similar to P:AAA. Sequences can be made to repeat using parentheses, for example, 
+P:(AB)3 is equivalent to P:ABABAB. 
+
+Nested parentheses are allowed, and dots within the P: field enhance readability, although they are 
+ignored by computer programs, like P:((AB)3.(CD)3)2.
+
+Note:
+ * In abc a **part*** refers to a section of the tune, not a voice in multi-voice music.
+```
+L:1
+P:((AB)2.C2D)2
+M:C
+K:C
+[P:A]A |
+[P:B]B |
+[P:C]C |
+[P:D]D |$
+```
+![part](images/part.png)
 
 ## ABC music code
 
@@ -449,8 +469,7 @@ Most of the characters above `~HLMOPSTuv` are just short-cuts for commonly used 
 
 Example:
 ```
-(3.a.b.c    % staccato triplet
-vAuBvA      % bowing marks (for fiddlers)
+[L:1/4] (3.a.b.c vAuBvA T[DFA]
 ```
 ![shorthand decorations](images/shorthand_decorations.png)
 
@@ -470,7 +489,7 @@ In ABC notation, dynamics are part of decorations, allowing notations like 'mf' 
 or 'p' for piano (soft).
 
 ```
-!p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
+[L:1/4] !p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
 ```
 ![dynamics](images/dynamics.png)
 
@@ -489,7 +508,7 @@ K:C
 The trill spanner is a recent addition, but ABC2M21 is capable of grouping adjacent notes with trill decorations 
 into a music21 trill extension spanner.
 ```
-X: 
+X:
 L:1/4
 M:C
 K:C
@@ -549,10 +568,6 @@ w:!segno!     !coda!    !fine!    !D.S.!    !D.S.alcoda!    !D.S.alfine!    !dac
 ABC decorations encompass a variety of music21 concepts, including fingering marker
 
 ```
-X:0
-L:1/4
-M:C
-K:C
 !1!E !2!G !3!E !4!F !5!G 
 ```
 ![Fingering marker](images/fingerings.png)
@@ -596,11 +611,11 @@ the letters H-W and h-w, as well as the symbol ~, can be designated using the U:
 Note:
 * ABC2M21 is versatile and can handle multiple symbols and various types of symbols (not just decorations, 
 but also fields in the inline form).
-* The '.' symbol is a pre-defined Symbol for '!staccato!' and is treated like a user-defined symbol, 
+* The `.` symbol is a pre-defined Symbol for `!staccato!` and is treated like a user-defined symbol, 
 but cannot be overridden.
 
 TODO:
-* The ABC standard refers to the '~' symbol as an 'Irish roll', but I'm not quite sure what it represents.
+* The ABC standard refers to the `~` symbol as an 'Irish roll', but I'm not quite sure what it represents.
 
 Example:
 ```
@@ -732,7 +747,6 @@ In the second example, a new feature (introduced in abc 2.1) allows **lyrics** t
 just immediately after the corresponding notes. This provides flexibility to position lyrics at the end of the tune if 
 needed.
 ```
-I:linebreak $
 C D E F|
 G A B c|
 w: doh re mi fa sol la ti doh
@@ -746,7 +760,6 @@ presence of a `w:` field links all preceding notes to a syllable, whether it's a
 For instance, in the next example, the empty `w:` field indicates that the four G notes do not have any **lyrics** 
 associated with them.
 ```
-I:linebreak $
 C D E F|
 w: doh re mi fa
 G G G G|
@@ -804,10 +817,17 @@ Todo:
 ## Typesetting
 
 ### score line-break
-The primary method for typesetting score line breaks (printed in the score) involves using code line breaks. Typically, 
-one line of music code in the tune body corresponds to one line of printed music. To prevent a score line break due to
-a end of line in the music code, a backslash `\` can be used. ABC2M21 recognizes the backslash both at the end of a line 
-and before a comment
+The primary method for typesetting score line breaks (printed in the score) involves using code line breaks. 
+Typically, one line of music code in the tune body corresponds to one line of printed music. To prevent a 
+score line break due to a end of line in the music code, a backslash (\) can be used. ABC2M21 recognizes the 
+backslash both at the end of a line and before a comment
+
+Note:
+* Line breaks and line continuation are among the most intricate small features of ABC, 
+as there are numerous divergent approaches to them across different ABC versions. Addressing 
+all these variations requires careful consideration of many subtle details by the translator.
+* It is not possible with music21 to create a score linebreak in the mittle of a measure.
+
 ```
 abc cba|\ % Backslash before the comment
 abc cba| % Backslash at the end of the line \
@@ -825,13 +845,11 @@ abc cba abc|
 ```
 ![line continue over comments](images/line_continue_over_comments.png)
 
-Todo:
- * At moment the score line break is always at the end of a measure, not in the middle of a measure.
-
 ```
 abc cba|$abc cba|!abc cba|
 ```
 ![score linebreak symbols](images/score_line_break_symbols.png)
+
 
 #### Instruction 'linebreak'
 Over time, in response to changes in ABC standards and extensions introduced by popular typesetting programs, 

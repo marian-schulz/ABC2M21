@@ -46,8 +46,7 @@ K:
 """
 
 abc_note_duration = """
-L:1/4
-C4   C3   C2   C3/2  C    C/2  C//   C///  C////
+[L:1/4] C4   C3   C2   C3/2  C    C/2  C//   C///  C////
 """
 
 abc_decoration_spanner = """
@@ -240,6 +239,7 @@ K:
 """
 
 abc_dynamics = """
+[L:1/4]
 !p!C !pp!C !ppp!C !pppp!C !f!C !ff!C !fff!C !ffff!C !mp!C !mf!C !sfz!C
 """
 
@@ -306,7 +306,8 @@ abc_tuplets = """
 """
 
 abc_shorthand_decorations = """
-(3.a.b.c vAuBvA
+[L:1/4]
+(3.a.b.c vAuBvA T[DFA]
 """
 
 abc_primitive_polyphonic = '''M:6/8
@@ -986,12 +987,27 @@ C:Marian
 K:
 C
 """
+
+abc_part = """
+X:1
+L:1
+I:linebreak $
+P:((AB)2.C2D)2
+M:C
+K:C
+[P:A]A |
+[P:B]B |
+[P:C]C |
+[P:D]D |$
+"""
+
 voices_and_parts = """
 X: 0
 L: 1/4
 T: Voices And Parts
 C: Marian Schulz
 P: A2BC
+M: C
 M: C
 K: C treble
 P: A

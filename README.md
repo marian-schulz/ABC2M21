@@ -1,8 +1,13 @@
 # ABC2M21
-ABC2M21 implements an alternative translator/converter for tunes in 
-[abc notation](https://abcnotation.com/wiki/abc:standard:v2.1) to 
-[music21](https://github.com/cuthbertLab/music21) streams and objects.
+ABC2M21 serves as an alternative translator/converter. It transforms tunes originally written 
+in [abc notation](https://abcnotation.com/) into[music21](https://github.com/cuthbertLab/music21) 
+streams and objects.
 
+ABC2M21 is a work in progress and is under active development. While many common ABC features have
+been successfully implemented, some lesser-utilized ABC features are still awaiting integration, 
+primarily due to the intricacies of merging with the music21 framework. Certain features have been 
+strategically repositioned owing to the challenges encountered during implementation. Be assured, 
+these features are slated for seamless integration in the future.
 
 ## Setup
 ABC2M21 only requires the [music21](https://github.com/cuthbertLab/music21) Python library and python version >= 3.10
@@ -16,6 +21,11 @@ or
     pip3 install requirements.txt
 
 ## Usage
+The details regarding the implementation of this ABC parser can be found in the documentation.md. 
+There is also a Sphinx autodoc directory that generates documentation of the Python code and 
+includes many interesting (albeit incomplete) doctest sections.
+
+However, for utilizing the parser, the following brief documentation should suffice.
 
     def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
 
@@ -96,6 +106,19 @@ or
       ... !>(!ABCD!>)!'''
       >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
       True
+
+## Configuration
+Sometimes, it's necessary to disable or configure certain features of ABC2M21.
+
+For instance, the images in this document were created using MuseScore3. Unfortunately, MuseScore's musicxml 
+import is not flawless. In such cases, if possible, ABC2M21 provides a workaround.
+
+```
+from ABC2M21 import ABC2M21_CONFIG
+
+# Convert complex meters into an equivalent of a simple meter
+ABC2M21_CONFIG['simplifiedComplexMeter'] = True
+```
 
 ## License
 
@@ -206,5 +229,4 @@ I've written my own license that's worth reading.
 * https://abcnotation.com/
 * http://web.mit.edu/music21/
 * https://abcplus.sourceforge.net
-* http://www.wtfpl.net/
 * https://www.subgenius.com

@@ -15,8 +15,7 @@ from music21 import note, chord, repeat, meter
 from ABC2M21.ABCToken import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
 
 ABC2M21_ENVIRONMENT = environment.Environment('ABC2M21')
-ABC2M21_CONFIG = {'simplifiedComplexMeter': False }
-
+ABC2M21_CONFIG = {'simplifiedComplexMeter': False}
 
 Syllables: TypeAlias = list[str]
 
@@ -77,9 +76,9 @@ M21_ARTICULATIONS = {
     'plus': articulations.Pizzicato,
     'snap': articulations.SnapPizzicato,
     'nail': articulations.NailPizzicato,
-    'doit': articulations.Doit,
+    'doit': articulations.Doit,                     # not in abc standart
     'thumb': articulations.StringThumbPosition,
-    'cesura': articulations.Caesura
+    'cesura': articulations.Caesura                 # not in abc standart
 }
 
 # Mapping from abc decorations to music21 RepeatMark
@@ -144,7 +143,7 @@ class ABCException(Exception):
 
 class ABCObject:
 
-    def abc_error(self, message: str, token: Token = None, exception=None):
+    def abc_debug(self, message: str, token: Token = None, exception=None):
         """
         Loggt eine Fehlermeldung im ABC-Parser.
 
@@ -187,7 +186,6 @@ class ScoreInstruction(NamedTuple):
 
 
 def join_voices(voices: list[stream.Part]) -> stream.Part:
-
     new_part = deepcopy(voices[0])
     for part in voices[1:]:
         # At first, we copy all spanners into the new part
@@ -287,7 +285,6 @@ def fix_measures(score: stream.Score):
             measure.rightBarline = bar_lines[bar_num * 2 + 1]
 
 
-
 class ABCParser(ABCObject):
     """
     Base class for token processors implements the abc_token method.
@@ -308,9 +305,10 @@ class ABCParser(ABCObject):
 
         abc_method = getattr(self, f'abc_{token.type}', None)
         if abc_method is None:
-            self.abc_error(f"No abc_method 'abc_{token.type}'.", token)
+            self.abc_debug(f"No abc_method 'abc_{token.type}'.", token)
         else:
             return abc_method(token)
+
 
 class FileHeader(ABCParser):
     """
@@ -396,14 +394,14 @@ class FileHeader(ABCParser):
             self.quarter_length = float(4 * Fraction(token.data))
             return self.quarter_length
         except Exception as e:
-            self.abc_error(f"Illegal abc UnitNoteLength.", token, e)
+            self.abc_debug(f"Illegal abc UnitNoteLength.", token, e)
             return None
 
     def abc_unknown_token(self, token: Field):
         """
         Process an unknown token, print a debug message and discard the token
         """
-        self.abc_error(f"Unknown Token", token)
+        self.abc_debug(f"Unknown Token", token)
 
     def abc_meter(self, token: Field) -> meter.TimeSignature:
         """
@@ -458,7 +456,7 @@ class FileHeader(ABCParser):
                 denominator = int("".join(
                     c for c in voices[1].strip() if c.isdigit()))
             except ValueError as e:
-                self.abc_error('Failed to calculate denominator of the meter token', token, e)
+                self.abc_debug('Failed to calculate denominator of the meter token', token, e)
 
             if len(numerators) > 1:
                 if ABC2M21_CONFIG.get('simplifiedComplexMeter', False):
@@ -508,7 +506,7 @@ class FileHeader(ABCParser):
         match token.tag:
             case 'T':
                 if type(self) == FileHeader:
-                    self.abc_error("Ignore titel (T:) field.", token)
+                    self.abc_debug("Ignore titel (T:) field.", token)
                 else:
                     md.title = token.data
             case 'C':
@@ -544,7 +542,7 @@ class FileHeader(ABCParser):
                     else:
                         md.addCustom(name, [token.data])
                 else:
-                    self.abc_error(f"Ignore ABC field '{token.tag}'.", token)
+                    self.abc_debug(f"Ignore ABC field '{token.tag}'.", token)
 
     def abc_user_def(self, token: Field):
         """
@@ -571,12 +569,12 @@ class FileHeader(ABCParser):
             symbol, token_str = token.data.split('=', maxsplit=1)
             symbol = symbol.strip()
             if symbol.upper() not in "HIJKLMNOPQRSTUVW~":
-                self.abc_error(f"User defined symbol {symbol} is not in [H-Wh-w~]", token)
+                self.abc_debug(f"User defined symbol {symbol} is not in [H-Wh-w~]", token)
                 return
 
             self.user_defined[symbol] = list(tokenize(token_str))
         except Exception as e:
-            self.abc_error(f"Error while parsing definition of an user-defined symbol", token, e)
+            self.abc_debug(f"Error while parsing definition of an user-defined symbol", token, e)
 
     def abc_midi_instruction(self, token: Field):
         """
@@ -626,7 +624,7 @@ class FileHeader(ABCParser):
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1]
         except Exception as e:
-            self.abc_error('Unknown midi instruction.', token, e)
+            self.abc_debug('Unknown midi instruction.', token, e)
             return
 
         if match := ABC_MIDI_1_RE.match(instruction_str):
@@ -639,7 +637,7 @@ class FileHeader(ABCParser):
             gd = match.groupdict()
             self.midi[None] = int(gd['program'].strip())
         else:
-            self.abc_error(f'Unknown midi instruction.', token)
+            self.abc_debug(f'Unknown midi instruction.', token)
 
     def abc_linebreak_instruction(self, token: Field):
         """
@@ -701,7 +699,7 @@ class FileHeader(ABCParser):
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1]
         except Exception as e:
-            self.abc_error('Unknown linebreak instruction.', token, e)
+            self.abc_debug('Unknown linebreak instruction.', token, e)
             return
 
         linebreaks = []
@@ -712,7 +710,7 @@ class FileHeader(ABCParser):
             elif linebreak == '<none>':
                 linebreaks = []
             else:
-                self.abc_error(f"Ignore unknown linebreak value '{linebreak}'.", token)
+                self.abc_debug(f"Ignore unknown linebreak value '{linebreak}'.", token)
 
         self.linebreak = linebreaks
 
@@ -762,7 +760,7 @@ class FileHeader(ABCParser):
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1]
         except Exception as e:
-            self.abc_error('Unknown score instruction.', token, e)
+            self.abc_debug('Unknown score instruction.', token, e)
             return
 
         # Regular expressions for various patterns
@@ -824,7 +822,7 @@ class FileHeader(ABCParser):
                 continued_bar_lines.append(sublist)
 
         if not order:
-            self.abc_error('No ABC voices found in SCORE instruction', token)
+            self.abc_debug('No ABC voices found in SCORE instruction', token)
         else:
             self.staves = ScoreInstruction(order=order, brace=brace, bracket=bracket,
                                            floating=floating, square=square,
@@ -856,12 +854,12 @@ class FileHeader(ABCParser):
         try:
             instruction_str = token.data.split(maxsplit=1)[1].lower()
         except Exception as e:
-            self.abc_error('Unknown propagate-accidentals instruction.',
+            self.abc_debug('Unknown propagate-accidentals instruction.',
                            token, e)
             return
 
         if instruction_str not in ('not', 'octave', 'pitch'):
-            self.abc_error(f"Unknown accidental mode.", token)
+            self.abc_debug(f"Unknown accidental mode.", token)
             return
 
         self.accidental_mode = instruction_str
@@ -886,14 +884,14 @@ class FileHeader(ABCParser):
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1].lower()
         except Exception as e:
-            self.abc_error('Unknown continueall instruction token.',
+            self.abc_debug('Unknown continueall instruction token.',
                            token, e)
             return
 
         if instruction_str.lower() in ('1', 'true', 'yes'):
             self.linebreak = ['!']
         else:
-            self.abc_error(f"Illegal continueall value '{instruction_str}'.",
+            self.abc_debug(f"Illegal continueall value '{instruction_str}'.",
                            token)
 
     def abc_decoration_instruction(self, token: Field):
@@ -932,7 +930,7 @@ class FileHeader(ABCParser):
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1].lower()
         except Exception as e:
-            self.abc_error('Unknown decoration instruction token.',
+            self.abc_debug('Unknown decoration instruction token.',
                            token, e)
             return
 
@@ -942,7 +940,7 @@ class FileHeader(ABCParser):
             # but disable the legacy chord symbol '+'
             self.is_legacy_abc_chord = False
         else:
-            self.abc_error(f"Unknown decoration dialect '{instruction_str}'.", token)
+            self.abc_debug(f"Unknown decoration dialect '{instruction_str}'.", token)
 
     def abc_instruction(self, token: Field):
         """
@@ -974,7 +972,7 @@ class FileHeader(ABCParser):
         try:
             instruction_type = token.data.split(maxsplit=1)[0].upper()
         except Exception as e:
-            self.abc_error('Illegal instruction token', token, e)
+            self.abc_debug('Illegal instruction token', token, e)
             return
 
         match instruction_type:
@@ -991,7 +989,7 @@ class FileHeader(ABCParser):
             case 'DECORATION':
                 self.abc_decoration_instruction(token)
             case _:
-                self.abc_error(f"Unsupported instruction '{instruction_type}'.", token)
+                self.abc_debug(f"Unsupported instruction '{instruction_type}'.", token)
 
     def process(self, token_generator: Iterator[Token]):
         """
@@ -1294,7 +1292,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                         referent = self.quarter_length if self.quarter_length \
                             else self.default_unit_note_length()
                     except ValueError:
-                        self.abc_error(f'Illegal abc tempo field syntax.', token)
+                        self.abc_debug(f'Illegal abc tempo field syntax.', token)
                 else:
                     _text, _number = group.split('=')
                     number = int(_number)
@@ -1306,11 +1304,11 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                             if _text[1:].isdigit():
                                 referent *= int(_text[1:])
                             else:
-                                self.abc_error(f'Illegal abc tempo field syntax.', token)
+                                self.abc_debug(f'Illegal abc tempo field syntax.', token)
                     else:
                         referent = float(sum([Fraction(f) for f in _text.split()])) * 4
         else:
-            self.abc_error(f'Illegal abc tempo field syntax.', token)
+            self.abc_debug(f'Illegal abc tempo field syntax.', token)
 
         try:
             if referent and number:
@@ -1328,7 +1326,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
             self.tempo = tempo_mark
             return tempo_mark
         except Exception as e:
-            self.abc_error(f'Cannot create music21 MetronomeMark', token, e)
+            self.abc_debug(f'Cannot create music21 MetronomeMark', token, e)
 
     def abc_key(self, token: Field) -> \
             (key.KeySignature | None, clef.Clef | None, int | None):
@@ -1481,7 +1479,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                     # Set alteredPitches of the KeySignature
                     ks.alteredPitches = [f"{p}{a}" for p, a in altered_pitches.items()]
             else:
-                self.abc_error(f"Unknown mode '{mode}' in ABC Key field.", token)
+                self.abc_debug(f"Unknown mode '{mode}' in ABC Key field.", token)
                 ks = None
 
         elif key_field_str == "HP":
@@ -1571,7 +1569,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
         splitter = data.split(maxsplit=1)
 
         if not splitter:
-            self.abc_error('Ignore abc voice field without voice id.', token)
+            self.abc_debug('Ignore abc voice field without voice id.', token)
             return None, None, None
 
         voice_id = splitter[0][:20]
@@ -1593,7 +1591,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                     case 'stem':
                         v = v.lower()
                         if v not in ['up', 'down']:
-                            self.abc_error(f'Illegal value "{stem}" for the voice'
+                            self.abc_debug(f'Illegal value "{stem}" for the voice'
                                            'property stem (up/down)', token)
                         else:
                             stem = v
@@ -1625,6 +1623,54 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                 info.octave = octave
 
         return voice_id, m21_clef, octave
+
+
+class ABCPart(ABCObject):
+    def __init__(self,
+                 part_id: str | None,
+                 tempo_mark: tempo.MetronomeMark,
+                 m21_clef: clef.Clef,
+                 octave: int):
+
+        self.part_id: str | None = part_id
+        self.linebreak: layout.SystemLayout | None = None
+        self.tempo: tempo.MetronomeMark | None = tempo_mark
+        self._voices: dict[str | None, ABCVoice] = {
+            None: ABCVoice(m21_clef=m21_clef, octave=octave, voice_id=None)
+        }
+        self.voice: ABCVoice = self._voices[None]
+
+    def get_voice(self, voice_id: str | None):
+        return self._voices.get(voice_id, None)
+
+    def close(self):
+        for voice in self._voices.values():
+            voice.close()
+
+    def active_voice(self,
+                     voice_id: str | None,
+                     m21_clef: clef.Clef,
+                     octave: int):
+        """
+        Change the active abc voice in the processor.
+        From now on, all Music21 objects, such as notes and measures,
+        will be inserted into the active part.
+        """
+
+        if voice := self.get_voice(voice_id):
+            voice.m21_clef = m21_clef
+            voice.octave = octave
+        else:
+            self._voices[voice_id] = ABCVoice(
+                voice_id=voice_id,
+                m21_clef=m21_clef,
+                octave=octave)
+
+        self.voice = self._voices[voice_id]
+        return self.voice
+
+    def __iter__(self) -> Iterator['ABCVoice']:
+        yield from self._voices.values()
 
 
 class ABCOverlay(ABCObject):
@@ -1695,7 +1741,7 @@ class ABCOverlay(ABCObject):
                 if last_note.tie.type == 'continue':
                     last_note.tie.type = 'stop'
                 else:
-                    self.abc_error("The previous note cannot be tied to a subsequent note.")
+                    self.abc_debug("The previous note cannot be tied to a subsequent note.")
                     last_note.tie = None
 
     def append(self, m21_object: music21.Music21Object):
@@ -1785,30 +1831,30 @@ class ABCOverlay(ABCObject):
         self.cleanup_ties([])
 
         while self.open_spanner:
-            self.abc_error(f"Close {len(self.open_spanner)} unclosed spanner.")
+            self.abc_debug(f"Close {len(self.open_spanner)} unclosed spanner.")
             self.close_spanner()
 
         if self.auto_trill_spanner:
             self.close_auto_trill_spanner()
 
         if self.articulations:
-            self.abc_error(f"Remove {len(self.articulations)} unassigned articulations")
+            self.abc_debug(f"Remove {len(self.articulations)} unassigned articulations")
             self.articulations = []
 
         if self.expressions:
-            self.abc_error(f"Remove {len(self.expressions)} unassigned expressions")
+            self.abc_debug(f"Remove {len(self.expressions)} unassigned expressions")
             self.articulations = []
 
         if self.ficta:
-            self.abc_error("Remove unassigned editorial/dicta")
+            self.abc_debug("Remove unassigned editorial/dicta")
             self.ficta = False
 
         if self.tuplet:
-            self.abc_error(f"Remove incomplete {len(self.tuplet)} tuplet(s)")
+            self.abc_debug(f"Remove incomplete {len(self.tuplet)} tuplet(s)")
             self.tuplet = []
 
         if self.broken_rhythm:
-            self.abc_error("Remove unfinished broken rhythm")
+            self.abc_debug("Remove unfinished broken rhythm")
             self.broken_rhythm = None
 
         if self.grace_notes:
@@ -1823,7 +1869,6 @@ class ABCOverlay(ABCObject):
 
 
 class ABCVoice(ABCObject):
-
     def __init__(self, voice_id: str | None,
                  m21_clef: clef.Clef | None = None,
                  octave: int = 0):
@@ -1838,7 +1883,7 @@ class ABCVoice(ABCObject):
         # Remember a clef token to insert in the next measure
         self.clef: clef.Clef | None = m21_clef
         self.octave: int = octave
-
+        self.linebreak: layout.SystemLayout | None = None
         self.lyrics: list = []
         self.lyric_bar_count: int = 0
 
@@ -1847,6 +1892,12 @@ class ABCVoice(ABCObject):
         self.repeat_bracket: spanner.RepeatBracket | None = None
         self.overlay: ABCOverlay = ABCOverlay()
         self._overlays: list[ABCOverlay] = [self.overlay]
+
+    def measures(self) -> Iterator[stream.Measure]:
+        yield from self.part.getElementsByClass(stream.Measure)
+
+    def __len__(self):
+        return len(self.part.getElementsByClass(stream.Measure))
 
     def apply_grace_notes(self, general_note: note.GeneralNote):
 
@@ -1870,8 +1921,8 @@ class ABCVoice(ABCObject):
     # def append(self, m21_object: music21.Music21Object):
     #    self.stream.append(m21_object)
 
-    def split_measure(self, quarterLength: float):
-        splits = self.stream.splitAtQuarterLength(quarterLength)
+    def split_measure(self, quarter_length: float):
+        splits = self.stream.splitAtQuarterLength(quarter_length)
         self.part.remove(self.stream)
         for measure in splits:
             self.stream = measure
@@ -1880,7 +1931,7 @@ class ABCVoice(ABCObject):
     def next_overlay(self) -> ABCOverlay:
         n = len(self.stream.getElementsByClass(stream.Voice))
         if len(self._overlays) <= n:
-            self.abc_error(f'Create Overlay #{n} context in voice: {self.voice_id}')
+            self.abc_debug(f'Create Overlay #{n} context in voice: {self.voice_id}')
             self._overlays.append(ABCOverlay())
 
         self.overlay = self._overlays[n]
@@ -1891,7 +1942,7 @@ class ABCVoice(ABCObject):
 
     def open_repeat_bracket(self, number: int):
         if self.repeat_bracket:
-            self.abc_error('Close still open repeat braket.')
+            self.abc_debug('Close still open repeat braket.')
             self.close_repeat_bracket()
 
         self.repeat_bracket = spanner.RepeatBracket(self.stream)
@@ -1945,6 +1996,9 @@ class ABCVoice(ABCObject):
 
         # Create a new measure with one Voices (ABC Overlay)
         measure = stream.Measure()
+        if self.linebreak:
+            measure.append(self.linebreak)
+            self.linebreak = None
 
         # For the first measure in this context, add recent clef,
         # key signature and meter
@@ -1980,7 +2034,7 @@ class ABCVoice(ABCObject):
             context.close()
 
         if self.repeat_bracket:
-            self.abc_error("Close unclosed repeat bracket.")
+            self.abc_debug("Close unclosed repeat bracket.")
             self.close_repeat_bracket()
 
     def align_lyrics(self):
@@ -2057,7 +2111,7 @@ class NoteMixin:
         self.time_signature: meter.TimeSignature | None = None
 
     @abstractmethod
-    def abc_error(self, message: str, token: Token = None, exception=None):
+    def abc_debug(self, message: str, token: Token = None, exception=None):
         pass
 
     def abc_note(self, token: Token) -> note.Note:
@@ -2125,7 +2179,7 @@ class NoteMixin:
             try:
                 length_modifier = self.abc_length(m)
             except ABCException as e:
-                self.abc_error("Fallback to note length modifier '1.0'.", token, e)
+                self.abc_debug("Fallback to note length modifier '1.0'.", token, e)
                 length_modifier = 1.0
         else:
             length_modifier = 1.0
@@ -2183,7 +2237,6 @@ class NoteMixin:
             float: The length modifier as a float.
         """
 
-
         denominator: int = 1
         while src.endswith('/'):
             denominator *= 2
@@ -2208,7 +2261,6 @@ class NoteMixin:
 
         except ValueError:
             raise ABCException(f'Incorrectly encoded or unparsable duration.')
-
 
     @staticmethod
     def abc_accidental(src: str) -> str:
@@ -2264,8 +2316,34 @@ class NoteMixin:
                                '<<<': (0.125, 1.875)
                                }.get(token.src, (1, 1))
 
-        return (left_mod, right_mod)
+        return left_mod, right_mod
 
+
+def post_linebreaks(part: stream.Part):
+    """
+    This function addresses an issue related to line breaks in music notation
+    handling.
+
+    In the default parsing behavior, the parser adds line breaks after the last
+    measure. However, in music21 line breaks are associated differently. They are
+    linked to the first element following the line break, representing the initial
+    measure of a new system.
+
+    To resolve this discrepancy, this method scans a part stream for all
+    SystemLayout elements, which represent line breaks. These elements are then
+    relocated to the measure at the same offset, ensuring they are correctly
+    associated with the first measure of the new system.
+    """
+
+    # Search linebreaks in the part and move the line break into the next measure
+    for line_break in part.getElementsByClass(layout.SystemLayout):
+        # Get measure on the offset of the linebreak
+        offset_measure: stream.Measure = part.getElementsByOffset(
+            line_break.offset).getElementsByClass(stream.Measure).first()
+
+        part.remove(line_break)
+        if offset_measure:
+            offset_measure.append(line_break)
 
 class TuneBody(TuneHeader, NoteMixin):
     def __init__(self, tune_header: TuneHeader):
@@ -2284,7 +2362,7 @@ class TuneBody(TuneHeader, NoteMixin):
         if tune_header.key_signature:
             self.key_signature = tune_header.key_signature
         else:
-            self.abc_error(f"No valid key signature, default to 'C major'")
+            self.abc_debug(f"No valid key signature, default to 'C major'")
             self.key_signature = key.Key('C')
 
         self.time_signature = tune_header.time_signature
@@ -2308,19 +2386,21 @@ class TuneBody(TuneHeader, NoteMixin):
             self.quarter_length: float = self.default_unit_note_length()
 
         # Store ABCVoiceContext in a dictionary by section id and voice id.
-        self.sections: dict[str | None, dict[str | None, ABCVoice]] = {
-            None: {None: ABCVoice(m21_clef=self.clef, octave=self.octave, voice_id=None)}
+        # self.sections: dict[str | None, dict[str | None, ABCVoice]] = {
+        #    None: {None: ABCVoice(m21_clef=self.clef, octave=self.octave, voice_id=None)}
+        # }
+        self.parts: dict[str | None, ABCPart] = {
+            None: ABCPart(part_id=None,
+                          tempo_mark=self.tempo,
+                          m21_clef=self.clef,
+                          octave=self.octave)
         }
-
         # Because sections may be played in any order, we need to remember the
         # tempo of each section.
-        self.section_tempo: dict[str | None, tempo.MetronomeMark] = {None: self.tempo}
-        self.part: dict[str | None, ABCVoice] = self.sections[None]
-        self.voice: ABCVoice = self.part[None]
-
-    def close_part(self):
-        for context in self.part.values():
-            context.close()
+        # self.section_tempo: dict[str | None, tempo.MetronomeMark] = {None: self.tempo}
+        # self.part: dict[str | None, ABCVoice] = self.sections[None]
+        self.part: ABCPart = self.parts[None]
+        self.voice: ABCVoice = self.part.voice
 
     def voice_grouping(self):
         score_instruction: ScoreInstruction
@@ -2368,7 +2448,7 @@ class TuneBody(TuneHeader, NoteMixin):
         # length by adding empty measures if necessary.
         self.fix_part_lengths()
 
-        section_sequence: str | list = self.section_sequence or list(self.sections.keys())
+        section_sequence: str | list = self.section_sequence or list(self.parts.keys())
 
         # keep track of used parts objekts
         multiple_parts = set()
@@ -2376,6 +2456,7 @@ class TuneBody(TuneHeader, NoteMixin):
         # The id of the first part (top on the score)
         first_part = None
 
+        #line_break : layout.SystemLayout | None = None
         voice_order = self.voice_order()
         for voice_id in voice_order:
             if voice_info := self.voice_info.get(voice_id, None):
@@ -2386,8 +2467,12 @@ class TuneBody(TuneHeader, NoteMixin):
                 combined_part = stream.Part()
 
             for part_id in section_sequence[:]:
-                section = self.sections[part_id]
-                if ctx := section.get(voice_id, None):
+                if part_id not in self.parts:
+                    self.abc_debug(f"No Part '{part_id}' in tune body.")
+                    continue
+
+                abc_part = self.parts[part_id]
+                if ctx := abc_part.get_voice(voice_id):
                     # We need to create a deepcopy when a part object is used
                     # multiple times. To avoid creating a deepcopy each time,
                     # we keep track of the parts that have already been used.
@@ -2397,28 +2482,30 @@ class TuneBody(TuneHeader, NoteMixin):
                     else:
                         m21_part = ctx.part
                         multiple_parts.add(ctx.part.id)
-
-                    if (first_measure := m21_part.getElementsByClass(stream.Measure).first()) is None:
-                        self.abc_error(f"Skip empty voice: {voice_id}")
-                        continue
-
-                    if first_part is None:
-                        first_part = m21_part
-
-                    if m21_part.id == first_part.id:
-                        if _tempo := self.section_tempo[part_id]:
-                            first_measure.insert(0, _tempo)
-
                         # Insert a TextMark for the Part ID (except the anonymous Part (id=None))
-                        if part_id:
+
+                        if (first_measure := m21_part.getElementsByClass(stream.Measure).first()) is None:
+                            self.abc_debug(f"Skip empty voice: {voice_id}")
+                            continue
+
+                        if part_id is not None:
                             label = expressions.TextExpression(content=part_id)
                             label.placement = 'above'
                             label.enclosure = style.Enclosure.SQUARE
                             first_measure.insert(0, label)
 
+                        if abc_part.tempo:
+                            first_measure.insert(0, abc_part.tempo)
+
+                    #if line_break:
+                    #    m21_part.getElementsByClass(stream.Measure).first().insert(0, line_break)
+                    #    line_break = None
+
                     # Kopieren Sie die Elemente aus part2 in part1
                     for element in m21_part.elements:
                         combined_part.append(element)
+
+
 
             if combined_part.quarterLength > 0:
                 try:
@@ -2426,10 +2513,11 @@ class TuneBody(TuneHeader, NoteMixin):
                     if first_measure.timeSignature and first_measure.barDurationProportion() < 1.0:
                         first_measure.padAsAnacrusis()
                 except Exception as e:
-                    self.abc_error(
+                    self.abc_debug(
                         f"Error while analyzing an anacrusis in the part: {combined_part.id}",
                         exception=e)
 
+                post_linebreaks(combined_part)
                 yield combined_part
 
     def set_context(self, voice_id: str | None):
@@ -2438,24 +2526,22 @@ class TuneBody(TuneHeader, NoteMixin):
         From now on, all Music21 objects, such as notes and measures,
         will be inserted into the active part.
         """
-        m21_clef, octave = None, None
+        m21_clef, octave = self.clef, self.octave
 
-        if voice_id not in self.part:
-            # This voice is not yet known in the active section.
+        if not self.part.get_voice(voice_id=voice_id):
+            # This voice is not yet known in the active part
             if voice_info := self.voice_info.get(voice_id, None):
                 # However, there is already information about this voice
                 # from the tune header or previously notated abc voice fields.
-                m21_clef = voice_info.m21_clef
-                octave = voice_info.octave
+                if voice_info.m21_clef is not None:
+                    m21_clef = voice_info.m21_clef
+                if voice_info.octave is not None:
+                    octave = voice_info.octave
 
-            # Create an ABCVoiceContext in the active section for this voice.
-            self.part.update({
-                voice_id: ABCVoice(voice_id=voice_id,
-                                   m21_clef=m21_clef or self.clef,
-                                   octave=octave or self.octave)
-            })
-
-        self.voice = self.part[voice_id]
+        self.voice = self.part.active_voice(voice_id=voice_id,
+                                            m21_clef=m21_clef,
+                                            octave=octave
+                                            )
 
     def abc_overlay(self, token: Token):
         """
@@ -2511,7 +2597,7 @@ class TuneBody(TuneHeader, NoteMixin):
                 cs = harmony.ChordSymbol(name)
             self.voice.overlay.decorations.append(cs)
         except Exception as e:
-            self.abc_error(f'Chord symbol is malformed.', token, e)
+            self.abc_debug(f'Chord symbol is malformed.', token, e)
 
     def abc_grace_notes(self, token: Token):
         """
@@ -2544,8 +2630,6 @@ class TuneBody(TuneHeader, NoteMixin):
 
             self.voice.overlay.append(self.key_signature)
 
-
-
     def abc_bidirectonal_barline(self, token: Token):
         """
         Process a bidirectional bar line token and split it into its
@@ -2557,40 +2641,40 @@ class TuneBody(TuneHeader, NoteMixin):
         if token.src[-1].isdigit():
 
             self.abc_end_repeat_barline(
-                Token('EndRepeatBarline', f'{token.src[:-2]}|',
+                Token('end_repeat_barline', f'{token.src[:-2]}|',
                       pos=token.pos)
             )
             self.abc_start_repeat_barline(
-                Token('StartRepeatBarline', token.src[-2:],
+                Token('start_repeat_barline', token.src[-2:],
                       pos=token.pos + len(token.src) - 2
                       )
             )
         elif token.src.endswith('|]'):
             self.abc_end_repeat_barline(
-                Token('EndRepeatBarline', token.src[:-1],
+                Token('end_repeat_barline', token.src[:-1],
                       pos=token.pos)
             )
             self.abc_barline(
-                Token('Barline', '|]',
+                Token('barline', '|]',
                       pos=token.pos + len(token.src) - 2)
             )
         elif token.src.startswith('[|'):
             self.abc_barline(
-                Token('Barline', '[|', pos=token.pos)
+                Token('barline', '[|', pos=token.pos)
             )
             self.abc_start_repeat_barline(
-                Token('Barline', '|:',
+                Token('barline', '|:',
                       pos=token.pos + 2)
             )
         elif '|' in token.src:
 
             left, right = token.src.split('|', maxsplit=1)
             self.abc_end_repeat_barline(
-                Token('EndRepeatBarline', f'{left}|',
+                Token('end_repeat_barline', f'{left}|',
                       pos=token.pos)
             )
             self.abc_start_repeat_barline(
-                Token('Barline', '|:',
+                Token('barline', '|:',
                       pos=token.pos + len(token.src) - 2)
             )
         else:
@@ -2715,25 +2799,25 @@ class TuneBody(TuneHeader, NoteMixin):
         """
 
         # Close old abc part
-        self.close_part()
+        self.part.close()
         part_id = token.data[0]
 
         # Add the section if it doesn't exist yet.
-        if part_id not in self.part:
-            self.section_tempo[part_id] = self.tempo
-            self.sections[part_id] = {
-                None: ABCVoice(
-                    voice_id=None,
-                    m21_clef=self.clef,
-                    octave=self.octave)
-            }
+        if part_id not in self.parts:
+            self.parts[part_id] = ABCPart(
+                part_id=None,
+                tempo_mark=self.tempo,
+                m21_clef=self.clef,
+                octave=self.octave)
 
         # Set the new active section.
-        self.part = self.sections[part_id]
+        self.part = self.parts[part_id]
+        self.part.active_voice(voice_id=None,
+                               m21_clef=self.clef,
+                               octave=self.octave)
 
         # Also set the active part of the new section.
-        self.set_context(voice_id=None)
-
+        self.voice = self.part.voice
 
     def abc_broken_rhythm(self, token: Token):
         """
@@ -2745,7 +2829,7 @@ class TuneBody(TuneHeader, NoteMixin):
         if self.voice.overlay.last_note:
             self.voice.overlay.broken_rhythm = super().abc_broken_rhythm(token)
         else:
-            self.abc_error('Ignore broken rhythm. No left side note.', token)
+            self.abc_debug('Ignore broken rhythm. No left side note.', token)
 
     def abc_unknown_token(self, token: Token):
         """
@@ -2757,7 +2841,7 @@ class TuneBody(TuneHeader, NoteMixin):
          token (Token): The token representing an unknown ABC token.
 
         """
-        self.abc_error(f"Unknown token.", token)
+        self.abc_debug(f"Unknown token.", token)
 
     def abc_annotation(self, token: Token):
         """
@@ -2784,7 +2868,7 @@ class TuneBody(TuneHeader, NoteMixin):
         if text := content[1:]:
             text_expr = expressions.TextExpression(content=text)
         else:
-            self.abc_error("Empty annotation.", token)
+            self.abc_debug("Empty annotation.", token)
             return
 
         match content[0]:
@@ -2793,7 +2877,7 @@ class TuneBody(TuneHeader, NoteMixin):
             case '_':
                 text_expr.placement = 'below'
             case _:
-                self.abc_error(f"Text placement '{content[0]}' is not supported by music21.", token)
+                self.abc_debug(f"Text placement '{content[0]}' is not supported by music21.", token)
 
         self.voice.overlay.decorations.append(text_expr)
 
@@ -2826,7 +2910,7 @@ class TuneBody(TuneHeader, NoteMixin):
             # Pop the spanner token on the open_spanner stack
             self.voice.overlay.close_spanner()
         else:
-            self.abc_error(f"No open spanner to close.", token)
+            self.abc_debug(f"No open spanner to close.", token)
 
     def abc_open_slur(self, token: Token):
         """
@@ -2931,12 +3015,13 @@ class TuneBody(TuneHeader, NoteMixin):
             try:
                 self.abc_chord(token)
             except ABCException as e:
-                self.abc_error("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token, e)
+                self.abc_debug("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token,
+                               e)
 
         elif self.is_legacy_abc_decoration:
             self.abc_decoration(token)
         else:
-            self.abc_error("The legacy use of '+' for chords or decorations is not allowed", token)
+            self.abc_debug("The legacy use of '+' for chords or decorations is not allowed", token)
 
     def abc_decoration(self, token: Token):
         """
@@ -2982,7 +3067,7 @@ class TuneBody(TuneHeader, NoteMixin):
             finger.placement = 'below'
             self.voice.overlay.articulations.append(finger)
         else:
-            self.abc_error('Unknown abc decoration', token)
+            self.abc_debug('Unknown abc decoration', token)
 
     def abc_repeat(self, token: Token):
         """
@@ -3118,7 +3203,7 @@ class TuneBody(TuneHeader, NoteMixin):
             length_modifier = self.abc_length(token.src[1:])
         except ABCException as e:
             length_modifier = 1.0
-            self.abc_error("Fallback to rest length modifier '1.0'.", token, e)
+            self.abc_debug("Fallback to rest length modifier '1.0'.", token, e)
 
         rest: note.Rest = note.Rest()
 
@@ -3161,12 +3246,11 @@ class TuneBody(TuneHeader, NoteMixin):
         if token.src.strip() in self.linebreak or token.type == "newline":
             linebreak = layout.SystemLayout(isNew=True)
             if self.voice.stream:
-                self.voice.overlay.stream.append(linebreak)
+                self.voice.stream.append(linebreak)
             else:
-                self.voice.overlay.decorations.append(linebreak)
+                self.voice.part.append(linebreak)
         else:
-            self.abc_error(f"Symbol '{token.src}' is not a supported score linebreak")
-
+            self.abc_debug(f"Symbol '{token.src}' is not a supported score linebreak")
 
     def fix_part_lengths(self):
         """
@@ -3179,24 +3263,24 @@ class TuneBody(TuneHeader, NoteMixin):
         - Do not extend voices that are empty in all sections.
         - voices or those not shown in the score are not extended.
         """
-        section_sequence: str | list = self.section_sequence or list(self.sections.keys())
+        section_sequence: str | list = self.section_sequence or list(self.parts.keys())
         part_order = self.voice_order()
 
         # Create a list of IDs for voices that are not empty.
         non_empty_voices = set()
-        for part_id, section in self.sections.items():
-            for voice_id, ctx in section.items():
+        for part in self.parts.values():
+            for voice in part:
                 # Only include voices that are being played and are not empty
-                if voice_id in part_order and len(ctx.part.getElementsByClass(stream.Measure)):
-                    non_empty_voices.add(voice_id)
+                if voice.voice_id in part_order and len(voice.part.getElementsByClass(stream.Measure)):
+                    non_empty_voices.add(voice.voice_id)
 
-        for part_id, section in self.sections.items():
+        for part in self.parts.values():
             # This section is not played
-            if part_id not in section_sequence:
+            if part.part_id not in section_sequence:
                 continue
 
-            section_part_lengths = [len(ctx.part.getElementsByClass(stream.Measure))
-                                    for ctx in section.values()]
+            section_part_lengths = [len(voice.part.getElementsByClass(stream.Measure))
+                                    for voice in part]
 
             if not section_part_lengths:
                 continue
@@ -3204,15 +3288,15 @@ class TuneBody(TuneHeader, NoteMixin):
             max_part_len = max(section_part_lengths)
 
             for voice_id in non_empty_voices:
-                if voice_id not in section:
-                    section[voice_id] = ABCVoice(voice_id=None)
+                if voice_id not in part._voices:
+                    part._voices[voice_id] = ABCVoice(voice_id=None)
 
-                ctx = section[voice_id]
-                part_len = len(ctx.part.getElementsByClass(stream.Measure))
+                voice = part.get_voice(voice_id)
+                part_len = len(voice)
                 if part_len < max_part_len:
                     for i in range(max_part_len - part_len):
                         fill_measure = stream.Measure()
-                        ctx.part.append(fill_measure)
+                        voice.part.append(fill_measure)
 
     def voice_order(self) -> list[str | None]:
         """
@@ -3243,7 +3327,7 @@ class TuneBody(TuneHeader, NoteMixin):
 
             self.abc_token(token)
 
-        self.close_part()
+        self.part.close()
 
         parts = list(self.combine_abc_parts())
         for midi_channel, part in enumerate(parts, start=1):
@@ -3253,7 +3337,7 @@ class TuneBody(TuneHeader, NoteMixin):
         try:
             fix_measures(self.score)
         except ABCException as e:
-            self.abc_error('Fixing bar line failed', exception=e)
+            self.abc_debug('Fixing bar line failed', exception=e)
 
         self.voice_grouping()
         return self.score
@@ -3297,7 +3381,7 @@ class ChordParser(ABCParser, NoteMixin):
         self.voice.overlay.cleanup_ties(m21_notes)
 
         if not m21_notes:
-            self.abc_error("Empty Chord.", token)
+            self.abc_debug("Empty Chord.", token)
             return None
 
         # The internal length of the chord is equal the first chord note
@@ -3309,11 +3393,10 @@ class ChordParser(ABCParser, NoteMixin):
         try:
             chord_length_modifier = self.abc_length(length_str)
         except ABCException as e:
-            chord_length_modifier= 1.0
-            self.abc_error("Fallback to chord length modifier '1.0'.", token, e)
+            chord_length_modifier = 1.0
+            self.abc_debug("Fallback to chord length modifier '1.0'.", token, e)
 
         m21_chord.quarterLength = m21_notes[0].quarterLength * chord_length_modifier
-
 
         return m21_chord
 
@@ -3329,7 +3412,7 @@ class GraceNoteParser(ABCParser, NoteMixin):
         self.time_signature = body_processor.time_signature
         self.quarterLength = 0.25
 
-    def process(self, intern: list[Token], slash:bool = False) -> list[music21.Music21Object]:
+    def process(self, intern: list[Token], slash: bool = False) -> list[music21.Music21Object]:
         grace_notes: list[note.Note] = []
         for token in intern:
             if grace_note := self.abc_token(token):
@@ -3342,17 +3425,17 @@ class GraceNoteParser(ABCParser, NoteMixin):
         Während grace notes broken rhythm enthalten können, dürfen sie nicht mir
         einen broken rhythm ausserhalb ihres kontext kommunizieren.
         """
-        self.abc_error('Broken rhythm for grace notes not supported. (yet)', token)
+        self.abc_debug('Broken rhythm for grace notes not supported. (yet)', token)
 
     def abc_tuplet(self, token: Token):
         """
         Während grace notes broken rhythm enthalten können, dürfen sie nicht mir
         einen broken rhythm ausserhalb ihres kontext kommunizieren.
         """
-        self.abc_error('Tuplets for grace notes not supported. (yet)', token)
+        self.abc_debug('Tuplets for grace notes not supported. (yet)', token)
 
     def abc_note(self, token: Token):
-        m21_note= super().abc_note(token)
+        m21_note = super().abc_note(token)
         m21_note.quarterLength *= self.quarterLength
         return m21_note.getGrace()
 

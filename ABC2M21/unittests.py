@@ -624,7 +624,7 @@ class TestFiles(unittest.TestCase):
         score = ABCTranslator(abc_ale_is_dear)
         self.assertIsInstance(score, stream.Score)
         _tempo = score[tempo.TempoIndication]
-        self.assertEqual(len(_tempo), 1)
+        self.assertEqual(2, len(_tempo))
         self.assertEqual(str(_tempo[0]),
                          '<music21.tempo.MetronomeMark Quarter=211>')
 

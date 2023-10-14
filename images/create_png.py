@@ -18,13 +18,11 @@ abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
              'abc_shorthand_decorations', 'abc_chord_example', 'abc_unison', 'abc_chord_symbols',
              'abc_chord_dialect', 'abc_annotations', 'abc_lyrics_1', 'abc_lyrics_2', 'abc_lyrics_3',
              'abc_lyrics_4', 'abc_verses_1','abc_verses_2', 'abc_suppress_score_linebreak',
-             'abc_score_line_break_symbols', 'abc_line_continue_over_comments'
-             ]
-"""
-'abc_full_rigged_ship', 'abc_hector_the_hero', 'abc_mystery_reel',
-'abc_william_and_nancy', 'abc_kitchen_girl', 'abc_fyrareprisarn', 'abc_ale_is_dear',
-'abc_the_begger_boy', 'abc_the_ale_wifes_daughter'
-"""
+             'abc_score_line_break_symbols', 'abc_line_continue_over_comments', 'abc_part',
+             'abc_full_rigged_ship', 'abc_hector_the_hero', 'abc_mystery_reel',
+             'abc_william_and_nancy', 'abc_kitchen_girl', 'abc_fyrareprisarn', 'abc_ale_is_dear',
+             'abc_the_begger_boy', 'abc_the_ale_wifes_daughter' ]
+
 
 
 musecores = ['/home/mschulz/Anwendungen/MuseScore-3.6.0.451381076-x86_64.AppImage',
@@ -41,7 +39,7 @@ for musecore in musecores:
 # Getting the current working directory
 cwd = os.getcwd()
 
-#s = ABCTranslator(testtunes.abc_legacy_chord_and_decoration)
+#s = ABCTranslator(testtunes.abc_part)
 #s.show()
 #exit()
 

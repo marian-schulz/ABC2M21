@@ -122,7 +122,7 @@ TOKEN_SPEC: list[tuple[str, str]] = [
     ('score_linebreak', '[\$\!]'),
     ('user_symbol', r'[H-Wh-w~\.](?![:])'),
     ('EmptyLine', r'^([ \t]*[\n])+'),
-    ('Skip', rf'^%(?!%).*(\n|$)'),
+    ('Skip', r'^%(?!%).*(\n|$)|%.*$'),
     ('newline', r'[\\ ]*(%[^\n\\]*)?[\\]?[ \t]*\n'),
     ('unknown_token', r'\S')
     # ('Space', r'\s+')
