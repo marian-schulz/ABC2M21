@@ -1,6 +1,6 @@
 # ABC2M21
 ABC2M21 serves as an alternative translator/converter. It transforms tunes originally written 
-in [abc notation](https://abcnotation.com/) into[music21](https://github.com/cuthbertLab/music21) 
+in [abc notation](https://abcnotation.com/) into [music21](https://github.com/cuthbertLab/music21) 
 streams and objects.
 
 ABC2M21 is a work in progress and is under active development. While many common ABC features have
@@ -8,6 +8,10 @@ been successfully implemented, some lesser-utilized ABC features are still await
 primarily due to the intricacies of merging with the music21 framework. Certain features have been 
 strategically repositioned owing to the challenges encountered during implementation. Be assured, 
 these features are slated for seamless integration in the future.
+
+Note:
+* Consider this project as a Beta version, a preview. I reserve the right to refactor the code, and 
+the API may not remain as is. Once I release version 1.0, it will stabilize accordingly.
 
 ## Setup
 ABC2M21 only requires the [music21](https://github.com/cuthbertLab/music21) Python library and python version >= 3.10
