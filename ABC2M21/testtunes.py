@@ -221,6 +221,16 @@ abc_fingerings = """
 !1!E !2!G !3!E !4!F !5!G 
 """
 
+abc_tcoz_metadata = """
+T:Ave Maria
+C:Johann Sebastian Bach
+C:Charles Gounod
+O:Germany
+O:France
+Z:abc-transcription Marian Schulz
+Z:abc-edited-by Marian Schulz
+Z:abc-copyright C. Opyright
+"""
 abc_clef_octave = """
 X:1
 L:1
@@ -266,8 +276,14 @@ w:!invertedfermata!  !trill!  !mordent!  !fermata!  !turn!  !invertedturn!  !arp
 abc_articulations = """
 L:1/4
 K:C
-!staccato!C  !>!C !downbow!C !^!C !breath!C !tenuto!C !upbow!C !open!C !+!C !snap!C !nail!C !doit! C !thumb!C| !cesura!C| 
-w:!staccato! !>!  !downbow!  !^!  !breath!  !tenuto!  !upbow!  !open!  !+!  !snap!  !nail!  !doit!   !thumb!   !cesura!
+!staccato!C  !>!C     !downbow!C !^!C    |$
+!tenuto!C    !upbow!C !open!C    !+!C    |
+!breath!C    !snap!C  !nail!C    !doit!C |
+!thumb!C     !cesura!C |
+w:!staccato! !>!      !downbow!  !^!     |
++:!tenuto!   !upbow!  !open!     !+!     |
++:!breath!   !snap!   !nail!     !doit!  |  
++:!thumb!    !cesura! |
 """
 
 abc_repeat_marker = """

@@ -240,6 +240,39 @@ K:C
 ```
 ![part](images/part.png)
 
+### Titel, Composer, Area, Origin, Transcription
+
+Historically, the A: field has been used to contain area information. However this field 
+is now deprecated and it is recommended that such information be included in the O: field. 
+
+Note:
+* The "Area" (A:) field is treated like the "Origin" (O:) field.
+```
+>>> abc_fragment = '''
+... T:Ave Maria
+... C:Johann Sebastian Bach
+... C:Charles Gounod
+... O:Germany
+... A:France
+... Z:John Smith, <j.s@mail.com>
+... Z:abc-transcription John Smith, <j.s@mail.com>, 1st Jan 2010
+... Z:abc-edited-by Fred Bloggs, <f.b@mail.com>, 31st Dec 2010
+... Z:abc-copyright &copy; John Smith
+... '''
+>>> score = ABCTranslator(abc_fragment)
+>>> score.metadata.composer
+'Johann Sebastian Bach and Charles Gounod'
+>>> score.metadata.localeOfComposition
+'Germany, France'
+>>> score.metadata.contributors
+(<music21.metadata.primitives.Contributor composer:Johann Sebastian Bach>,
+ <music21.metadata.primitives.Contributor composer:Charles Gounod>,
+ <music21.metadata.primitives.Contributor abc-transcription:John Smith, <j.s@mail.com>>,
+ <music21.metadata.primitives.Contributor abc-transcription : John Smith, <j.s@mail.com>, 1st Jan 2010>,
+ <music21.metadata.primitives.Contributor abc-edited-by : Fred Bloggs, <f.b@mail.com>, 31st Dec 2010>,
+ <music21.metadata.primitives.Contributor abc-copyright : © John Smith)
+```
+
 ## ABC music code
 
 ### Pitches Across Various Octaves
@@ -565,8 +598,10 @@ Note:
 ```
 L:1/4
 K:C
-  !staccato!C  | !>!C     | !downbow!C | !^!C | !breath!C |
-  !tenuto!C    | !upbow!C | !open!C    | !+!C | !snap!C   | !nail!C
+!staccato!C  !>!C     !downbow!C !^!C |
+!tenuto!C    !upbow!C !open!C    !+!C |
+!breath!C    !snap!C  !nail!C    !doit!C |
+!thumb!C|    !cesura!C
 ```
 ![Articulations](images/articulations.png)
 

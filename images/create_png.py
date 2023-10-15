@@ -21,7 +21,7 @@ abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
              'abc_score_line_break_symbols', 'abc_line_continue_over_comments', 'abc_part',
              'abc_full_rigged_ship', 'abc_hector_the_hero', 'abc_mystery_reel',
              'abc_william_and_nancy', 'abc_kitchen_girl', 'abc_fyrareprisarn', 'abc_ale_is_dear',
-             'abc_the_begger_boy', 'abc_the_ale_wifes_daughter' ]
+             'abc_the_begger_boy', 'abc_the_ale_wifes_daughter']
 
 
 
@@ -39,7 +39,7 @@ for musecore in musecores:
 # Getting the current working directory
 cwd = os.getcwd()
 
-#s = ABCTranslator(testtunes.abc_clef_octave)
+#s = ABCTranslator(testtunes.abc_score_line_break_symbols)
 #s.show()
 #exit()
 

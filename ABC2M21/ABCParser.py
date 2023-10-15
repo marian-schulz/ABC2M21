@@ -483,7 +483,24 @@ class FileHeader(ABCParser):
 
         Examples:
 
-        >>> from ABC2M21 import Field
+        >>> abc_fragment = '''
+        ... T:Ave Maria
+        ... C:Johann Sebastian Bach
+        ... C:Charles Gounod
+        ... O:Germany
+        ... A:France
+        ... Z:John Smith, <j.s@mail.com>
+        ... Z:abc-transcription John Smith, <j.s@mail.com>, 1st Jan 2010
+        ... Z:abc-edited-by Fred Bloggs, <f.b@mail.com>, 31st Dec 2010
+        ... Z:abc-copyright &copy; John Smith
+        ... '''
+        >>> score = ABCTranslator(abc_fragment)
+        >>> score.metadata.composer
+        'Johann Sebastian Bach and Charles Gounod'
+        >>> score.metadata.localeOfComposition
+        'Germany, France'
+        >>> score.metadata.contributors
+
         >>> fh = FileHeader()
         >>> fh.abc_meta_data(Field('MetaData', 'B:WTC I'))
         >>> fh.abc_meta_data(Field('MetaData', 'C:J.S. Bach'))
@@ -2323,12 +2340,15 @@ def post_linebreaks(part: stream.Part):
     # Search linebreaks in the part and move the line break into the next measure
     for line_break in part.getElementsByClass(layout.SystemLayout):
         # Get measure on the offset of the linebreak
-        offset_measure: stream.Measure = part.getElementsByOffset(
-            line_break.offset).getElementsByClass(stream.Measure).first()
+        offset_measure = part.getElementsByOffset(line_break.offset)
+        offset_measure = offset_measure.getElementsByClass(stream.Measure).first()
 
-        part.remove(line_break)
+        #part.remove(line_break)
         if offset_measure:
-            offset_measure.append(line_break)
+            offset_measure.append(layout.SystemLayout(isNew=True))
+            #offset_measure.coreElementsChanged()
+
+        #part.coreElementsChanged()
 
 class TuneBody(TuneHeader, NoteMixin):
     def __init__(self, tune_header: TuneHeader):
@@ -2473,9 +2493,8 @@ class TuneBody(TuneHeader, NoteMixin):
 
                     # Kopieren Sie die Elemente aus part2 in part1
                     for element in m21_part.elements:
-                        combined_part.append(element)
-
-
+                        combined_part.coreInsert(element.offset, element)
+                    combined_part.coreElementsChanged()
 
             if combined_part.quarterLength > 0:
                 try:
@@ -2691,7 +2710,7 @@ class TuneBody(TuneHeader, NoteMixin):
         else:
             # There is no open measure in the context that can be closed
             # with this token
-            print(f"Ignore end repeat bar line there is no open measure in this part.")
+            self.abc_debug(f"Ignore end repeat bar line there is no open measure in this part.")
 
     def abc_barline(self, token: Token):
         """
@@ -3185,6 +3204,7 @@ class TuneBody(TuneHeader, NoteMixin):
                 self.voice.part.append(linebreak)
         else:
             self.abc_debug(f"Symbol '{token.src}' is not a supported score linebreak")
+
 
     def fix_part_lengths(self):
         """
