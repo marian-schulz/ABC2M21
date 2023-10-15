@@ -1022,8 +1022,6 @@ class FileHeader(ABCParser):
                 return
             self.abc_token(token)
 
-
-@dataclass
 class VoiceInfo:
     """
     Data class representing information about an abc voice.
@@ -1035,12 +1033,13 @@ class VoiceInfo:
         m21_clef (clef.Clef | None): The clef associated with the part.
         octave (int | None): The octave information for the part.
     """
-    voice_id: str = None
-    name: str | None = None
-    sub_name: str | None = None
-    stem: str | None = None
-    m21_clef: clef.Clef | None = None
-    octave: int | None = None
+    def __init__(self, id: str | None):
+        self.id: str | None = id
+        self.name: str | None = None
+        self.sub_name: str | None = None
+        self.stem: str | None = None
+        self.m21_clef: clef.Clef | None = None
+        self.octave: int | None = None
 
 
 class TuneHeader(FileHeader):
@@ -1085,7 +1084,7 @@ class TuneHeader(FileHeader):
         self.octave: int = 0
         self.tempo: tempo.MetronomeMark | None = None
         self.section_sequence: str = ''
-        self.voice_info = {}
+        self.voice_info: dict[str|None, VoiceInfo] = { None: VoiceInfo(id=None) }
         self.token_generator = None
 
     def process(self, token_generator: Iterator[Token]):
@@ -1546,7 +1545,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
         self.section_sequence = eval("".join(result))
 
     def abc_voice(self, token: Field) -> \
-            (str, clef.Clef | None, int | None):
+            (str, clef.Clef | None):
         """
         Process the ABC voice field token and return relevant information
         for a Music21 Part.
@@ -1599,46 +1598,37 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
         if voice_id not in self.voice_info:
             # If the part is not yet known
             # Create a PartInfo for the part
-            self.voice_info[voice_id] = VoiceInfo(
-                voice_id=voice_id,
-                stem=stem,
-                m21_clef=m21_clef,
-                octave=octave,
-                name=name,
-                sub_name=subname
-            )
-        else:
-            # Otherwise, update the VoiceInfo of the voice with the
-            # information found in the token
-            info: VoiceInfo = self.voice_info[voice_id]
-            if name is not None:
-                info.name = name
-            if subname is not None:
-                info.sub_name = subname
-            if stem is not None:
-                info.stem = stem
-            if m21_clef is not None:
-                info.m21_clef = m21_clef
-            if octave is not None:
-                info.octave = octave
+            self.voice_info[voice_id] = VoiceInfo(id=voice_id)
 
-        return voice_id, m21_clef, octave
+        # Otherwise, update the VoiceInfo of the voice with the
+        # information found in the token
+        info: VoiceInfo = self.voice_info[voice_id]
+        if name is not None:
+            info.name = name
+        if subname is not None:
+            info.sub_name = subname
+        if stem is not None:
+            info.stem = stem
+        if m21_clef is not None:
+            info.m21_clef = m21_clef
+        if octave is not None:
+            info.octave = octave
+
+        return voice_id, m21_clef
 
 
 class ABCPart(ABCObject):
-    def __init__(self,
-                 part_id: str | None,
-                 tempo_mark: tempo.MetronomeMark,
-                 m21_clef: clef.Clef,
-                 octave: int):
+    def __init__(self, id: str | None,
+                       tempo_mark: tempo.MetronomeMark):
 
-        self.part_id: str | None = part_id
+        self.id: str | None = id
         self.linebreak: layout.SystemLayout | None = None
         self.tempo: tempo.MetronomeMark | None = tempo_mark
-        self._voices: dict[str | None, ABCVoice] = {
-            None: ABCVoice(m21_clef=m21_clef, octave=octave, voice_id=None)
-        }
-        self.voice: ABCVoice = self._voices[None]
+        self._voices: dict[str|None, ABCVoice] = {}
+        self.voice: ABCVoice|None = None
+
+    def __contains__(self, info: VoiceInfo):
+        return info.id in self._voices
 
     def get_voice(self, voice_id: str | None):
         return self._voices.get(voice_id, None)
@@ -1647,26 +1637,17 @@ class ABCPart(ABCObject):
         for voice in self._voices.values():
             voice.close()
 
-    def active_voice(self,
-                     voice_id: str | None,
-                     m21_clef: clef.Clef,
-                     octave: int):
+    def active_voice(self, info: VoiceInfo):
         """
         Change the active abc voice in the processor.
         From now on, all Music21 objects, such as notes and measures,
         will be inserted into the active part.
         """
 
-        if voice := self.get_voice(voice_id):
-            voice.m21_clef = m21_clef
-            voice.octave = octave
-        else:
-            self._voices[voice_id] = ABCVoice(
-                voice_id=voice_id,
-                m21_clef=m21_clef,
-                octave=octave)
+        if info not in self:
+            self._voices[info.id] = ABCVoice(info)
 
-        self.voice = self._voices[voice_id]
+        self.voice = self._voices[info.id]
         return self.voice
 
     def __iter__(self) -> Iterator['ABCVoice']:
@@ -1869,29 +1850,33 @@ class ABCOverlay(ABCObject):
 
 
 class ABCVoice(ABCObject):
-    def __init__(self, voice_id: str | None,
-                 m21_clef: clef.Clef | None = None,
-                 octave: int = 0):
-
-        self.voice_id: str | None = voice_id
-        self.part: stream.Part = stream.Part(id=voice_id)
+    def __init__(self, info: VoiceInfo):
+        self.info: VoiceInfo = info
+        self.part: stream.Part = stream.Part(id=info.id)
 
         # Part stream objekt of this context
         # carried accidentals in this voice
         self.carried_accidentals: dict = {}
 
-        # Remember a clef token to insert in the next measure
-        self.clef: clef.Clef | None = m21_clef
-        self.octave: int = octave
-        self.linebreak: layout.SystemLayout | None = None
         self.lyrics: list = []
         self.lyric_bar_count: int = 0
 
         # last measure of the part in this context
-        self.stream: stream.Measure | None = None
+        self.measure: stream.Measure | None = None
         self.repeat_bracket: spanner.RepeatBracket | None = None
         self.overlay: ABCOverlay = ABCOverlay()
         self._overlays: list[ABCOverlay] = [self.overlay]
+
+    @property
+    def Id(self):
+        return self.info.id
+    @property
+    def octave(self):
+        return self.info.octave
+
+    @property
+    def clef(self):
+        return self.info.m21_clef
 
     def measures(self) -> Iterator[stream.Measure]:
         yield from self.part.getElementsByClass(stream.Measure)
@@ -1922,21 +1907,21 @@ class ABCVoice(ABCObject):
     #    self.stream.append(m21_object)
 
     def split_measure(self, quarter_length: float):
-        splits = self.stream.splitAtQuarterLength(quarter_length)
-        self.part.remove(self.stream)
+        splits = self.measure.splitAtQuarterLength(quarter_length)
+        self.part.remove(self.measure)
         for measure in splits:
-            self.stream = measure
+            self.measure = measure
             self.part.append(measure)
 
     def next_overlay(self) -> ABCOverlay:
-        n = len(self.stream.getElementsByClass(stream.Voice))
+        n = len(self.measure.getElementsByClass(stream.Voice))
         if len(self._overlays) <= n:
-            self.abc_debug(f'Create Overlay #{n} context in voice: {self.voice_id}')
+            self.abc_debug(f'Create Overlay #{n} context in voice: {self.Id}')
             self._overlays.append(ABCOverlay())
 
         self.overlay = self._overlays[n]
         self.overlay.stream = stream.Voice()
-        self.stream.insert(0, self.overlay.stream)
+        self.measure.insert(0, self.overlay.stream)
         self.carried_accidentals = {}
         return self.overlay
 
@@ -1945,7 +1930,7 @@ class ABCVoice(ABCObject):
             self.abc_debug('Close still open repeat braket.')
             self.close_repeat_bracket()
 
-        self.repeat_bracket = spanner.RepeatBracket(self.stream)
+        self.repeat_bracket = spanner.RepeatBracket(self.measure)
         self.repeat_bracket.number = number
         self.repeat_bracket.completeStatus = False
         self.part.insert(0, self.repeat_bracket)
@@ -1957,8 +1942,8 @@ class ABCVoice(ABCObject):
 
     def close_measure(self, time_signature: meter.TimeSignature, bar_line: bar.Barline | None = None):
 
-        assert self.stream is not None, "No open measure in the active context to close found"
-        assert self.stream.quarterLength > 0, 'Closing an empty measure!'
+        assert self.measure is not None, "No open measure in the active context to close found"
+        assert self.measure.quarterLength > 0, 'Closing an empty measure!'
         # Split a measure if the measure length is greater than the measure
         # length of the given time signature
         if time_signature is not None:
@@ -1967,16 +1952,16 @@ class ABCVoice(ABCObject):
                 measures[0].timeSignature = time_signature
 
             time_sig_length = time_signature.barDuration.quarterLength
-            if self.stream.quarterLength > time_sig_length:
+            if self.measure.quarterLength > time_sig_length:
                 self.split_measure(time_sig_length)
 
         # set the closing barline i the measure
-        self.stream.rightBarline = bar_line if bar_line else bar.Barline()
+        self.measure.rightBarline = bar_line if bar_line else bar.Barline()
 
         self.carried_accidentals = {}
 
         # Remove the measure reference from the context
-        self.stream = None
+        self.measure = None
         self.overlay.stream = None
 
         # Set the overlay context to the first overlay
@@ -1991,14 +1976,11 @@ class ABCVoice(ABCObject):
         if self.lyrics:
             self.align_lyrics()
 
-        assert self.stream is None, \
-            f"Last measure of active part '{self.voice_id}' is still open!"
+        assert self.measure is None, \
+            f"Last measure of active part '{self.Id}' is still open!"
 
         # Create a new measure with one Voices (ABC Overlay)
         measure = stream.Measure()
-        if self.linebreak:
-            measure.append(self.linebreak)
-            self.linebreak = None
 
         # For the first measure in this context, add recent clef,
         # key signature and meter
@@ -2019,10 +2001,10 @@ class ABCVoice(ABCObject):
             self.repeat_bracket.addSpannedElements(measure)
 
         # set active measure in the context
-        self.stream = measure
+        self.measure = measure
         self.overlay = self._overlays[0]
         self.overlay.stream = stream.Voice()
-        self.stream.insert(0, self.overlay.stream)
+        self.measure.insert(0, self.overlay.stream)
         self.part.append(measure)
 
     def close(self):
@@ -2106,6 +2088,7 @@ class NoteMixin:
 
     def __init__(self):
         self.voice: ABCVoice | None = None
+        self.octave: int = 0
         self.key_signature: key.KeySignature | None = None
         self.accidental_mode: str = 'not'
         self.time_signature: meter.TimeSignature | None = None
@@ -2127,11 +2110,13 @@ class NoteMixin:
 
         # ABC pitches are case-sensitive, indicating an octave.
         pitch_name = match.group(2)
-        octave: int = self.voice.octave + (5 if pitch_name.islower() else 4)
-        pitch_name: common.types.StepName = pitch_name.upper()
 
+        octave: int = (5 if pitch_name.islower() else 4)
         if m := match.group(3):
             octave = octave - m.count(',') + m.count("'")
+        octave += self.octave if self.voice.octave is None else self.voice.octave
+
+        pitch_name  = pitch_name.upper()
 
         # the abc accidental of the note
         accidental = self.abc_accidental(match.group(1))
@@ -2385,22 +2370,11 @@ class TuneBody(TuneHeader, NoteMixin):
         else:
             self.quarter_length: float = self.default_unit_note_length()
 
-        # Store ABCVoiceContext in a dictionary by section id and voice id.
-        # self.sections: dict[str | None, dict[str | None, ABCVoice]] = {
-        #    None: {None: ABCVoice(m21_clef=self.clef, octave=self.octave, voice_id=None)}
-        # }
         self.parts: dict[str | None, ABCPart] = {
-            None: ABCPart(part_id=None,
-                          tempo_mark=self.tempo,
-                          m21_clef=self.clef,
-                          octave=self.octave)
+            None: ABCPart(id=None, tempo_mark=self.tempo)
         }
-        # Because sections may be played in any order, we need to remember the
-        # tempo of each section.
-        # self.section_tempo: dict[str | None, tempo.MetronomeMark] = {None: self.tempo}
-        # self.part: dict[str | None, ABCVoice] = self.sections[None]
         self.part: ABCPart = self.parts[None]
-        self.voice: ABCVoice = self.part.voice
+        self.voice: ABCVoice = self.part.active_voice(self.voice_info[None])
 
     def voice_grouping(self):
         score_instruction: ScoreInstruction
@@ -2497,10 +2471,6 @@ class TuneBody(TuneHeader, NoteMixin):
                         if abc_part.tempo:
                             first_measure.insert(0, abc_part.tempo)
 
-                    #if line_break:
-                    #    m21_part.getElementsByClass(stream.Measure).first().insert(0, line_break)
-                    #    line_break = None
-
                     # Kopieren Sie die Elemente aus part2 in part1
                     for element in m21_part.elements:
                         combined_part.append(element)
@@ -2520,28 +2490,6 @@ class TuneBody(TuneHeader, NoteMixin):
                 post_linebreaks(combined_part)
                 yield combined_part
 
-    def set_context(self, voice_id: str | None):
-        """
-        Change the active abc voice in the processor.
-        From now on, all Music21 objects, such as notes and measures,
-        will be inserted into the active part.
-        """
-        m21_clef, octave = self.clef, self.octave
-
-        if not self.part.get_voice(voice_id=voice_id):
-            # This voice is not yet known in the active part
-            if voice_info := self.voice_info.get(voice_id, None):
-                # However, there is already information about this voice
-                # from the tune header or previously notated abc voice fields.
-                if voice_info.m21_clef is not None:
-                    m21_clef = voice_info.m21_clef
-                if voice_info.octave is not None:
-                    octave = voice_info.octave
-
-        self.voice = self.part.active_voice(voice_id=voice_id,
-                                            m21_clef=m21_clef,
-                                            octave=octave
-                                            )
 
     def abc_overlay(self, token: Token):
         """
@@ -2556,7 +2504,7 @@ class TuneBody(TuneHeader, NoteMixin):
             token (Token): The token representing an ABC voice overlay.
         """
 
-        assert self.voice.stream is not None, "Cannot append overlay, the measure is already closed"
+        assert self.voice.measure is not None, "Cannot append overlay, the measure is already closed"
         self.voice.next_overlay()
 
     def abc_lyrics(self, token: Field):
@@ -2608,7 +2556,7 @@ class TuneBody(TuneHeader, NoteMixin):
         Args:
             token: The token representing ABC GraceNotes.
         """
-        if self.voice.stream is None:
+        if self.voice.measure is None:
             self.voice.open_measure(key_signature=self.key_signature)
 
         intern = token.src[1:-1]
@@ -2625,7 +2573,7 @@ class TuneBody(TuneHeader, NoteMixin):
         ks, _, _ = super().abc_key(token)
 
         if ks:
-            if self.voice.stream is None:
+            if self.voice.measure is None:
                 self.voice.open_measure(key_signature=self.key_signature)
 
             self.voice.overlay.append(self.key_signature)
@@ -2699,7 +2647,7 @@ class TuneBody(TuneHeader, NoteMixin):
             token (Token): The StartRepeatBarline token to process.
         """
 
-        if self.voice.stream:
+        if self.voice.measure:
             # If the last measure is still open, close it
             self.voice.close_measure(self.time_signature)
 
@@ -2734,7 +2682,7 @@ class TuneBody(TuneHeader, NoteMixin):
             self.voice.close_repeat_bracket()
 
         #  Count the number of colons to determine the times
-        if self.voice.stream:
+        if self.voice.measure:
             #  Close the current measure with this EndRepeatBarline Token
             self.voice.close_measure(
                 time_signature=self.time_signature,
@@ -2774,7 +2722,7 @@ class TuneBody(TuneHeader, NoteMixin):
         if bar_line.type != 'regular' and self.voice.repeat_bracket:
             self.voice.close_repeat_bracket()
 
-        if self.voice.stream:
+        if self.voice.measure:
             # Close the current measure with this bar line
             self.voice.close_measure(self.time_signature, bar_line)
         else:
@@ -2804,17 +2752,11 @@ class TuneBody(TuneHeader, NoteMixin):
 
         # Add the section if it doesn't exist yet.
         if part_id not in self.parts:
-            self.parts[part_id] = ABCPart(
-                part_id=None,
-                tempo_mark=self.tempo,
-                m21_clef=self.clef,
-                octave=self.octave)
+            self.parts[part_id] = ABCPart(id=None, tempo_mark=self.tempo)
 
         # Set the new active section.
         self.part = self.parts[part_id]
-        self.part.active_voice(voice_id=None,
-                               m21_clef=self.clef,
-                               octave=self.octave)
+        self.part.active_voice(self.voice_info[None])
 
         # Also set the active part of the new section.
         self.voice = self.part.voice
@@ -2957,17 +2899,8 @@ class TuneBody(TuneHeader, NoteMixin):
         """
         Process abc voice field token in the tune body.
         """
-
-        voice_id, m21_clef, octave = super().abc_voice(token)
-
-        # change active voice context
-        self.set_context(voice_id)
-
-        if m21_clef is not None:
-            self.voice.clef = m21_clef
-
-        if octave is not None:
-            self.voice.octave = octave
+        voice_id, m21_clef = super().abc_voice(token)
+        self.voice = self.part.active_voice(self.voice_info[voice_id])
 
     def abc_tempo(self, token: Field):
         """
@@ -2976,7 +2909,7 @@ class TuneBody(TuneHeader, NoteMixin):
         Insert a music21 tempoMark Object into the recent measure
         """
         if tempoMark := super().abc_tempo(token):
-            if self.voice.stream is None:
+            if self.voice.measure is None:
                 self.voice.open_measure(key_signature=self.key_signature)
 
             self.voice.overlay.append(tempoMark)
@@ -3015,8 +2948,9 @@ class TuneBody(TuneHeader, NoteMixin):
             try:
                 self.abc_chord(token)
             except ABCException as e:
-                self.abc_debug("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token,
-                               e)
+                self.abc_debug(
+                    "Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token,
+                    e)
 
         elif self.is_legacy_abc_decoration:
             self.abc_decoration(token)
@@ -3103,7 +3037,7 @@ class TuneBody(TuneHeader, NoteMixin):
         Args:
             ncr (note.GeneralNote): The GeneralNote object to be processed.
         """
-        if self.voice.stream is None:
+        if self.voice.measure is None:
             self.voice.open_measure(key_signature=self.key_signature)
 
         self.voice.overlay.apply_broken_rhythm(ncr)
@@ -3154,12 +3088,12 @@ class TuneBody(TuneHeader, NoteMixin):
     def abc_meter(self, token: Field):
         _meter = super().abc_meter(token)
         if _meter:
-            if self.voice.stream is None:
+            if self.voice.measure is None:
                 self.voice.open_measure(
                     key_signature=self.key_signature
                 )
             self.voice.time_signature = _meter
-            self.voice.stream.timeSignature = _meter
+            self.voice.measure.timeSignature = _meter
 
     def abc_chord(self, token: Token):
         """
@@ -3245,8 +3179,8 @@ class TuneBody(TuneHeader, NoteMixin):
         """
         if token.src.strip() in self.linebreak or token.type == "newline":
             linebreak = layout.SystemLayout(isNew=True)
-            if self.voice.stream:
-                self.voice.stream.append(linebreak)
+            if self.voice.measure:
+                self.voice.measure.append(linebreak)
             else:
                 self.voice.part.append(linebreak)
         else:
@@ -3271,12 +3205,12 @@ class TuneBody(TuneHeader, NoteMixin):
         for part in self.parts.values():
             for voice in part:
                 # Only include voices that are being played and are not empty
-                if voice.voice_id in part_order and len(voice.part.getElementsByClass(stream.Measure)):
-                    non_empty_voices.add(voice.voice_id)
+                if voice.Id in part_order and len(voice.part.getElementsByClass(stream.Measure)):
+                    non_empty_voices.add(voice.Id)
 
         for part in self.parts.values():
             # This section is not played
-            if part.part_id not in section_sequence:
+            if part.id not in section_sequence:
                 continue
 
             section_part_lengths = [len(voice.part.getElementsByClass(stream.Measure))
@@ -3289,7 +3223,7 @@ class TuneBody(TuneHeader, NoteMixin):
 
             for voice_id in non_empty_voices:
                 if voice_id not in part._voices:
-                    part._voices[voice_id] = ABCVoice(voice_id=None)
+                    part._voices[voice_id] = ABCVoice(self.voice_info[None])
 
                 voice = part.get_voice(voice_id)
                 part_len = len(voice)
@@ -3318,7 +3252,7 @@ class TuneBody(TuneHeader, NoteMixin):
         else:
             # yield voice ids in the order of the voices as defined in the ABC
             # tune
-            return [None] + list(k for k in self.voice_info.keys())
+            return list(k for k in self.voice_info.keys())
 
     def process(self, token_generator: Iterator[Token]) -> stream.Score:
         for token in token_generator:
@@ -3350,6 +3284,7 @@ class ChordParser(ABCParser, NoteMixin):
         self.accidental_mode = body_processor.accidental_mode
         self.voice = body_processor.voice
         self.is_legacy_abc_chord = body_processor.is_legacy_abc_chord
+        self.octave = body_processor.octave
 
     def process(self, token: Token):
 
@@ -3411,6 +3346,7 @@ class GraceNoteParser(ABCParser, NoteMixin):
         self.accidental_mode = body_processor.accidental_mode
         self.time_signature = body_processor.time_signature
         self.quarterLength = 0.25
+        self.octave: int = body_processor.octave
 
     def process(self, intern: list[Token], slash: bool = False) -> list[music21.Music21Object]:
         grace_notes: list[note.Note] = []
@@ -3583,7 +3519,7 @@ def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
             return scores[0]
     else:
         tune_header = TuneHeader(abc_version=version)
-        # no, its not a tune book just an abc fragment
+        # no, it is not a tune book just an abc fragment
 
         src = abc_tune_book.lstrip('\n')
         if not src.endswith('\n'):

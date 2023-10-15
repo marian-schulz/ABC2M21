@@ -221,6 +221,19 @@ abc_fingerings = """
 !1!E !2!G !3!E !4!F !5!G 
 """
 
+abc_clef_octave = """
+X:1
+L:1
+M:C
+K:C
+P:A
+[V: A]E [V: A]E
+[V: B bass octave=-2]e [V: B]e
+P:B
+[V: A]E [V: A]E
+[V: B] e e
+"""
+
 abc_decorations = """
 X: 0
 L: 1/4

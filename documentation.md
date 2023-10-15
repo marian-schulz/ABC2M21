@@ -318,6 +318,23 @@ z z2 z/2 z/4 z/4 | x x2 x/2 x/4 x/4 | Z | X | Z2 | X2 |
 
 ![rests](images/rests.png)
 
+### Clefs and transposition
+Clef and transposition information may be provided in the `K:` key and `V:' voice fields. 
+The general syntax is: 
+
+```
+[clef=]<clef name>[<line number>][+8 | -8] [middle=<pitch>] [transpose=<semitones>] [octave=<number>] [stafflines=<lines>]
+```
+
+### transposition
+
+```
+X:1
+L:1
+V:1 clef=bass octave=-2
+K:
+CDEF
+```
 
 ### Bar lines
 

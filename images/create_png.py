@@ -39,7 +39,7 @@ for musecore in musecores:
 # Getting the current working directory
 cwd = os.getcwd()
 
-#s = ABCTranslator(testtunes.abc_part)
+#s = ABCTranslator(testtunes.abc_clef_octave)
 #s.show()
 #exit()
 
