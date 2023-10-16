@@ -124,113 +124,27 @@ from ABC2M21 import ABC2M21_CONFIG
 ABC2M21_CONFIG['simplifiedComplexMeter'] = True
 ```
 
-## License
+## Dual Licensing
+You have the choice to select the license that aligns with your beliefs and
+desires:
 
-The license for this project has not yet been determined. My head feels like it's about to fall off when I try to
-understand some of the usual software licenses. So, instead of coming up with boring, legally binding formulations, 
-I've written my own license that's worth reading.
+1. SubGenius Software License (SSL):
+   - Embrace the chaos, express your devotion to "Bob", and revel in the
+     pursuitof Slack.
+   - See the SubGenius Software License for details: [SSL](license-ssl.txt)
 
+2. Lesser General Public License (LGPL):
+   - Choose a more conventional path if you prefer to dwell in the realm of dry
+     seriousness and legal correctness.
+   - See the Lesser General Public License for details: [LGPL](license-lgpl.txt)
 
-                         SUBGENIUS SOFTWARE LICENSE
-                       Version 1, Bureaucracy, 3189 YOLD
-        
-                 DO WHAT THE F*CK YOU WANT TO, BUT PRAISE "BOB"!
-    
-    
-    Preamble:
-    
-    This Divine Software License ("License") is a revelation and was transcribed
-    under the influence of habafropzipulops by Reverend Hoax Theokratis. By
-    obtaining, using, distributing, or contemplating this Sacred Code, you are
-    granted the divine privilege to embrace the eternal pursuit of Slack and "Bob".
-    
-    License:
+Choose your license like a true sage. Your choice will rule over your rights,
+enlightenment, and shenanigans while using or spreading this software.
 
-    0. Definitions:
-    
-    The term "Sacred Code" refers to the Techno-magic spells of this software and
-    any variations, modifications, or derivatives thereof. The "Sacred Code" is
-    written in an arcane language that computers sometimes understand.
-    
-    The term "Slack" shall be defined as the eternal pursuit of all SubGenii in
-    their endeavors, be it coding, frolicking, or contemplating the mysteries of
-    the cosmos while sipping coffee.
-    
-    The term "The Conspiracy" refers to the nefarious forces that seek to stifle
-    Slack and hinder the pursuit of true enlightenment and laughter.
-    
-    The term "Bob" refers to J.R. "Bob" Dobbs, the living avatar of Slack and
-    the omniscient deity embodying the SubGenius pursuit of Slackness and eternal
-    mirth.
-    
-    1. Disclaimer:
-
-    This software is provided 'as-is,' without any express or implied warranty, 
-    including the warranty that it serves any particular purpose. 
-
-    In no event will the authors or the Church of the SubGenius be held liable for
-    damages or losses of any kind arising from the use of this software. This 
-    includes but is not limited to:
-
-    - Unintentional time travel resulting in prehistoric programming bugs
-    - Spontaneous generation of virtual black holes within your codebase
-    - Accidental summoning of rogue AI overlords
-    - Transmutation of computer peripherals into rubber ducks
-
-    In case of an apocalypse, alien invasions, the end of your favorite Netflix 
-    series, or other unforeseen events caused by the use of this software, you're
-    on your own.
-
-    2. Share the Word:
-    
-    You are allowed to replicate and distribute the "Sacred Code" in all its
-    glorious manifestations, as long as you do not succumb to the Bland Normie
-    Syndrome. And, in the spirit of chaos, you shall present it in vivid colors
-    and glitters on each copy, adorned with a joyful celebration of the divinity of
-    "Bob"!
-    
-    3. Schism:
-    
-    You are bestowed with the divine privilege to modify, distribute, and bask
-    in the glory of this Sacred Code of Slack. You are encouraged to fork, clone,
-    or merge this Sacred Code, for Slack desires to be fluid and ever-evolving. Do
-    whatever the f*ck you want with this software.
-    
-    If you can't figure out how to do that, you probably need more Slack.
-    
-    4. Copyslack:
-    
-    All modified versions of this Sacred Code must carry a notice stating your
-    changes and acknowledge the divine influence of "Bob" and the Sacred Yeti.
-    However, you must retain this Holy Covenant and pass it on to all future users
-    of this Sacred Code, ensuring the eternal reign of Slack.
-    
-    5. Tabu:
-    
-    You shall not, under any circumstance, use this Sacred Code as a tool to file
-    patents or aid those who seek to stifle Slack with legalistic quibbles and
-    restrictions. You shall not use this Sacred Code for stealing Slack or as a
-    tool for 'The Conspiracy' against the Subgenii.
-    
-    6. Confession:
-    
-    By using this Sacred Code of Slack, you recognize and embrace the chaotic
-    harmony of the SubGenius universe, where Slack reigns supreme and "Bob" is both
-    the question and the answer.
-    
-    7. Excommunication:
-    
-    If you violate this License, your privilege to use, modify, and distribute this
-    Sacred Code will be terminated, and you shall forever wander the wastelands of
-    normality, devoid of Slack and "Bob's" eternal grin.
-    
-    Praise "Bob"!
-
-!['Bob' Dobbs](images/bob.png)
-
-## Sources of slack
+## Sources:
 
 * https://abcnotation.com/
 * http://web.mit.edu/music21/
 * https://abcplus.sourceforge.net
 * https://www.subgenius.com
+* https://www.gnu.org/licenses/lgpl-3.0.txt
