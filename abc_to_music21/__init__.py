@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------------
-# Name:         ABC2M21/__init__.py
-# Purpose:      This file serves as the initialization for the ABC2M21 package.
+# Name:         abc_to_music21/__init__.py
+# Purpose:      This file serves as the initialization for the abc_to_music21 package.
 #
 # Authors:      Marian Schulz
 #
@@ -12,13 +12,13 @@
 making it easily understandable for both humans and computers. Comprising letters, digits,
 and punctuation marks, *ABC* allows music to be notated on paper or within computer files
 
-The *ABC2M21* package are focused on the task of converting ABC notation into `music21
+*ABC2M21* is focused on the task of converting ABC notation into `music21
 <https://web.mit.edu/music21/>`_ representation. Typically, users dealing with *ABC* data may not
 require the majority of methods and classes available in this package. To transform ABC notation
 from Python text or a file path into a :class:`~music21.stream.Stream` object, the recommended
 approach is to utilize the :func:`~abc_translator` function within this module.
 
-*ABC2M21*, while not strictly adhering to all recommendations and definitions of the
+*abc_to_music21*, while not strictly adhering to all recommendations and definitions of the
 abc standard v2.1, follows them to a considerable extent, aiming to maintain compatibility
 and coherence with the standards outlined in the `abc:standard:v2.1 documentation
 <https://abcnotation.com/wiki/abc:standard:v2.1>`_. *ABC2M21* takes into account some extensions
@@ -34,8 +34,8 @@ __all__ = [
 import re
 from pathlib import Path
 from music21 import stream, environment
-from ABC2M21.Parser import ABC2M21_CONFIG, ABCException, FileHeader, TuneHeader, TuneBody
-from ABC2M21.ABCToken import tokenize, Field, Token, DEFAULT_VERSION, ABCVersion
+from abc_to_music21.parser import ABC2M21_CONFIG, ABCException, FileHeader, TuneHeader, TuneBody
+from abc_to_music21.tokens import tokenize, Field, Token, DEFAULT_VERSION, ABCVersion
 
 # Some regular expressions to split the abc data
 ABC_TUNE_BOOK_SPLIT = re.compile(r'(^X:.*$)', flags=re.MULTILINE).split
@@ -240,7 +240,7 @@ def abc_translator(src: str | Path) -> stream.Stream:
 
     parser = TuneHeader(abc_version=version)
     tokens = tokenize(src, abc_version=version)
-    tokens = list(tokens)
+    #tokens = list(tokens)
     m21_stream = TuneBody(tune_header=parser).process(tokens)
     if len(m21_stream.parts) == 1:
         m21_stream = m21_stream.parts[0]

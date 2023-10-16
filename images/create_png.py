@@ -1,8 +1,8 @@
 # Importing the module
 import os
 from pathlib import Path
-from ABC2M21 import abc_translator, ABC2M21_CONFIG
-from ABC2M21 import testtunes
+from abc_to_music21 import abc_translator, ABC2M21_CONFIG
+from abc_to_music21 import testtunes
 from music21 import environment, converter
 import re
 a = environment.Environment()

@@ -31,7 +31,7 @@ includes many interesting (albeit incomplete) doctest sections.
 
 However, for utilizing the parser, the following brief documentation should suffice.
 
-    def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
+    def abc_translator(abc: str | pathlib.Path) -> stream.Stream:
 
       Translate ABC notation to a music21 stream.
   
@@ -49,7 +49,7 @@ However, for utilizing the parser, the following brief documentation should suff
   
       Translate a tune book from ABC notation to an opus:
 
-      >>> from ABC2M21 import abc_translator
+      >>> from abc_to_music21 import abc_translator
       >>> abc_tune_book = '''
       ... %abc-2.1
       ... X:1

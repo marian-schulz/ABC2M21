@@ -26,7 +26,7 @@ MuseScore features a WYSIWYG editor, facilitating note input and providing playb
 
 Example:
 
-    from ABC2M21 import abc_translator 
+    from abc_to_musci21 import abc_translator 
     from music21 import converter, environment
     
     abc_tune = """
@@ -66,7 +66,7 @@ or
 ## Usage
 To use ABC2M21, usually, only the following method is required.
         
-    def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
+    def abc_translator(abc: str | pathlib.Path) -> stream.Stream:
         
         Translate ABC notation to a music21 stream.
         
@@ -84,7 +84,7 @@ To use ABC2M21, usually, only the following method is required.
         
         Translate a tune book from ABC notation to an opus:
         
-        >>> from ABC2M21 import abc_translator
+        >>> from abc_to_music21 import abc_translator
         >>> abc_tune_book = '''
         ... %abc-2.1
         ... X:1
@@ -108,7 +108,7 @@ To use ABC2M21, usually, only the following method is required.
         ... T:single tune
         ... K: G
         ... CEG'''
-        >>> score = abc_translator(abc_tune)
+        >>> score = translator(abc_tune)
         >>> score
         <music21.stream.Score X: 1>
         >>> score.metadata.title
@@ -153,7 +153,7 @@ For instance, the images in this document were created using MuseScore3. Unfortu
 import is not flawless. In such cases, if possible, ABC2M21 provides a workaround.
 
 ```
-from ABC2M21 import ABC2M21_CONFIG
+from abc_to_music21 import ABC2M21_CONFIG
 
 # Convert complex meters into an equivalent of a simple meter
 ABC2M21_CONFIG['simplifiedComplexMeter'] = True

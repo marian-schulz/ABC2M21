@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         ABC2M21/ABCParser
-# Purpose:      This file serves as the initialization for the ABC2M21 package.
+# Name:         abc_to_music21/ABCParser
+# Purpose:      This file serves as the initialization for the abc_to_music21 package.
 #
 # Authors:      Marian Schulz
 #
@@ -19,9 +19,9 @@ from music21 import duration, spanner, dynamics, common, tie, instrument, clef
 from music21 import expressions, articulations, harmony, style, environment
 from music21 import key, pitch, stream, metadata, bar, tempo, layout
 from music21 import note, chord, repeat, meter
-from ABC2M21.ABCToken import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
+from abc_to_music21.tokens import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
 
-ABC2M21_ENVIRONMENT = environment.Environment('ABC2M21')
+ABC2M21_ENVIRONMENT = environment.Environment('abc_to_music21')
 ABC2M21_CONFIG = {'simplifiedComplexMeter': False}
 
 Syllables: TypeAlias = list[str]
@@ -135,6 +135,22 @@ M21_OPEN_SPANNER = {
     '<(': dynamics.Crescendo,
 }
 
+# The default dictionary for user-defined symbols.
+DEFAULT_USER_DEF_SYMBOLS: dict[str, list[Token]] = {
+    '.': list(tokenize('!staccato!')),
+    'H': list(tokenize('!fermata!')),
+    'L': list(tokenize('!accent!')),
+    'M': list(tokenize('!lowermordent!')),
+    'O': list(tokenize('!coda!')),
+    'P': list(tokenize('!uppermordent!')),
+    'S': list(tokenize('!segno!')),
+    'T': list(tokenize('!trill!')),
+    'k': list(tokenize('!straccent!')),
+    'K': list(tokenize('!accent!')),
+    'u': list(tokenize('!upbow!')),
+    'v': list(tokenize('!downbow!'))
+}
+
 # Tuple of ABC Dynamics
 M21_DYNAMICS = ('pppp', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'ffff', 'sfz')
 
@@ -229,8 +245,8 @@ def fix_measures(score: stream.Score):
     try:
         max_len = max(len(part.getElementsByClass(stream.Measure))
                       for part in score.getElementsByClass(stream.Part))
-    except ValueError:
-        raise ABCException('Tune is complete empty')
+    except ValueError as e:
+        raise ABCException('Tune is complete empty') from e
 
     bar_lines = [None] * max_len * 2
     meters = [list() for _ in range(max_len)]
@@ -303,29 +319,13 @@ class FileHeader(ABCParser):
     FIELD_METADATA = {'D': 'discography', 'B': 'book', 'H': 'history', 'N': 'notes',
                       'F': 'file', 'S': 'source', 'R': 'rhythm', 'G': 'groups'}
 
-    # The default dictionary for user-defined symbols.
-    DEFAULT_USER_DEF_SYMBOLS: dict[str, list[Token]] = {
-        '.': list(tokenize('!staccato!')),
-        'H': list(tokenize('!fermata!')),
-        'L': list(tokenize('!accent!')),
-        'M': list(tokenize('!lowermordent!')),
-        'O': list(tokenize('!coda!')),
-        'P': list(tokenize('!uppermordent!')),
-        'S': list(tokenize('!segno!')),
-        'T': list(tokenize('!trill!')),
-        'k': list(tokenize('!straccent!')),
-        'K': list(tokenize('!accent!')),
-        'u': list(tokenize('!upbow!')),
-        'v': list(tokenize('!downbow!'))
-    }
-
     def __init__(self, abc_version: ABCVersion = DEFAULT_VERSION):
         super().__init__(abc_version)
         self.metadata: metadata.Metadata = metadata.Metadata()
         self.quarter_length: float | None = None
         self.time_signature: meter.TimeSignature | None = None
         self.user_defined: dict[str, list[Token]] = dict(
-            FileHeader.DEFAULT_USER_DEF_SYMBOLS)
+            DEFAULT_USER_DEF_SYMBOLS)
 
         self.accidental_mode: str = 'not' if abc_version < (2, 0, 0) \
             else 'pitch'
@@ -345,7 +345,7 @@ class FileHeader(ABCParser):
 
         Examples:
 
-        >>> from ABC2M21 import Field
+        >>> from abc_to_music21 import Field
         >>> fh = FileHeader()
 
         Commonly used valuee for unit note length area crotchet (1/4)
@@ -374,15 +374,15 @@ class FileHeader(ABCParser):
         try:
             self.quarter_length = float(4 * Fraction(token.data))
             return self.quarter_length
-        except Exception as e:
-            self.abc_debug(f"Illegal abc UnitNoteLength.", token, e)
+        except ValueError as e:
+            self.abc_debug("Illegal abc UnitNoteLength.", token, e)
             return None
 
     def abc_unknown_token(self, token: Field):
         """
         Process an unknown token, print a debug message and discard the token
         """
-        self.abc_debug(f"Unknown Token", token)
+        self.abc_debug("Unknown Token", token)
 
     def abc_meter(self, token: Field) -> meter.TimeSignature:
         """
@@ -394,7 +394,7 @@ class FileHeader(ABCParser):
 
         Examples:
 
-        >>> from ABC2M21 import Field
+        >>> from abc_to_music21 import Field
         >>> fh = FileHeader()
 
         Apart from standard meters, e.g. M:6/8 or M:4/4
@@ -420,9 +420,9 @@ class FileHeader(ABCParser):
 
         if not meter_str or meter_str == 'none':
             self.time_signature = None
-        elif meter_str == 'C' or meter_str == 'common':
+        elif meter_str in ('C','common'):
             self.time_signature = meter.TimeSignature('common')
-        elif meter_str == 'C|' or meter_str == 'cut':
+        elif meter_str in ('C|', 'cut'):
             self.time_signature = meter.TimeSignature('cut')
         else:
             denominator: int = 1
@@ -463,24 +463,6 @@ class FileHeader(ABCParser):
             token (Field): The metadata token to process
 
         Examples:
-
-        >>> abc_fragment = '''
-        ... T:Ave Maria
-        ... C:Johann Sebastian Bach
-        ... C:Charles Gounod
-        ... O:Germany
-        ... A:France
-        ... Z:John Smith, <j.s@mail.com>
-        ... Z:abc-transcription John Smith, <j.s@mail.com>, 1st Jan 2010
-        ... Z:abc-edited-by Fred Bloggs, <f.b@mail.com>, 31st Dec 2010
-        ... Z:abc-copyright &copy; John Smith
-        ... '''
-        >>> score = ABCTranslator(abc_fragment)
-        >>> score.metadata.composer
-        'Johann Sebastian Bach and Charles Gounod'
-        >>> score.metadata.localeOfComposition
-        'Germany, France'
-        >>> score.metadata.contributors
 
         >>> fh = FileHeader()
         >>> fh.abc_meta_data(Field('MetaData', 'B:WTC I'))
@@ -571,8 +553,8 @@ class FileHeader(ABCParser):
                 return
 
             self.user_defined[symbol] = list(tokenize(token_str))
-        except Exception as e:
-            self.abc_debug(f"Error while parsing definition of an user-defined symbol", token, e)
+        except IndexError as e:
+            self.abc_debug("Error while parsing definition of an user-defined symbol", token, e)
 
     def abc_midi_instruction(self, token: Field):
         """
@@ -621,7 +603,7 @@ class FileHeader(ABCParser):
 
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1]
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Unknown midi instruction.', token, e)
             return
 
@@ -635,7 +617,7 @@ class FileHeader(ABCParser):
             gd = match.groupdict()
             self.midi[None] = int(gd['program'].strip())
         else:
-            self.abc_debug(f'Unknown midi instruction.', token)
+            self.abc_debug('Unknown midi instruction.', token)
 
     def abc_linebreak_instruction(self, token: Field):
         """
@@ -696,7 +678,7 @@ class FileHeader(ABCParser):
         """
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1]
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Unknown linebreak instruction.', token, e)
             return
 
@@ -757,7 +739,7 @@ class FileHeader(ABCParser):
         """
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1]
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Unknown score instruction.', token, e)
             return
 
@@ -851,13 +833,13 @@ class FileHeader(ABCParser):
         """
         try:
             instruction_str = token.data.split(maxsplit=1)[1].lower()
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Unknown propagate-accidentals instruction.',
                            token, e)
             return
 
         if instruction_str not in ('not', 'octave', 'pitch'):
-            self.abc_debug(f"Unknown accidental mode.", token)
+            self.abc_debug("Unknown accidental mode.", token)
             return
 
         self.accidental_mode = instruction_str
@@ -881,7 +863,7 @@ class FileHeader(ABCParser):
         """
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1].lower()
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Unknown continueall instruction token.',
                            token, e)
             return
@@ -927,7 +909,7 @@ class FileHeader(ABCParser):
         """
         try:
             instruction_str = token.src[2:].split(maxsplit=1)[1].lower()
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Unknown decoration instruction token.',
                            token, e)
             return
@@ -969,7 +951,7 @@ class FileHeader(ABCParser):
         """
         try:
             instruction_type = token.data.split(maxsplit=1)[0].upper()
-        except Exception as e:
+        except IndexError as e:
             self.abc_debug('Illegal instruction token', token, e)
             return
 
@@ -1128,9 +1110,6 @@ class TuneHeader(FileHeader):
         'ABBC'
         >>> th.tempo
         <music21.tempo.MetronomeMark slow Quarter=26>
-        >>> th.voice_info['Violine']
-        VoiceInfo(voice_id='Violine', name='First Violine', sub_name=None, stem=None, \
-m21_clef=<music21.clef.TrebleClef>, octave=None)
         """
 
         self.token_generator = token_generator
@@ -1151,7 +1130,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         The clef definition in abc is part of the voice (V:) or key (K:) field.
 
-        >>> from ABC2M21 import Field
+        >>> from abc_to_music21 import Field
         >>> th = TuneHeader()
         >>> m21_clef, octave = th.abc_clef(
         ...         Field("Voice", "V:1 clef=treble octave=-2"))
@@ -1236,7 +1215,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         Q:1/2=120 means 120 half-note beats per minute.
 
-        >>> from ABC2M21 import Field
+        >>> from abc_to_music21 import Field
         >>> th = TuneHeader()
         >>> th.abc_tempo(Field('tempo', 'Q:1/2=120'))
         <music21.tempo.MetronomeMark Half=120>
@@ -1273,7 +1252,6 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
         >>> th.abc_tempo(Field('tempo', 'Q:C3=120'))
         <music21.tempo.MetronomeMark Dotted Half=120>
         """
-        from fractions import Fraction
         text: str = ''
         referent: float = 0.0
         number: int = 0
@@ -1291,7 +1269,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                         referent = self.quarter_length if self.quarter_length \
                             else self.default_unit_note_length()
                     except ValueError:
-                        self.abc_debug(f'Illegal abc tempo field syntax.', token)
+                        self.abc_debug('Illegal abc tempo field syntax.', token)
                 else:
                     _text, _number = group.split('=')
                     number = int(_number)
@@ -1303,11 +1281,11 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
                             if _text[1:].isdigit():
                                 referent *= int(_text[1:])
                             else:
-                                self.abc_debug(f'Illegal abc tempo field syntax.', token)
+                                self.abc_debug('Illegal abc tempo field syntax.', token)
                     else:
                         referent = float(sum([Fraction(f) for f in _text.split()])) * 4
         else:
-            self.abc_debug(f'Illegal abc tempo field syntax.', token)
+            self.abc_debug('Illegal abc tempo field syntax.', token)
 
         try:
             if referent and number:
@@ -1325,7 +1303,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
             self.tempo = tempo_mark
             return tempo_mark
         except Exception as e:
-            self.abc_debug(f'Cannot create music21 MetronomeMark', token, e)
+            self.abc_debug('Cannot create music21 MetronomeMark', token, e)
 
     def abc_key(self, token: Field) -> \
             (key.KeySignature | None, clef.Clef | None, int | None):
@@ -1343,7 +1321,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         Examples:
 
-        >>> from ABC2M21 import Field
+        >>> from abc_to_music21 import Field
         >>> th = TuneHeader()
 
         The processing of the 'key' token will consistently return a tuple
@@ -1521,7 +1499,7 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
         Examples:
 
-        >>> from ABC2M21 import Field
+        >>> from abc_to_music21 import Field
         >>> processor = TuneHeader()
         >>> processor.abc_part(Field('Section', 'P: A2BC'))
         >>> processor.section_sequence
@@ -1997,7 +1975,7 @@ class ABCVoice(ABCObject):
         # Add the left bar line for the open measure
         if bar_line:
             assert not (isinstance(bar_line, bar.Repeat) and bar_line.direction == 'end'), \
-                f"Cannot open a measure with a closing repeat bar line"
+                "Cannot open a measure with a closing repeat bar line"
             measure.leftBarline = bar_line
 
         # add the measure to an open repeat bracket spanner
@@ -2252,8 +2230,8 @@ class NoteMixin:
 
             return numerator / denominator
 
-        except ValueError:
-            raise ABCException(f'Incorrectly encoded or unparsable duration.')
+        except ValueError as e:
+            raise ABCException('Incorrectly encoded or unparsable duration.') from e
 
     @staticmethod
     def abc_accidental(src: str) -> str:
@@ -2329,7 +2307,7 @@ class TuneBody(TuneHeader, NoteMixin):
         if tune_header.key_signature:
             self.key_signature = tune_header.key_signature
         else:
-            self.abc_debug(f"No valid key signature, default to 'C major'")
+            self.abc_debug("No valid key signature, default to 'C major'")
             self.key_signature = key.Key('C')
 
         self.time_signature = tune_header.time_signature
@@ -2359,7 +2337,6 @@ class TuneBody(TuneHeader, NoteMixin):
         self.voice: ABCVoice = self.part.active_voice(self.voice_info[None])
 
     def voice_grouping(self):
-        score_instruction: ScoreInstruction
         if not self.staves:
             return
 
@@ -2537,7 +2514,7 @@ class TuneBody(TuneHeader, NoteMixin):
                 cs = harmony.ChordSymbol(name)
             self.voice.overlay.decorations.append(cs)
         except Exception as e:
-            self.abc_debug(f'Chord symbol is malformed.', token, e)
+            self.abc_debug('Chord symbol is malformed.', token, e)
 
     def abc_grace_notes(self, token: Token):
         """
@@ -2607,8 +2584,7 @@ class TuneBody(TuneHeader, NoteMixin):
                       pos=token.pos + 2)
             )
         elif '|' in token.src:
-
-            left, right = token.src.split('|', maxsplit=1)
+            left = token.src.split('|', maxsplit=1)[0]
             self.abc_end_repeat_barline(
                 Token('end_repeat_barline', f'{left}|',
                       pos=token.pos)
@@ -2623,7 +2599,7 @@ class TuneBody(TuneHeader, NoteMixin):
                       pos=token.pos)
             )
             self.abc_start_repeat_barline(
-                Token('StartRepeatBarline', f'|:',
+                Token('StartRepeatBarline', '|:',
                       pos=token.pos + len(token.src) - 2
                       )
             )
@@ -2683,7 +2659,7 @@ class TuneBody(TuneHeader, NoteMixin):
         else:
             # There is no open measure in the context that can be closed
             # with this token
-            self.abc_debug(f"Ignore end repeat bar line there is no open measure in this part.")
+            self.abc_debug("Ignore end repeat bar line there is no open measure in this part.")
 
     def abc_barline(self, token: Token):
         """
@@ -2775,7 +2751,7 @@ class TuneBody(TuneHeader, NoteMixin):
          token (Token): The token representing an unknown ABC token.
 
         """
-        self.abc_debug(f"Unknown token.", token)
+        self.abc_debug("Unknown token.", token)
 
     def abc_annotation(self, token: Token):
         """
@@ -2844,7 +2820,7 @@ class TuneBody(TuneHeader, NoteMixin):
             # Pop the spanner token on the open_spanner stack
             self.voice.overlay.close_spanner()
         else:
-            self.abc_debug(f"No open spanner to close.", token)
+            self.abc_debug("No open spanner to close.", token)
 
     def abc_open_slur(self, token: Token):
         """
@@ -3220,7 +3196,7 @@ class TuneBody(TuneHeader, NoteMixin):
                 voice = part.get_voice(voice_id)
                 part_len = len(voice)
                 if part_len < max_part_len:
-                    for i in range(max_part_len - part_len):
+                    for _ in range(max_part_len - part_len):
                         fill_measure = stream.Measure()
                         voice.part.append(fill_measure)
 
@@ -3371,6 +3347,5 @@ class GraceNoteParser(ABCParser, NoteMixin):
 
 if __name__ == '__main__':
     import doctest
-
     ABC2M21_ENVIRONMENT['debug'] = False
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
