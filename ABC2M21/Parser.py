@@ -1,17 +1,24 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         ABC2M21/ABCParser
+# Purpose:      This file serves as the initialization for the ABC2M21 package.
+#
+# Authors:      Marian Schulz
+#
+# Copyslack:    2023, Marian Schulz
+# License:      SSL - SUBGENIUS SOFTWARE LICENSE
+#-------------------------------------------------------------------------------
 import copy
-import pathlib
 import re
 from copy import deepcopy
 from fractions import Fraction
 from typing import Iterator, NamedTuple, TypeAlias
 from abc import abstractmethod
-from dataclasses import dataclass
 import music21
 from music21 import duration, spanner, dynamics, common, tie, instrument, clef
 from music21 import expressions, articulations, harmony, style, environment
 from music21 import key, pitch, stream, metadata, bar, tempo, layout
 from music21 import note, chord, repeat, meter
-
 from ABC2M21.ABCToken import DEFAULT_VERSION, ABCVersion, Field, Token, tokenize
 
 ABC2M21_ENVIRONMENT = environment.Environment('ABC2M21')
@@ -20,7 +27,8 @@ ABC2M21_CONFIG = {'simplifiedComplexMeter': False}
 Syllables: TypeAlias = list[str]
 
 # Regular expressions for parsing ABC Fields
-ABC_MIDI_1_RE = re.compile(r'voice\s+(?P<voice>[A-Za-b0-9]*)\s*instrument\s*=\s*(?P<program>[0-9]+)')
+ABC_MIDI_1_RE = re.compile(r'voice\s+(?P<voice>[A-Za-b0-9]*)\s*'
+                           r'instrument\s*=\s*(?P<program>[0-9]+)')
 ABC_MIDI_2_RE = re.compile(r'program\s+(?P<channel>[0-9]+)\s+(?P<program>[0-9]+)')
 ABC_MIDI_3_RE = re.compile(r'program\s+(?P<program>[0-9]+)')
 
@@ -40,8 +48,6 @@ ABC_RE_TEMPO = re.compile(r'\s*("[^"]*")?\s*([0-9/ C]+\s*=\s*[0-9]+|[0-9]+)?\s*(
 ABC_RE_ABC_NOTE = re.compile(r'([\^_=]*)([A-Ga-g])([\',]*)([0-9/]*)([\-]*)')
 
 ABC_RE_voices = re.compile(r'[/(/)]|\d+|[A-Z]')
-ABC_TUNE_BOOK_SPLIT = re.compile(r'(^X:.*$)', flags=re.MULTILINE).split
-ABC_VERSION_SPLIT = re.compile(r'[ \n]*(%abc-\d+.*)\n', flags=re.MULTILINE).split
 
 # <tonic> exp <accidentals>
 ABC_KEY_EXP_RE = re.compile(
@@ -49,13 +55,12 @@ ABC_KEY_EXP_RE = re.compile(
 )
 # <tonic><mode><accidentals>
 ABC_KEY_MODE_RE = re.compile(
-    r'(?P<tonic>([A-G][#b]?))\s*(?P<mode>([aAmMlLdDpPiI][A-Za-z]*)?)(?P<accidentals>(\s*[\^_=]+[a-g])*)'
+    r'(?P<tonic>([A-G][#b]?))\s*(?P<mode>([aAmMlLdDpPiI][A-Za-z]*)?)'
+    r'(?P<accidentals>(\s*[\^_=]+[a-g])*)'
 )
 
 ABC_MODES = {v[:3]: v for v in ['major', 'minor', 'locrian', 'dorian', 'lydian',
                                 'phrygian', 'ionian', 'aeolian', 'mixolydian']}
-
-RE_MACRO = re.compile(r'^m:.*\n|\[m:[^\]]*\]', flags=re.MULTILINE)
 
 # Mappings from abc decorations to music21 Articulations
 M21_ARTICULATIONS = {
@@ -76,9 +81,9 @@ M21_ARTICULATIONS = {
     'plus': articulations.Pizzicato,
     'snap': articulations.SnapPizzicato,
     'nail': articulations.NailPizzicato,
-    'doit': articulations.Doit,                     # not in abc standart
+    'doit': articulations.Doit,  # not in abc standart
     'thumb': articulations.StringThumbPosition,
-    'cesura': articulations.Caesura                 # not in abc standart
+    'cesura': articulations.Caesura  # not in abc standart
 }
 
 # Mapping from abc decorations to music21 RepeatMark
@@ -200,30 +205,6 @@ def join_voices(voices: list[stream.Part]) -> stream.Part:
     return new_part
 
 
-def apply_macros(src: str, macros: dict[str, str] | None = None) -> (str, dict[str, str]):
-    # Startposition der aktuellen Übereinstimmung
-    start_pos = 0
-    # Liste zur Speicherung von Teilen
-    voices = []
-    macros: dict[str, str] = {} if macros is None else dict(macros)
-
-    def replace(t: str):
-        for pattern, replacement in macros.items():
-            t = t.replace(pattern, replacement)
-        return t
-
-    # Iteriere über die gefundenen Übereinstimmungen
-    for match in RE_MACRO.finditer(src):
-        voices.append(replace(src[start_pos:match.start()]))
-        k, v = match.group().lstrip('[').rstrip(']').strip('m:').strip().split('=')
-        macros[k.strip()] = replace(v).strip()
-        start_pos = match.end()
-
-    # Füge den verbleibenden Text am Ende hinzu
-    voices.append(replace(src[start_pos:]))
-    return "".join(voices), macros
-
-
 def fix_measures(score: stream.Score):
     """
     Apply the same bar lines and meter to all synchronized measures of the
@@ -319,8 +300,8 @@ class FileHeader(ABCParser):
 
     """
 
-    FIELD_METADATA = {'D': 'discography', 'B': 'book', 'H': 'history', 'N': 'notes', 'F': 'file', 'S': 'source',
-                      'R': 'rhythm', 'G': 'groups'}
+    FIELD_METADATA = {'D': 'discography', 'B': 'book', 'H': 'history', 'N': 'notes',
+                      'F': 'file', 'S': 'source', 'R': 'rhythm', 'G': 'groups'}
 
     # The default dictionary for user-defined symbols.
     DEFAULT_USER_DEF_SYMBOLS: dict[str, list[Token]] = {
@@ -1039,6 +1020,7 @@ class FileHeader(ABCParser):
                 return
             self.abc_token(token)
 
+
 class VoiceInfo:
     """
     Data class representing information about an abc voice.
@@ -1050,6 +1032,7 @@ class VoiceInfo:
         m21_clef (clef.Clef | None): The clef associated with the part.
         octave (int | None): The octave information for the part.
     """
+
     def __init__(self, id: str | None):
         self.id: str | None = id
         self.name: str | None = None
@@ -1101,7 +1084,7 @@ class TuneHeader(FileHeader):
         self.octave: int = 0
         self.tempo: tempo.MetronomeMark | None = None
         self.section_sequence: str = ''
-        self.voice_info: dict[str|None, VoiceInfo] = { None: VoiceInfo(id=None) }
+        self.voice_info: dict[str | None, VoiceInfo] = {None: VoiceInfo(id=None)}
         self.token_generator = None
 
     def process(self, token_generator: Iterator[Token]):
@@ -1636,13 +1619,13 @@ m21_clef=<music21.clef.TrebleClef>, octave=None)
 
 class ABCPart(ABCObject):
     def __init__(self, id: str | None,
-                       tempo_mark: tempo.MetronomeMark):
+                 tempo_mark: tempo.MetronomeMark):
 
         self.id: str | None = id
         self.linebreak: layout.SystemLayout | None = None
         self.tempo: tempo.MetronomeMark | None = tempo_mark
-        self._voices: dict[str|None, ABCVoice] = {}
-        self.voice: ABCVoice|None = None
+        self._voices: dict[str | None, ABCVoice] = {}
+        self.voice: ABCVoice | None = None
 
     def __contains__(self, info: VoiceInfo):
         return info.id in self._voices
@@ -1767,7 +1750,9 @@ class ABCOverlay(ABCObject):
         self.is_trill = False
         self.auto_trill_spanner = None
 
-    def apply_auto_trill_spanner(self, general_note: note.GeneralNote) -> expressions.TrillExtension | None:
+    def apply_auto_trill_spanner(self, general_note: note.GeneralNote) -> \
+            expressions.TrillExtension | None:
+
         if self.is_trill:
             # Create a trill extension spanner for continues trill notes
             if self.auto_trill_spanner is None:
@@ -1887,6 +1872,7 @@ class ABCVoice(ABCObject):
     @property
     def Id(self):
         return self.info.id
+
     @property
     def octave(self):
         return self.info.octave
@@ -1953,11 +1939,12 @@ class ABCVoice(ABCObject):
         self.part.insert(0, self.repeat_bracket)
 
     def close_repeat_bracket(self):
-        assert (self.repeat_bracket is not None)
+        assert self.repeat_bracket is not None
         self.repeat_bracket.completeStatus = True
         self.repeat_bracket = None
 
-    def close_measure(self, time_signature: meter.TimeSignature, bar_line: bar.Barline | None = None):
+    def close_measure(self, time_signature: meter.TimeSignature,
+                      bar_line: bar.Barline | None = None):
 
         assert self.measure is not None, "No open measure in the active context to close found"
         assert self.measure.quarterLength > 0, 'Closing an empty measure!'
@@ -2091,7 +2078,9 @@ class ABCVoice(ABCObject):
                                     syllabic: note.SyllabicChoices = "single"
 
                             _note.lyrics.append(
-                                note.Lyric(number=len(_note.lyrics), text=syllable, syllabic=syllabic)
+                                note.Lyric(number=len(_note.lyrics),
+                                           text=syllable,
+                                           syllabic=syllabic)
                             )
                 else:
                     if syllables and syllables[0] == '|':
@@ -2133,7 +2122,7 @@ class NoteMixin:
             octave = octave - m.count(',') + m.count("'")
         octave += self.octave if self.voice.octave is None else self.voice.octave
 
-        pitch_name  = pitch_name.upper()
+        pitch_name = pitch_name.upper()
 
         # the abc accidental of the note
         accidental = self.abc_accidental(match.group(1))
@@ -2148,9 +2137,11 @@ class NoteMixin:
                 elif self.accidental_mode == 'octave':
                     carried_accidentals[(pitch_name, octave)] = accidental
             else:
-                if self.accidental_mode == 'pitch' and pitch_name in carried_accidentals:
+                if self.accidental_mode == 'pitch' and \
+                        pitch_name in carried_accidentals:
                     implicit_accidental = carried_accidentals[pitch_name]
-                elif self.accidental_mode == 'octave' and (pitch_name, octave) in carried_accidentals:
+                elif self.accidental_mode == 'octave' and \
+                        (pitch_name, octave) in carried_accidentals:
                     implicit_accidental = carried_accidentals[(pitch_name, octave)]
 
         if implicit_accidental is None and (acc := self.key_signature.accidentalByStep(pitch_name)):
@@ -2321,35 +2312,6 @@ class NoteMixin:
         return left_mod, right_mod
 
 
-def post_linebreaks(part: stream.Part):
-    """
-    This function addresses an issue related to line breaks in music notation
-    handling.
-
-    In the default parsing behavior, the parser adds line breaks after the last
-    measure. However, in music21 line breaks are associated differently. They are
-    linked to the first element following the line break, representing the initial
-    measure of a new system.
-
-    To resolve this discrepancy, this method scans a part stream for all
-    SystemLayout elements, which represent line breaks. These elements are then
-    relocated to the measure at the same offset, ensuring they are correctly
-    associated with the first measure of the new system.
-    """
-
-    # Search linebreaks in the part and move the line break into the next measure
-    for line_break in part.getElementsByClass(layout.SystemLayout):
-        # Get measure on the offset of the linebreak
-        offset_measure = part.getElementsByOffset(line_break.offset)
-        offset_measure = offset_measure.getElementsByClass(stream.Measure).first()
-
-        #part.remove(line_break)
-        if offset_measure:
-            offset_measure.append(layout.SystemLayout(isNew=True))
-            #offset_measure.coreElementsChanged()
-
-        #part.coreElementsChanged()
-
 class TuneBody(TuneHeader, NoteMixin):
     def __init__(self, tune_header: TuneHeader):
         super().__init__(abc_version=tune_header.abc_version)
@@ -2450,7 +2412,7 @@ class TuneBody(TuneHeader, NoteMixin):
         # The id of the first part (top on the score)
         first_part = None
 
-        #line_break : layout.SystemLayout | None = None
+        # line_break : layout.SystemLayout | None = None
         voice_order = self.voice_order()
         for voice_id in voice_order:
             if voice_info := self.voice_info.get(voice_id, None):
@@ -2460,25 +2422,28 @@ class TuneBody(TuneHeader, NoteMixin):
             else:
                 combined_part = stream.Part()
 
+            linebreak: bool = False
             for part_id in section_sequence[:]:
                 if part_id not in self.parts:
                     self.abc_debug(f"No Part '{part_id}' in tune body.")
                     continue
 
                 abc_part = self.parts[part_id]
-                if ctx := abc_part.get_voice(voice_id):
+                if voice := abc_part.get_voice(voice_id):
                     # We need to create a deepcopy when a part object is used
                     # multiple times. To avoid creating a deepcopy each time,
                     # we keep track of the parts that have already been used.
                     # We only create a deepcopy when the part is actually needed again.
-                    if ctx.part.id in multiple_parts:
-                        m21_part = deepcopy(ctx.part)
+                    if voice.part.id in multiple_parts:
+                        m21_part = deepcopy(voice.part)
                     else:
-                        m21_part = ctx.part
-                        multiple_parts.add(ctx.part.id)
+                        m21_part = voice.part
+                        multiple_parts.add(voice.part.id)
                         # Insert a TextMark for the Part ID (except the anonymous Part (id=None))
 
-                        if (first_measure := m21_part.getElementsByClass(stream.Measure).first()) is None:
+                        first_measure = m21_part.getElementsByClass(stream.Measure).first()
+
+                        if (first_measure) is None:
                             self.abc_debug(f"Skip empty voice: {voice_id}")
                             continue
 
@@ -2493,22 +2458,29 @@ class TuneBody(TuneHeader, NoteMixin):
 
                     # Kopieren Sie die Elemente aus part2 in part1
                     for element in m21_part.elements:
-                        combined_part.coreInsert(element.offset, element)
-                    combined_part.coreElementsChanged()
+                        if isinstance(element, layout.SystemLayout):
+                            linebreak = True
+                            continue
+                        if isinstance(element, stream.Measure) and linebreak:
+                            element.append(layout.SystemLayout(isNew=True))
+                            linebreak = False
+
+                        combined_part.append(element)
+            # linebreak = False
+            # combined_part.coreElementsChanged()
 
             if combined_part.quarterLength > 0:
                 try:
-                    first_measure: stream.Measure = combined_part.getElementsByClass(stream.Measure).first()
-                    if first_measure.timeSignature and first_measure.barDurationProportion() < 1.0:
-                        first_measure.padAsAnacrusis()
+                    first = combined_part.getElementsByClass(stream.Measure).first()
+                    if first.timeSignature and first.barDurationProportion() < 1.0:
+                        first.padAsAnacrusis()
+
                 except Exception as e:
                     self.abc_debug(
                         f"Error while analyzing an anacrusis in the part: {combined_part.id}",
                         exception=e)
 
-                post_linebreaks(combined_part)
                 yield combined_part
-
 
     def abc_overlay(self, token: Token):
         """
@@ -2523,7 +2495,8 @@ class TuneBody(TuneHeader, NoteMixin):
             token (Token): The token representing an ABC voice overlay.
         """
 
-        assert self.voice.measure is not None, "Cannot append overlay, the measure is already closed"
+        assert self.voice.measure is not None, \
+            "Cannot append overlay, the measure is already closed"
         self.voice.next_overlay()
 
     def abc_lyrics(self, token: Field):
@@ -2911,7 +2884,9 @@ class TuneBody(TuneHeader, NoteMixin):
 
         # Set a line break if <EOL> is a line break symbol and no backslash is
         # suppressing the newline
-        if '<EOL>' in self.linebreak and not (token.src.endswith('\\') or token.src.startswith('\\')):
+        if '<EOL>' in self.linebreak and not \
+                (token.src.endswith('\\') or token.src.startswith('\\')):
+
             self.abc_score_linebreak(token)
 
     def abc_voice(self, token: Field):
@@ -2967,9 +2942,7 @@ class TuneBody(TuneHeader, NoteMixin):
             try:
                 self.abc_chord(token)
             except ABCException as e:
-                self.abc_debug(
-                    "Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", token,
-                    e)
+                self.abc_debug("Cannot parse chord in '+...+' dialect.", token, e)
 
         elif self.is_legacy_abc_decoration:
             self.abc_decoration(token)
@@ -3205,7 +3178,6 @@ class TuneBody(TuneHeader, NoteMixin):
         else:
             self.abc_debug(f"Symbol '{token.src}' is not a supported score linebreak")
 
-
     def fix_part_lengths(self):
         """
         Append additional empty measures to voices of a section to ensure equal
@@ -3395,168 +3367,6 @@ class GraceNoteParser(ABCParser, NoteMixin):
         m21_note.quarterLength *= self.quarterLength
         return m21_note.getGrace()
 
-
-def ABCTranslator(abc: str | pathlib.Path) -> stream.Stream:
-    """
-    Translate ABC notation to a music21 stream.
-
-    This function translates ABC notation, which can be a tune book,
-    a single tune, or an incomplete ABC fragment, into a music21 stream object.
-    The resulting object can be a stream.Opus, a single stream.Score, a stream.Part,
-    or just a stream.Measure.
-
-    Parameters:
-    - abc: The input ABC notation as a string or a path to an ABC file.
-
-    Returns: A music21 stream object representing the parsed ABC content.
-
-    Examples:
-
-    Translate a tune book from ABC notation to an opus:
-
-    >>> abc_tune_book = '''
-    ... %abc-2.1
-    ... X:1
-    ... T:tune 1
-    ... K:
-    ... EGB
-    ... X: 2
-    ... T:tune 2
-    ... K:
-    ... CEG'''
-    >>> opus = ABCTranslator(abc_tune_book)
-    >>> opus
-    <music21.stream.Opus string>
-    >>> len(opus.scores)
-    2
-
-    Translate a single tune from ABC notation to stream.Score:
-
-    >>> abc_tune = '''
-    ... X: 1
-    ... T:single tune
-    ... K: G
-    ... CEG'''
-    >>> score = ABCTranslator(abc_tune)
-    >>> score
-    <music21.stream.Score X: 1>
-    >>> score.metadata.title
-    'single tune'
-
-    Translate a single-voice ABC fragment to a stream.Part:
-
-    >>> abc_fragment = '''
-    ... ABCD | EFGA'''
-    >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
-    True
-
-    ABC Fragments with just some notes (and no bar lines) return a stream.Measure:
-
-    >>> abc_fragment = '''
-    ... ABCD'''
-    >>> isinstance(ABCTranslator(abc_fragment), stream.Measure)
-    True
-
-    You may load your abc source from a file:
-
-    >>> from pathlib import Path
-    >>> tune_path = Path('abc/avemaria.abc')
-    >>> score = ABCTranslator(tune_path)
-    >>> score
-    <music21.stream.Score X:1 (file='abc/avemaria.abc')>
-    >>> score.metadata.title
-    "Ave Maria (Ellen's Gesang III) - Page 1"
-
-    However, music21 spanners are set in the Part object, so the following
-    example, even if it consists of only a few notes, will return a Part object.
-
-    >>> abc_fragment = '''
-    ... !>(!ABCD!>)!'''
-    >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
-    True
-
-    """
-    if isinstance(abc, str):
-        source_type = "string"
-        src = abc
-    elif isinstance(abc, pathlib.Path):
-        source_type = str(abc)
-        with abc.open() as f:
-            src = f.read()
-    else:
-        raise ABCException("Illegal abc input, chose a pathlib.Path or str")
-
-    abc_tune_book, *abc_tunes = ABC_TUNE_BOOK_SPLIT(src)
-    # The ABC version strin if set is the first line of an ABC file.
-    try:
-        _, _version, abc_tune_book = ABC_VERSION_SPLIT(abc_tune_book, maxsplit=1)
-        _version = [int(d) for d in _version.split('-', maxsplit=1)[1].split('.', maxsplit=2)]
-        version = ABCVersion(_version + (3 - len(_version)) * [0])
-    except ValueError:
-        # no %%abc-.. Version found, use a default version ?
-        version: ABCVersion = DEFAULT_VERSION
-
-    if abc_tunes:
-        # Evaluate and apply macros on the file header
-        file_header_src, file_header_macros = apply_macros(abc_tune_book)
-        file_header = FileHeader(version)
-        t = tokenize(file_header_src, version)
-        file_header.process(t)
-        scores = []
-        abc_tunes = iter(abc_tunes)
-        while True:
-            try:
-                abc_refnum = next(abc_tunes).split('%', maxsplit=1)[0].strip()
-                abc_tune_src = next(abc_tunes, "")
-            except StopIteration:
-                break
-
-            # Evaluate and apply macros on the tunes
-            tune_src = apply_macros(abc_tune_src, file_header_macros)[0].lstrip('\n')
-            tokens = tokenize(tune_src)
-            # tokens = list(tokens)
-            # HeaderParser will process tokens until the header ends with Field 'K:'
-            tune_header = TuneHeader(file_header=file_header, abc_version=version)
-            tune_header.process(tokens)
-            tokens = list(tokens)
-            # BodyParser will process all remaining tokens
-            score = TuneBody(tune_header=tune_header).process(tokens)
-            if score.metadata:
-                score.metadata.number = abc_refnum
-            if source_type == "string":
-                score.id = abc_refnum
-            else:
-                score.id = f"{abc_refnum} (file='{source_type}')"
-
-            scores.append(score)
-
-        if len(scores) > 1:
-            opus = stream.Opus(id=source_type)
-            for score in scores:
-                opus.append(score)
-            return opus
-        else:
-            return scores[0]
-    else:
-        tune_header = TuneHeader(abc_version=version)
-        # no, it is not a tune book just an abc fragment
-
-        src = abc_tune_book.lstrip('\n')
-        if not src.endswith('\n'):
-            src += '\n'
-
-        tokens = list(tokenize(src, abc_version=version))
-        score = TuneBody(tune_header=tune_header).process(tokens)
-        if len(score.parts) == 1:
-            part = score.parts[0]
-            if len(part.elements) == 1:
-                measures = list(score.recurse().getElementsByClass(stream.Measure))
-                if len(measures) == 1:
-                    return measures[0]
-
-            return part
-        else:
-            return score
 
 
 if __name__ == '__main__':

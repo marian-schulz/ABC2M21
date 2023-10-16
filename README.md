@@ -49,7 +49,7 @@ However, for utilizing the parser, the following brief documentation should suff
   
       Translate a tune book from ABC notation to an opus:
 
-      >>> from ABC2M21 import ABCTranslator
+      >>> from ABC2M21 import abc_translator
       >>> abc_tune_book = '''
       ... %abc-2.1
       ... X:1
@@ -60,7 +60,7 @@ However, for utilizing the parser, the following brief documentation should suff
       ... T:tune 2
       ... K:
       ... CEG'''
-      >>> opus = ABCTranslator(abc_tune_book)
+      >>> opus = abc_translator(abc_tune_book)
       >>> opus
       <music21.stream.Opus string>
       >>> len(opus.scores)
@@ -73,7 +73,7 @@ However, for utilizing the parser, the following brief documentation should suff
       ... T:single tune
       ... K: G
       ... CEG'''
-      >>> score = ABCTranslator(abc_tune)
+      >>> score = abc_translator(abc_tune)
       >>> score
       <music21.stream.Score X: 1>
       >>> score.metadata.title
@@ -83,21 +83,21 @@ However, for utilizing the parser, the following brief documentation should suff
   
       >>> abc_fragment = '''
       ... ABCD | EFGA'''
-      >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
+      >>> isinstance(abc_translator(abc_fragment), stream.Part)
       True
   
       ABC Fragments with just some notes (and no bar lines) return a stream.Measure:
   
       >>> abc_fragment = '''
       ... ABCD'''
-      >>> isinstance(ABCTranslator(abc_fragment), stream.Measure)
+      >>> isinstance(abc_translator(abc_fragment), stream.Measure)
       True
   
       You may load your abc source from a file:
   
       >>> from pathlib import Path
       >>> tune_path = Path('tests/avemaria.abc')
-      >>> score = ABCTranslator(tune_path)
+      >>> score = abc_translator(tune_path)
       >>> score
       <music21.stream.Score X:1 (file='tests/avemaria.abc')>
       >>> score.metadata.title
@@ -108,7 +108,7 @@ However, for utilizing the parser, the following brief documentation should suff
   
       >>> abc_fragment = '''
       ... !>(!ABCD!>)!'''
-      >>> isinstance(ABCTranslator(abc_fragment), stream.Part)
+      >>> isinstance(abc_translator(abc_fragment), stream.Part)
       True
 
 ## Configuration

@@ -727,7 +727,7 @@ K:C
 w: C, D, E, F, G, A, B, C D E F G A B c d e f g a b c' d' e' f' g' a' b'
 """
 
-abc_twinkle = """
+twinkle = """
 X:1
 T:Twinkle, Twinkle Little Star in C
 M:C

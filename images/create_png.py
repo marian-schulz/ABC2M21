@@ -1,28 +1,28 @@
 # Importing the module
 import os
 from pathlib import Path
-from ABC2M21 import ABCTranslator, ABC2M21_CONFIG
+from ABC2M21 import abc_translator, ABC2M21_CONFIG
 from ABC2M21 import testtunes
 from music21 import environment, converter
+import re
 a = environment.Environment()
 a['debug'] = True
 ABC2M21_CONFIG['simplifiedComplexMeter'] = True
 
-abc_tunes = ['abc_propagate_accidentals', 'abc_twinkle', 'abc_pitch_octaves',
-             'abc_accidentals', 'abc_decoration_spanner', 'abc_note_duration', 'abc_meter',
-             'abc_user_defined_symbols', 'abc_broken_rhythm', 'abc_dynamics', 'abc_unit_note_length',
-             'abc_expressions', 'abc_articulations', 'abc_repeat_marker', 'abc_rests',
-             'abc_legacy_chord_and_decoration', 'abc_ave_maria', 'abc_fingerings',
-             'abc_bar_lines', 'abc_slur', 'abc_simple_ties', 'abc_simple_grace', 'abc_tempo',
-             'abc_atholl_brose', 'abc_auto_trill_spanner', 'abc_tuplets', 'abc_extended_tuplet',
-             'abc_shorthand_decorations', 'abc_chord_example', 'abc_unison', 'abc_chord_symbols',
-             'abc_chord_dialect', 'abc_annotations', 'abc_lyrics_1', 'abc_lyrics_2', 'abc_lyrics_3',
-             'abc_lyrics_4', 'abc_verses_1','abc_verses_2', 'abc_suppress_score_linebreak',
-             'abc_score_line_break_symbols', 'abc_line_continue_over_comments', 'abc_part',
-             'abc_full_rigged_ship', 'abc_hector_the_hero', 'abc_mystery_reel',
-             'abc_william_and_nancy', 'abc_kitchen_girl', 'abc_fyrareprisarn', 'abc_ale_is_dear',
-             'abc_the_begger_boy', 'abc_the_ale_wifes_daughter']
+DOCUMENT_FILE = Path('../documentation.md')
+MARKDOWN_ABC_RE = re.compile(r"```abc:([a-zA-Z0-9_]*)\n(.*?)```", re.DOTALL)
 
+with DOCUMENT_FILE.open('r') as f:
+    markdown_doc = f.read()
+
+abc_fragments : dict[str, str]= {
+    'twinkle': testtunes.twinkle
+}
+
+# Search in doc
+for abc_match in MARKDOWN_ABC_RE.finditer(markdown_doc):
+    abc_name, abc_text = abc_match.groups()
+    abc_fragments[abc_name] =  abc_text
 
 
 musecores = ['/home/mschulz/Anwendungen/MuseScore-3.6.0.451381076-x86_64.AppImage',
@@ -39,32 +39,25 @@ for musecore in musecores:
 # Getting the current working directory
 cwd = os.getcwd()
 
-#s = ABCTranslator(testtunes.abc_score_line_break_symbols)
+#s = ABCTranslator(abc_fragments['part'])
 #s.show()
 #exit()
 
 # delete old pngs but bob
 for filename in os.listdir():
-    if filename.endswith(".png") and not filename != "bob.png":
+    if filename.endswith(".png") and filename != "bob.png":
         os.remove(filename)
 
-for name in abc_tunes:
-    if not name.startswith('abc_'):
-        continue
-
-    abc_tune = getattr(testtunes, name)
-    m21_stream = ABCTranslator(abc_tune)
+for abc_name, abc_text in abc_fragments.items():
+    m21_stream = abc_translator(abc_text)
     xmlconv = converter.subConverters.ConverterMusicXML()
-    xmlconv.write(m21_stream, fmt='musicxml', fp=f"{name[4:]}.png", subformats=['png'], trimEdges=True)
+    xmlconv.write(m21_stream, fmt='musicxml', fp=f"{abc_name}.png", subformats=['png'], trimEdges=True)
 
 
 # delete all except png and py files & move musicxml
 for filename in os.listdir():
     if filename.endswith(".py"):
         continue
-    #if filename.endswith(".musicxml"):
-    #    os.rename(filename, f'../musicxml/{filename}')
-    #    continue
 
     if filename.endswith(".png"):
         if filename.endswith("-1.png"):

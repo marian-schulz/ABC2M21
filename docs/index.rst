@@ -1,7 +1,13 @@
 Welcome to ABC2M21 documentation!
 =====================================
 
-.. automodule:: ABCParser
+.. automodule:: __init__
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+.. automodule:: Parser
     :members:
     :undoc-members:
     :inherited-members:

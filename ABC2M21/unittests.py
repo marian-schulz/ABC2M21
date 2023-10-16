@@ -8,7 +8,7 @@ from music21 import expressions, articulations, harmony, style, environment
 from music21 import meter, key, pitch, stream, metadata, bar, tempo, layout
 from music21 import note, chord, repeat, base
 from itertools import chain
-from ABC2M21 import ABCTranslator, tokenize
+from ABC2M21 import abc_translator, tokenize
 
 a = environment.Environment()
 a['debug'] = True
@@ -54,7 +54,7 @@ class TestMetric(NamedTuple):
 
 
 def create_metric(src: str):
-    score: stream.Score = next(ABCTranslator(src))
+    score: stream.Score = next(abc_translator(src))
     _objects = score.flatten().getElementsByClass(base.Music21Object)
     _note = score.flatten().getElementsByClass(note.Note)
     _chord = score.flatten().getElementsByClass(chord.Chord)
@@ -162,12 +162,12 @@ class TestFiles(unittest.TestCase):
     def test_file_metric(self):
         return
         for testfile, metric in test_metric.items():
-            score: stream.Score = next(ABCtranslator(testfile))
+            score: stream.Score = next(abc_translator(testfile))
             notes = score.flatten().getElementsByClass(note.Note)
             self.assertEqual(len(notes), metric.note)
 
     def test_note_duration(self):
-        score = ABCTranslator(abc_note_duration)
+        score = abc_translator(abc_note_duration)
         self.assertIsInstance(score, stream.Measure)
         quarter_lengths = [ n.quarterLength for n in score.recurse().getElementsByClass(note.Note)]
         self.assertEqual([4.0, 3.0, 2.0, 1.5, 1.0, 0.5, 0.25, 0.125, 0.0625],
@@ -177,7 +177,7 @@ class TestFiles(unittest.TestCase):
 
         # catch debug messages
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_legacy_chord_and_decoration)
+            score = abc_translator(abc_legacy_chord_and_decoration)
 
         self.assertIsInstance(score, stream.Measure)
         # we have one chord ?
@@ -195,7 +195,7 @@ class TestFiles(unittest.TestCase):
 
     def test_legacy_decoration_2_0(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_legacy_decoration_2_0)
+            score = abc_translator(abc_legacy_decoration_2_0)
 
         self.assertIsInstance(score, stream.Score)
         notes = list(score.recurse().getElementsByClass(note.Note))
@@ -228,7 +228,7 @@ class TestFiles(unittest.TestCase):
 
     def test_decoration_instruction(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_decoration_instruction)
+            score = abc_translator(abc_decoration_instruction)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -248,12 +248,12 @@ class TestFiles(unittest.TestCase):
         self.assertIsInstance(notes[2].expressions[0], expressions.Trill)
 
         # Check the debug message about legacy decoration and token
-        self.assertIn("Cannot parse this chord (+ dialect). Perhaps it is in the + decoration dialect?", debug_messages)
+        self.assertIn("TuneBody: Cannot parse chord in '+...+' dialect.", debug_messages)
         self.assertIn("<decoration_or_chord: '+trill+' (pos=3)>", debug_messages)
 
     def test_tune_header(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            opus = ABCTranslator(abc_tune_header_and_file_structure)
+            opus = abc_translator(abc_tune_header_and_file_structure)
             debug_messages = mock_stdout.getvalue()
 
         # we are interested in the handling of fields and freetext in the file header
@@ -315,7 +315,7 @@ class TestFiles(unittest.TestCase):
 
     def test_line_continue(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(line_continue)
+            score = abc_translator(line_continue)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -326,7 +326,7 @@ class TestFiles(unittest.TestCase):
 
     def test_rests(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_rests)
+            score = abc_translator(abc_rests)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Part)
@@ -338,7 +338,7 @@ class TestFiles(unittest.TestCase):
         self.assertEqual(32.0, sum(r.quarterLength for r in rests))
 
     def test_pitch_octaves(self):
-        score = ABCTranslator(abc_pitch_octaves)
+        score = abc_translator(abc_pitch_octaves)
         self.assertIsInstance(score, stream.Score)
         name_with_octave: list[str] = [ n.nameWithOctave for n in score.recurse().getElementsByClass(note.Note)]
 
@@ -348,7 +348,7 @@ class TestFiles(unittest.TestCase):
          'C6', 'D6', 'E6', 'F6', 'G6', 'A6', 'B6'], name_with_octave)
 
     def test_propagate_accidentals(self):
-        score = ABCTranslator(abc_propagate_accidentals)
+        score = abc_translator(abc_propagate_accidentals)
         self.assertIsInstance(score, stream.Score)
         self.assertEqual(3, len(score.parts))
 
@@ -369,7 +369,7 @@ class TestFiles(unittest.TestCase):
 
     def test_trills(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_trills)
+            score = abc_translator(abc_trills)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -381,7 +381,7 @@ class TestFiles(unittest.TestCase):
 
     def test_overlays_and_voices(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_overlays_and_voices)
+            score = abc_translator(abc_overlays_and_voices)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -389,7 +389,7 @@ class TestFiles(unittest.TestCase):
 
     def test_spanner(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_spanner)
+            score = abc_translator(abc_spanner)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -400,7 +400,7 @@ class TestFiles(unittest.TestCase):
 
     def test_broken_rhythm(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_broken_rhythm)
+            score = abc_translator(abc_broken_rhythm)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Part)
@@ -424,7 +424,7 @@ class TestFiles(unittest.TestCase):
 
     def test_decorations(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_decorations)
+            score = abc_translator(abc_decorations)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -473,7 +473,7 @@ class TestFiles(unittest.TestCase):
 
     def test_bar_lines(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_bar_lines)
+            score = abc_translator(abc_bar_lines)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -516,7 +516,7 @@ class TestFiles(unittest.TestCase):
             (abc_kitchen_girl, 'Kitchen Girl', '4/4', 'D major', None, ""),
             (abc_william_and_nancy, 'William and Nancy', '6/8', 'G major', None, ""),
         ]:
-            score = ABCTranslator(tf)
+            score = abc_translator(tf)
             self.assertEqual(score.metadata.title, _title)
             self.assertEqual(score.metadata.localeOfComposition, _origin)
             self.assertEqual(_meter,
@@ -525,7 +525,7 @@ class TestFiles(unittest.TestCase):
                 score.recurse().getElementsByClass(key.KeySignature)[0].name)
 
     def test_key_signature(self):
-        score = ABCTranslator(abc_key_signature)
+        score = abc_translator(abc_key_signature)
         self.assertIsInstance(score, stream.Score)
 
         for measure in score.recurse().getElementsByClass(stream.Measure):
@@ -537,7 +537,7 @@ class TestFiles(unittest.TestCase):
 
     def test_chords(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_ale_is_dear)
+            score = abc_translator(abc_ale_is_dear)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -560,7 +560,7 @@ class TestFiles(unittest.TestCase):
 
     def test_user_defined_symbols(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_user_defined_symbols)
+            score = abc_translator(abc_user_defined_symbols)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Measure)
@@ -574,7 +574,7 @@ class TestFiles(unittest.TestCase):
     def test_anacrusis_padding(self):
         # using voices in the measure streams cause a problem with the note beats ..
         return
-        score = ABCTranslator(abc_hector_the_hero)
+        score = abc_translator(abc_hector_the_hero)
         self.assertIsInstance(score, stream.Score)
 
         m1 = score.parts[0].getElementsByClass(stream.Measure).first()
@@ -592,7 +592,7 @@ class TestFiles(unittest.TestCase):
         self.assertEqual(n1.beat, 3.0)
 
         # two 16th pickup in 4/4
-        score = ABCTranslator(abc_the_ale_wifes_daughter)
+        score = abc_translator(abc_the_ale_wifes_daughter)
         self.assertIsInstance(score, stream.Score)
         m1 = score.parts[0].getElementsByClass(stream.Measure).first()
         n0 = m1.notesAndRests[0]
@@ -614,21 +614,21 @@ class TestFiles(unittest.TestCase):
         # the standard permitted two syntax variants, now deprecated, which
         # specified how many unit note lengths to play per minute.
 
-        score = ABCTranslator(abc_full_rigged_ship)
+        score = abc_translator(abc_full_rigged_ship)
         self.assertIsInstance(score, stream.Score)
         _tempo = score[tempo.TempoIndication]
         self.assertEqual(len(_tempo), 1)
         self.assertEqual(str(_tempo[0]),
                          '<music21.tempo.MetronomeMark Eighth=100>')
 
-        score = ABCTranslator(abc_ale_is_dear)
+        score = abc_translator(abc_ale_is_dear)
         self.assertIsInstance(score, stream.Score)
         _tempo = score[tempo.TempoIndication]
         self.assertEqual(2, len(_tempo))
         self.assertEqual(str(_tempo[0]),
                          '<music21.tempo.MetronomeMark Quarter=211>')
 
-        score = ABCTranslator(abc_the_begger_boy)
+        score = abc_translator(abc_the_begger_boy)
         self.assertIsInstance(score, stream.Score)
         _tempo = score[tempo.TempoIndication]
         self.assertEqual(len(_tempo), 1)
@@ -637,7 +637,7 @@ class TestFiles(unittest.TestCase):
 
     def test_ties(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_ties)
+            score = abc_translator(abc_ties)
             debug_messages = mock_stdout.getvalue()
 
         def assert_ties(obj, expected_ties):
@@ -677,7 +677,7 @@ class TestFiles(unittest.TestCase):
 
     def test_slur(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_slur)
+            score = abc_translator(abc_slur)
             debug_messages = mock_stdout.getvalue()
 
         # C(DE)F|ABC(D|AB)([CEG]C)
@@ -697,7 +697,7 @@ class TestFiles(unittest.TestCase):
 
     def test_grace(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_grace)
+            score = abc_translator(abc_grace)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -705,7 +705,7 @@ class TestFiles(unittest.TestCase):
 
     def test_tuplets(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_tuplets)
+            score = abc_translator(abc_tuplets)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Measure)
@@ -728,7 +728,7 @@ class TestFiles(unittest.TestCase):
 
     def test_abc_primitive_polyphonic(self):
         with patch('sys.stderr', new_callable=StringIO) as mock_stdout:
-            score = ABCTranslator(abc_primitive_polyphonic)
+            score = abc_translator(abc_primitive_polyphonic)
             debug_messages = mock_stdout.getvalue()
 
         self.assertIsInstance(score, stream.Score)
@@ -738,7 +738,7 @@ class TestFiles(unittest.TestCase):
         self.assertEqual(len(score.parts[2].flatten().notesAndRests), 6)
 
     def test_overlays_and_lyric(self):
-        score = ABCTranslator(abc_overlays_and_lyric)
+        score = abc_translator(abc_overlays_and_lyric)
         self.assertIsInstance(score, stream.Score)
 
         notes = list(score.flatten().notesAndRests)
