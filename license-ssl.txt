@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:         license.txt
+# Name:         license-ssl.txt
 # Purpose:      This license covers all Python files provided with ABC2M21, as
 #               well as text and images in the documentation, applying when the
 #               user has selected this choice of license.
