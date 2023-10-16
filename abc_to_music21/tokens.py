@@ -1,6 +1,3 @@
-import re
-from typing import Iterator, TypeAlias
-
 '''
 # ABCToken Module Documentation
 
@@ -37,6 +34,10 @@ By maintaining the correct order of tokens, you ensure that the tokenizer can
 accurately match and generate tokens from the input ABC notation.
 '''
 
+import re
+from typing import Iterator, TypeAlias
+from html import unescape
+
 # Type aliases
 ABCVersion: TypeAlias = tuple[int, int, int]
 
@@ -48,14 +49,14 @@ class Token:
     """
     Represents a token in the ABC notation.
     Attributes:
-        type (str): The type of the token (e.g., "MetaData", "Note", etc.).
+        type (str): The type of the token
         src (str): The text of the token as it appears in the ABC code.
         pos (int): The position within the abc source where the token begins.
     """
     __slots__ = ('type', 'src', 'pos')
 
-    def __init__(self, type, src, pos: int = 0):
-        self.type: str = type
+    def __init__(self, token_type, src, pos: int = 0):
+        self.type: str = token_type
         self.src: str = src
         self.pos: int = pos
 
@@ -67,12 +68,25 @@ class Token:
 
 
 class Field(Token):
+    """
+    Represents a field token in the ABC notation.
+    Attributes:
+        type (str): The type of the token
+        src (str): The text of the token as it appears in the ABC code.
+        pos (int): The position within the abc source where the token begins.
+    """
     @property
-    def tag(self):
+    def tag(self) -> str:
+        """
+        Returns the abc field tag (A,C,K..) of this field token
+        """
         return self.src[1] if self.src.startswith('[') else self.src[0]
 
     @property
     def data(self):
+        """
+        Returns the data of the field token
+        """
         return (self.src[3:-1] if self.src.startswith('[') else self.src[2:]).strip()
 
 
@@ -82,10 +96,11 @@ def abc_field_regex(tags: str) -> str:
     an additional expression for inline field tags.
     """
     inline_tags = [t for t in tags if t in "IKLMPQRNUV"]
-    regex = rf'^[{tags}]:.*(\n|$)'
+    regexpr = rf'^[{tags}]:.*(\n|$)'
     if inline_tags:
-        regex += rf'|([\[]{"".join(inline_tags)}:[^\]\n%]*[\]])'
-    return regex
+        regexpr += rf'|([\[]{"".join(inline_tags)}:[^\]\n%]*[\]])'
+    return regexpr
+
 
 TOKEN_SPEC: list[tuple[str, str]] = [
     ('Directive', r'^[%]{2}.*\n'),
@@ -103,14 +118,15 @@ TOKEN_SPEC: list[tuple[str, str]] = [
     ('LineContinue', abc_field_regex('+')),
     ('tuplet', r'\([2-9]:[2-9]?:[2-9]|\([2-9]:[2-9]|\([2-9]'),
     ('grace_notes', r'\{[^\}]*\}'),
-    ('bidirectonal_barline', r"|".join([':+[\|\]][12]', ':+\|:+', '\[\|:+', ':+\|\]', r'::+(?![\|\[])'])),
-    ('end_repeat_barline', r"|".join([r':+[\|]', '[\|\]][1-9]'])),
+    ('bidirectonal_barline', r"|".join([r':+[\|\]][12]', r':+\|:+', r'\[\|:+', r':+\|\]',
+                                        r'::+(?![\|\[])'])),
+    ('end_repeat_barline', r"|".join([r':+[\|]', r'[\|\]][1-9]'])),
     ('start_repeat_barline', r'[\|]:+|\[[1-9]'),
     ('barline', r"|".join([r'\|\]', r'\[\|', r'\|\|(?![:])', r'\|'])),
-    ('decoration', r'![^!%\[\]\|:\s]+!'),     # Note that decorations may not contain any spaces, [, ], | or : signs.
+    ('decoration', r'![^!%\[\]\|:\s]+!'),
     ('chord', r'[\[][^\]:]*[\]][0-9]*[/]*[0-9]*(\s*[-])?'),
-    ('decoration_or_chord', r'[+][^+:\n]*[+][0-9]*[/]*[0-9]*(\s*[-])?'),  # for legacy support
-    ('unknown_decoration', rf"![^!\n]!"),
+    ('decoration_or_chord', r'[+][^+:\n]*[+][0-9]*[/]*[0-9]*(\s*[-])?'),
+    ('unknown_decoration', r"![^!\n]!"),
     ('open_slur', r'[\.]?\('),
     ('close_slur', r'[\.]?\)'),
     ('broken_rhythm', r'[>]{1,3}|[<]{1,3}'),
@@ -119,7 +135,7 @@ TOKEN_SPEC: list[tuple[str, str]] = [
     ('overlay', r'&'),
     ('rest', r'[zZxX][0-9/]*(?!:)'),
     ('note', r'[=_\^]*[a-gA-G][\',0-9/]*(\s*[-])?'),
-    ('score_linebreak', '[\$\!]'),
+    ('score_linebreak', r'[\$\!]'),
     ('user_symbol', r'[H-Wh-w~\.](?![:])'),
     ('EmptyLine', r'^([ \t]*[\n])+'),
     ('Skip', r'^%(?!%).*(\n|$)|%.*$'),
@@ -157,6 +173,7 @@ def remove_comment(text: str) -> str:
         >>> remove_comment('')
         ''
     """
+
     return re.match(r'("[^"\n]*"|[^"%\n]*)*[^%]*', text).group(0).rstrip()
 
 
@@ -217,7 +234,7 @@ def tokenize(src: str, abc_version: ABCVersion | None = DEFAULT_VERSION) -> Iter
 
             continue
 
-        elif empty_line and token_type != 'Directive':
+        if empty_line and token_type != 'Directive':
             continue
 
         match token_type:
@@ -252,7 +269,8 @@ def tokenize(src: str, abc_version: ABCVersion | None = DEFAULT_VERSION) -> Iter
                     token_string = encode_accent_and_ligature(token_string[2:])
                     token_buffer[0].src = token_buffer[0].src.rstrip("\\") + " " + token_string
                 else:
-                    print(f"Skip '{token_type}' there was no previous abc string field to continue.")
+                    print(f"Skip '{token_type}' "
+                          f"there was no previous abc string field to continue.")
 
                 continue
 
@@ -270,35 +288,22 @@ def tokenize(src: str, abc_version: ABCVersion | None = DEFAULT_VERSION) -> Iter
         yield from token_buffer
 
 
-ACCENT_AND_LIGATURES = {'&Aacute;': 'Á', '&Abreve;': 'Ă', '&Acirc;': 'Â', '&Agrave;': 'À', '&Aring;': 'Å',
-                        '&Atilde;': 'Ã', '&Auml;': 'Ä', '&Ccedil;': 'Ç', '&Eacute;': 'É', '&Ecirc;': 'Ê',
-                        '&Egrave;': 'È', '&Euml;': 'Ë', '&Iacute;': 'Í', '&Icirc;': 'Î', '&Igrave;': 'Ì',
-                        '&Iuml;': 'Ï', '&Ntilde;': 'Ñ', '&Oacute;': 'Ó', '&Ocirc;': 'Ô', '&Ograve;': 'Ò',
-                        '&Oslash;': 'Ø', '&Otilde;': 'Õ', '&Ouml;': 'Ö', '&Scaron;': 'Š', '&Uacute;': 'Ú',
-                        '&Ucirc;': 'Û', '&Ugrave;': 'Ù', '&Uuml;': 'Ü', '&Yacute;': 'Ý', '&Ycirc;': 'Ŷ',
-                        '&Yuml;': 'Ÿ', '&Zcaron;': 'Ž', '&aacute;': 'á', '&abreve;': 'ă', '&acirc;': 'â',
-                        '&agrave;': 'à', '&aring;': 'å', '&atilde;': 'ã', '&auml;': 'ä', '&ccedil;': 'ç',
-                        '&eacute;': 'é', '&ecirc;': 'ê', '&egrave;': 'è', '&euml;': 'ë', '&iacute;': 'í',
-                        '&icirc;': 'î', '&igrave;': 'ì', '&iuml;': 'ï', '&ntilde;': 'ñ', '&oacute;': 'ó',
-                        '&ocirc;': 'ô', '&ograve;': 'ò', '&oslash;': 'ø', '&otilde;': 'õ', '&ouml;': 'ö',
-                        '&scaron;': 'š', '&uacute;': 'ú', '&ucirc;': 'û', '&ugrave;': 'ù', '&uuml;': 'ü',
-                        '&yacute;': 'ý', '&ycirc;': 'ŷ', '&yuml;': 'ÿ', '&zcaron;': 'ž', '&copy;': '©',
-                        '\\"A': 'Ä', '\\"E': 'Ë',
-                        '\\"I': 'Ï', '\\"O': 'Ö', '\\"U': 'Ü', '\\"Y': 'Ÿ', '\\"a': 'ä', '\\"e': 'ë', '\\"i': 'ï',
-                        '\\"o': 'ö', '\\"u': 'ü', '\\"y': 'ÿ', "\\'A": 'Á', "\\'E": 'É', "\\'I": 'Í', "\\'O": 'Ó',
-                        "\\'U": 'Ú', "\\'Y": 'Ý', "\\'a": 'á', "\\'e": 'é', "\\'i": 'í', "\\'o": 'ó', "\\'u": 'ú',
-                        "\\'y": 'ý', '\\/O': 'Ø', '\\/o': 'ø', '\\AA': 'Å', '\\HO': 'Ő', '\\HU': 'Ű', '\\Ho': 'ő',
-                        '\\Hu': 'ű', '\\^A': 'Â', '\\^E': 'Ê', '\\^I': 'Î', '\\^O': 'Ô', '\\^U': 'Û', '\\^Y': 'Ŷ',
-                        '\\^a': 'â', '\\^e': 'ê', '\\^i': 'î', '\\^o': 'ô', '\\^u': 'û', '\\^y': 'ŷ', '\\`A': 'À',
-                        '\\`E': 'È', '\\`I': 'Ì', '\\`O': 'Ò', '\\`U': 'Ù', '\\`a': 'à', '\\`e': 'è', '\\`i': 'ì',
-                        '\\`o': 'ò', '\\`u': 'ù', '\\aa': 'å', '\\cC': 'Ç', '\\cc': 'ç', '\\uA': 'Ă', '\\uE': 'Ĕ',
-                        '\\ua': 'ă', '\\ue': 'ĕ', '\\vS': 'Š', '\\vZ': 'Ž', '\\vs': 'š', '\\vz': 'ž', '\\~A': 'Ã',
-                        '\\~N': 'Ñ', '\\~O': 'Õ', '\\~a': 'ã', '\\~n': 'ñ', '\\~o': 'õ', '&AElig;': 'Æ',
-                        '&aelig;': 'æ', '&OElig;': 'Œ', '&oelig;': 'œ', '&szlig;': 'ß', '&ETH;': 'Ð', '&eth;': 'ð',
-                        '&THORN;': 'Þ', '&thorn;': 'þ', '\\AE': 'Æ', '\\ae': 'æ', '\\OE': 'Œ', '\\oe': 'œ',
-                        '\\ss': 'ß', '\\DH': 'Ð', '\\dh': 'ð', '\\TH': 'Þ', '\\th': 'þ'}
+ACCENT_AND_LIGATURES = {
+    '\\"A': 'Ä', '\\"E': 'Ë',
+    '\\"I': 'Ï', '\\"O': 'Ö', '\\"U': 'Ü', '\\"Y': 'Ÿ', '\\"a': 'ä', '\\"e': 'ë', '\\"i': 'ï',
+    '\\"o': 'ö', '\\"u': 'ü', '\\"y': 'ÿ', "\\'A": 'Á', "\\'E": 'É', "\\'I": 'Í', "\\'O": 'Ó',
+    "\\'U": 'Ú', "\\'Y": 'Ý', "\\'a": 'á', "\\'e": 'é', "\\'i": 'í', "\\'o": 'ó', "\\'u": 'ú',
+    "\\'y": 'ý', '\\/O': 'Ø', '\\/o': 'ø', '\\AA': 'Å', '\\HO': 'Ő', '\\HU': 'Ű', '\\Ho': 'ő',
+    '\\Hu': 'ű', '\\^A': 'Â', '\\^E': 'Ê', '\\^I': 'Î', '\\^O': 'Ô', '\\^U': 'Û', '\\^Y': 'Ŷ',
+    '\\^a': 'â', '\\^e': 'ê', '\\^i': 'î', '\\^o': 'ô', '\\^u': 'û', '\\^y': 'ŷ', '\\`A': 'À',
+    '\\`E': 'È', '\\`I': 'Ì', '\\`O': 'Ò', '\\`U': 'Ù', '\\`a': 'à', '\\`e': 'è', '\\`i': 'ì',
+    '\\`o': 'ò', '\\`u': 'ù', '\\aa': 'å', '\\cC': 'Ç', '\\cc': 'ç', '\\uA': 'Ă', '\\uE': 'Ĕ',
+    '\\ua': 'ă', '\\ue': 'ĕ', '\\vS': 'Š', '\\vZ': 'Ž', '\\vs': 'š', '\\vz': 'ž', '\\~A': 'Ã',
+    '\\~N': 'Ñ', '\\~O': 'Õ', '\\~a': 'ã', '\\~n': 'ñ', '\\~o': 'õ', '\\TH': 'Þ', '\\th': 'þ',
+    '\\AE': 'Æ', '\\ae': 'æ', '\\OE': 'Œ', '\\oe': 'œ', '\\ss': 'ß', '\\DH': 'Ð', '\\dh': 'ð'}
 
-ACCENT_AND_LIGATURES_RE = re.compile('|'.join(re.escape(entity) for entity in ACCENT_AND_LIGATURES.keys()))
+ACCENT_AND_LIGATURES_RE = re.compile('|'.join(re.escape(entity) for entity in
+                                              ACCENT_AND_LIGATURES))
 
 
 def encode_accent_and_ligature(text: str) -> str:
@@ -318,14 +323,17 @@ def encode_accent_and_ligature(text: str) -> str:
 
     Examples:
 
-        >>> encode_accent_and_ligature("Cafe &acirc; la carte")
+        >>> encode_accent_and_ligature(r"Cafe &acirc; la carte")
         'Cafe â la carte'
-
-        >>> encode_accent_and_ligature("Spa&szlig; ist toll")
+        >>> encode_accent_and_ligature(r"Spa&szlig; ist toll")
+        'Spaß ist toll'
+        >>> encode_accent_and_ligature(r"Spa\u00df ist toll")
+        'Spaß ist toll'
+        >>> encode_accent_and_ligature(r"Spa\\ss ist toll")
         'Spaß ist toll'
     """
-    return ACCENT_AND_LIGATURES_RE.sub(
-        lambda m: ACCENT_AND_LIGATURES[m.group(0)], text)
+    return unescape(ACCENT_AND_LIGATURES_RE.sub(
+        lambda m: ACCENT_AND_LIGATURES[m.group(0)], text))
 
 
 if __name__ == '__main__':
@@ -336,17 +344,6 @@ if __name__ == '__main__':
         except re.error as e:
             print(f"Compiling regular expressions of token '{name}' failed.", e)
 
-    from testtunes import *
+    import doctest
 
-    test = """X: 1
-K:G "hjh" "% foo
-c %5
-d
-e
-    """
-
-    for token in tokenize(test):
-        print(token)
-
-    # import doctest
-    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
